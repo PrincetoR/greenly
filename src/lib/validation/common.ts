@@ -69,3 +69,12 @@ export interface FormState {
   message?: string;
   errors?: Record<string, string>;
 }
+
+/** slug ภาษาไทยมาถึง server แบบ percent-encoded — ถอดก่อนค้นเสมอ */
+export function decodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}

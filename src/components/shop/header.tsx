@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { cn } from '@/lib/cn';
 import type { Category } from '@/lib/types';
@@ -119,10 +119,13 @@ export function ShopHeader({
   );
 }
 
+/**
+ * ช่องค้นหาในหัวเว็บ — ตั้งใจไม่อ่าน useSearchParams เพราะจะทำให้ header ทั้งก้อน
+ * ถูก stream หลัง fallback (เห็นแถบว่างแวบหนึ่ง) · คำค้นปัจจุบันแสดงที่ช่องในหน้ารายการแทน
+ */
 function SearchForm({ autoFocus }: { autoFocus?: boolean }) {
   const router = useRouter();
-  const params = useSearchParams();
-  const [q, setQ] = useState(params.get('q') ?? '');
+  const [q, setQ] = useState('');
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
