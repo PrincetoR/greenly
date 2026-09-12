@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import { findCategoryBySlug, listCategories } from '@/lib/db/categories';
 import { listProducts } from '@/lib/db/products';
 import { ProductListing, parseSort } from '@/components/shop/product-listing';
+import { PromoProductCard } from '@/components/shop/promo-product-card';
+import { loadPromotionContext } from '@/lib/promotions/service';
 import { decodeSlug } from '@/lib/validation/common';
 
 export async function generateMetadata({ params }: PageProps<'/category/[slug]'>) {
@@ -18,9 +20,10 @@ export default async function CategoryPage({ params, searchParams }: PageProps<'
 
   const q = typeof sp.q === 'string' ? sp.q.trim() : '';
   const sort = parseSort(sp.sort);
-  const [products, categories] = await Promise.all([
+  const [products, categories, ctx] = await Promise.all([
     listProducts({ q, categoryId: category.id, activeOnly: true, sort }),
     listCategories({ activeOnly: true }),
+    loadPromotionContext(),
   ]);
 
   return (
@@ -32,6 +35,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps<'
       q={q}
       sort={sort}
       basePath={`/category/${category.slug}`}
+      renderCard={(p, i) => <PromoProductCard key={p.id} product={p} ctx={ctx} priority={i < 4} />}
     />
   );
 }

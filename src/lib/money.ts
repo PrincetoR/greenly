@@ -3,11 +3,13 @@
  * pure module ใช้ได้ทั้ง server และ client
  */
 
-const thb = new Intl.NumberFormat('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const whole = new Intl.NumberFormat('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const cents = new Intl.NumberFormat('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-/** 129000 → "฿1,290" · 129050 → "฿1,290.50" */
+/** 129000 → "฿1,290" · 129050 → "฿1,290.50" · 10320 → "฿103.20" (มีเศษสตางค์แสดง 2 หลักเสมอ) */
 export function formatBaht(satang: number): string {
-  return `฿${thb.format(satang / 100)}`;
+  const fmt = satang % 100 === 0 ? whole : cents;
+  return `฿${fmt.format(satang / 100)}`;
 }
 
 /** สำหรับช่องกรอกในฟอร์ม: 129050 → "1290.50" · 129000 → "1290" */

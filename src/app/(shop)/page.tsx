@@ -1,22 +1,27 @@
 import Link from 'next/link';
 import { listCategories } from '@/lib/db/categories';
 import { listProducts } from '@/lib/db/products';
-import { getSettings } from '@/lib/db/settings';
-import { ProductCard, ProductGrid } from '@/components/shop/product-card';
+import { loadPromotionContext } from '@/lib/promotions/service';
+import { promotionStatus } from '@/lib/pricing/status';
+import { ProductGrid } from '@/components/shop/product-card';
+import { PromoProductCard } from '@/components/shop/promo-product-card';
+import { PromoCard } from '@/components/shop/promo-card';
 import { Section } from '@/components/shop/section';
 import { buttonStyles } from '@/components/ui/button';
 
 export default async function HomePage() {
-  const [settings, categories, featured, newest] = await Promise.all([
-    getSettings(),
+  const [ctx, categories, featured, newest, allProducts] = await Promise.all([
+    loadPromotionContext(),
     listCategories({ activeOnly: true }),
     listProducts({ activeOnly: true, featuredOnly: true, sort: 'newest' }),
     listProducts({ activeOnly: true, sort: 'newest' }),
+    listProducts(),
   ]);
+  const { settings, promotions, usage, now } = ctx;
+  const live = promotions.filter((p) => promotionStatus(p, now, usage[p.id]) === 'live');
 
   return (
     <div className="pb-8">
-      {/* hero */}
       <section className="bg-gradient-to-br from-brand-soft via-page to-accent-soft">
         <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-14 sm:py-20">
           <h1 className="text-3xl font-bold sm:text-5xl">{settings.storeName}</h1>
@@ -26,21 +31,28 @@ export default async function HomePage() {
               เลือกซื้อสินค้า
             </Link>
             <Link href="/promotions" className={buttonStyles({ size: 'lg', variant: 'secondary' })}>
-              ดูโปรโมชัน
+              ดูโปรโมชัน{live.length > 0 && ` (${live.length})`}
             </Link>
           </div>
         </div>
       </section>
 
-      {/* หมวดหมู่ — เลื่อนแนวนอนบนมือถือ */}
+      {/* โปรที่กำลังใช้งาน — โผล่/หายเองตามเวลาและ quota */}
+      {live.length > 0 && (
+        <Section title="โปรโมชันตอนนี้" description="ราคาโปรมีผลอัตโนมัติ ไม่ต้องทำอะไรเพิ่ม" href="/promotions">
+          <div className="grid gap-3 md:grid-cols-2">
+            {live.slice(0, 4).map((p) => (
+              <PromoCard key={p.id} promo={p} status="live" usage={usage[p.id]} categories={categories} products={allProducts} now={now} />
+            ))}
+          </div>
+        </Section>
+      )}
+
       <Section title="หมวดหมู่">
         <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none sm:mx-0 sm:flex-wrap sm:px-0">
           {categories.map((c) => (
             <li key={c.id} className="shrink-0">
-              <Link
-                href={`/category/${c.slug}`}
-                className="block rounded-full bg-surface px-4 py-2 text-sm font-medium ring-1 ring-line transition-colors hover:bg-brand-soft hover:text-brand hover:ring-brand"
-              >
+              <Link href={`/category/${c.slug}`} className="block rounded-full bg-surface px-4 py-2 text-sm font-medium ring-1 ring-line transition-colors hover:bg-brand-soft hover:text-brand hover:ring-brand">
                 {c.name}
               </Link>
             </li>
@@ -52,7 +64,7 @@ export default async function HomePage() {
         <Section title="สินค้าแนะนำ" href="/products">
           <ProductGrid>
             {featured.slice(0, 8).map((p, i) => (
-              <ProductCard key={p.id} product={p} priority={i < 4} />
+              <PromoProductCard key={p.id} product={p} ctx={ctx} priority={i < 4} />
             ))}
           </ProductGrid>
         </Section>
@@ -61,7 +73,7 @@ export default async function HomePage() {
       <Section title="สินค้าใหม่" href="/products?sort=newest">
         <ProductGrid>
           {newest.slice(0, 8).map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <PromoProductCard key={p.id} product={p} ctx={ctx} />
           ))}
         </ProductGrid>
       </Section>
