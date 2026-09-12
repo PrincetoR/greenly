@@ -48,3 +48,17 @@ export async function writeCart(items: CartItem[]): Promise<void> {
 export function cartCount(items: CartItem[]): number {
   return items.reduce((sum, i) => sum + i.qty, 0);
 }
+
+/* ---------- คูปองที่ลูกค้ากรอก — เก็บใน cookie แยกจากตะกร้า ---------- */
+export const COUPON_COOKIE = 'ec_coupon';
+
+export async function readCoupon(): Promise<string | null> {
+  const v = (await cookies()).get(COUPON_COOKIE)?.value?.trim();
+  return v ? v.toUpperCase() : null;
+}
+
+export async function writeCoupon(code: string | null): Promise<void> {
+  const store = await cookies();
+  if (!code) store.delete(COUPON_COOKIE);
+  else store.set(COUPON_COOKIE, code.toUpperCase(), { path: '/', httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 });
+}

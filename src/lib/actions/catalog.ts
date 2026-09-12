@@ -6,7 +6,7 @@ import { requirePermission } from '@/lib/auth/session';
 import * as categories from '@/lib/db/categories';
 import * as products from '@/lib/db/products';
 import { categorySchema, productSchema } from '@/lib/validation/catalog';
-import { fieldErrors, type FormState } from '@/lib/validation/common';
+import { fieldErrors, formValues, type FormState } from '@/lib/validation/common';
 
 function revalidateCatalog() {
   // ทั้งหน้าร้านและหลังบ้านอ่านชุดข้อมูลเดียวกัน
@@ -24,10 +24,10 @@ export async function saveCategory(_prev: FormState, formData: FormData): Promis
     sortOrder: formData.get('sortOrder') ?? '0',
     active: formData.get('active'),
   });
-  if (!parsed.success) return { errors: fieldErrors(parsed.error) };
+  if (!parsed.success) return { errors: fieldErrors(parsed.error), values: formValues(formData) };
 
   const dup = await categories.findCategoryBySlug(parsed.data.slug);
-  if (dup && dup.id !== id) return { errors: { slug: 'slug นี้ถูกใช้แล้ว' } };
+  if (dup && dup.id !== id) return { errors: { slug: 'slug นี้ถูกใช้แล้ว' }, values: formValues(formData) };
 
   if (id) await categories.updateCategory(id, parsed.data);
   else await categories.createCategory(parsed.data);
@@ -63,11 +63,12 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
     active: formData.get('active'),
     featured: formData.get('featured'),
   });
-  if (!parsed.success) return { errors: fieldErrors(parsed.error) };
+  const values = formValues(formData);
+  if (!parsed.success) return { errors: fieldErrors(parsed.error), values };
 
   const dup = await products.findProductBySlug(parsed.data.slug);
-  if (dup && dup.id !== id) return { errors: { slug: 'slug นี้ถูกใช้แล้ว' } };
-  if (!(await categories.findCategory(parsed.data.categoryId))) return { errors: { categoryId: 'ไม่พบหมวดหมู่นี้' } };
+  if (dup && dup.id !== id) return { errors: { slug: 'slug นี้ถูกใช้แล้ว' }, values };
+  if (!(await categories.findCategory(parsed.data.categoryId))) return { errors: { categoryId: 'ไม่พบหมวดหมู่นี้' }, values };
 
   if (id) await products.updateProduct(id, parsed.data);
   else await products.createProduct(parsed.data);

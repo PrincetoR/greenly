@@ -18,6 +18,7 @@ export function ProductForm({ product, categories }: { product?: Product; catego
   const [slug, setSlug] = useState(product?.slug ?? '');
   const [slugTouched, setSlugTouched] = useState(Boolean(product));
   const errors = state.errors ?? {};
+  const v = state.values ?? {};
 
   return (
     <form action={action} className="grid gap-6 lg:grid-cols-[1fr_320px]">
@@ -41,7 +42,7 @@ export function ProductForm({ product, categories }: { product?: Product; catego
               />
             </Field>
             <Field label="SKU" htmlFor="sku" error={errors.sku} required>
-              <input id="sku" name="sku" defaultValue={product?.sku ?? ''} aria-invalid={Boolean(errors.sku)} required />
+              <input id="sku" name="sku" defaultValue={v.sku ?? product?.sku ?? ''} aria-invalid={Boolean(errors.sku)} required />
             </Field>
             <Field label="slug (ใช้ใน URL)" htmlFor="slug" error={errors.slug} required>
               <input
@@ -57,7 +58,7 @@ export function ProductForm({ product, categories }: { product?: Product; catego
               />
             </Field>
             <Field label="คำอธิบาย" htmlFor="description" error={errors.description} className="sm:col-span-2">
-              <textarea id="description" name="description" rows={5} defaultValue={product?.description ?? ''} />
+              <textarea id="description" name="description" rows={5} defaultValue={v.description ?? product?.description ?? ''} />
             </Field>
           </div>
         </Card>
@@ -80,17 +81,17 @@ export function ProductForm({ product, categories }: { product?: Product; catego
                 id="price"
                 name="price"
                 inputMode="decimal"
-                defaultValue={product ? satangToInput(product.price) : ''}
+                defaultValue={v.price ?? (product ? satangToInput(product.price) : '')}
                 placeholder="0.00"
                 aria-invalid={Boolean(errors.price)}
                 required
               />
             </Field>
             <Field label="จำนวนคงเหลือ" htmlFor="stock" error={errors.stock} required>
-              <input id="stock" name="stock" type="number" min={0} defaultValue={product?.stock ?? 0} aria-invalid={Boolean(errors.stock)} required />
+              <input id="stock" name="stock" type="number" min={0} defaultValue={v.stock ?? product?.stock ?? 0} aria-invalid={Boolean(errors.stock)} required />
             </Field>
             <Field label="หมวดหมู่" htmlFor="categoryId" error={errors.categoryId} required>
-              <select id="categoryId" name="categoryId" defaultValue={product?.categoryId ?? ''} aria-invalid={Boolean(errors.categoryId)} required>
+              <select id="categoryId" name="categoryId" defaultValue={v.categoryId ?? product?.categoryId ?? ''} aria-invalid={Boolean(errors.categoryId)} required>
                 <option value="" disabled>
                   เลือกหมวดหมู่
                 </option>
@@ -108,11 +109,11 @@ export function ProductForm({ product, categories }: { product?: Product; catego
           <CardHeader title="การแสดงผล" />
           <div className="flex flex-col gap-3 p-5 text-sm">
             <label className="flex items-center gap-2">
-              <input type="checkbox" name="active" defaultChecked={product?.active ?? true} className="size-4 accent-brand" />
+              <input type="checkbox" name="active" defaultChecked={state.values ? v.active === 'on' : (product?.active ?? true)} className="size-4 accent-brand" />
               เปิดขาย (แสดงบนหน้าร้าน)
             </label>
             <label className="flex items-center gap-2">
-              <input type="checkbox" name="featured" defaultChecked={product?.featured ?? false} className="size-4 accent-brand" />
+              <input type="checkbox" name="featured" defaultChecked={state.values ? v.featured === 'on' : (product?.featured ?? false)} className="size-4 accent-brand" />
               สินค้าแนะนำ (ขึ้นหน้าแรก)
             </label>
           </div>

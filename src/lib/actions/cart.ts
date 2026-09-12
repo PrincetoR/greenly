@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { MAX_QTY_PER_LINE, readCart, writeCart, type CartItem } from '@/lib/cart/cookie';
+import { MAX_QTY_PER_LINE, readCart, writeCart, writeCoupon, type CartItem } from '@/lib/cart/cookie';
 import { findProduct } from '@/lib/db/products';
 
 export interface CartActionState {
@@ -53,6 +53,27 @@ export async function updateCartQty(formData: FormData): Promise<void> {
 export async function removeFromCart(formData: FormData): Promise<void> {
   const productId = String(formData.get('productId') ?? '');
   await writeCart((await readCart()).filter((i) => i.productId !== productId));
+  revalidatePath('/', 'layout');
+  redirect('/cart');
+}
+
+/* ---------- คูปอง ---------- */
+
+export async function applyCoupon(_prev: CartActionState, formData: FormData): Promise<CartActionState> {
+  const code = String(formData.get('code') ?? '').trim().toUpperCase();
+  if (!code) {
+    await writeCoupon(null);
+    revalidatePath('/', 'layout');
+    return { ok: true, message: 'นำคูปองออกแล้ว' };
+  }
+  await writeCoupon(code);
+  revalidatePath('/', 'layout');
+  // ผลลัพธ์จริง (ใช้ได้/ไม่ได้) หน้า cart คำนวณจาก quote แล้วแสดงเอง
+  return { ok: true };
+}
+
+export async function removeCoupon(): Promise<void> {
+  await writeCoupon(null);
   revalidatePath('/', 'layout');
   redirect('/cart');
 }

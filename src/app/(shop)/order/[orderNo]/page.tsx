@@ -1,0 +1,114 @@
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { findOrderByNo } from '@/lib/db/orders';
+import { getSettings } from '@/lib/db/settings';
+import { formatBaht } from '@/lib/money';
+import { formatDateTime } from '@/lib/datetime';
+import { ORDER_STATUS_LABEL, ORDER_STATUS_TONE, PAYMENT_LABEL } from '@/lib/orders/labels';
+import { ProductImage } from '@/components/product-image';
+import { Badge } from '@/components/ui/badge';
+import { Alert } from '@/components/ui/alert';
+import { buttonStyles } from '@/components/ui/button';
+
+export const metadata = { title: 'คำสั่งซื้อ' };
+
+export default async function OrderPage({ params, searchParams }: PageProps<'/order/[orderNo]'>) {
+  const { orderNo } = await params;
+  const sp = await searchParams;
+  const [order, settings] = await Promise.all([findOrderByNo(orderNo), getSettings()]);
+  if (!order) notFound();
+
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-8">
+      {sp.new && (
+        <Alert tone="ok" className="mb-6 text-base">
+          🎉 สั่งซื้อสำเร็จ! ขอบคุณที่อุดหนุน {settings.storeName}
+        </Alert>
+      )}
+
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-sm text-muted">เลขที่คำสั่งซื้อ</p>
+          <h1 className="font-mono text-2xl font-bold">{order.orderNo}</h1>
+          <p className="mt-1 text-sm text-muted">{formatDateTime(order.createdAt)}</p>
+        </div>
+        <Badge tone={ORDER_STATUS_TONE[order.status]} className="text-sm">
+          {ORDER_STATUS_LABEL[order.status]}
+        </Badge>
+      </div>
+
+      {order.status === 'pending' && order.paymentMethod === 'transfer' && (
+        <div className="mt-6 rounded-card bg-info-soft p-5 text-sm">
+          <p className="font-semibold text-info">โอนเงินเพื่อยืนยันคำสั่งซื้อ (จำลอง)</p>
+          <p className="mt-1">
+            ธนาคารตัวอย่าง · เลขบัญชี <span className="font-mono font-bold">123-4-56789-0</span> · ชื่อบัญชี {settings.storeName}
+          </p>
+          <p className="mt-1 text-muted">
+            ยอด <b className="text-ink">{formatBaht(order.total)}</b> — ร้านจะยืนยันหลังตรวจสอบยอดโอน
+          </p>
+        </div>
+      )}
+      {order.status === 'pending' && order.paymentMethod === 'cod' && (
+        <div className="mt-6 rounded-card bg-info-soft p-5 text-sm">
+          <p className="font-semibold text-info">เก็บเงินปลายทาง</p>
+          <p className="mt-1 text-muted">
+            เตรียมเงินสด <b className="text-ink">{formatBaht(order.total)}</b> ให้พนักงานจัดส่ง
+          </p>
+        </div>
+      )}
+
+      <section className="mt-6 rounded-card bg-surface p-5 ring-1 ring-line">
+        <h2 className="font-semibold">รายการสินค้า</h2>
+        <ul className="mt-3 divide-y divide-line">
+          {order.lines.map((l, i) => (
+            <li key={i} className="flex items-center gap-3 py-3 text-sm">
+              <ProductImage src={l.image} alt="" className="size-14 rounded-md" />
+              <span className="min-w-0 flex-1">
+                <span className="block">{l.name}</span>
+                <span className="text-xs text-muted">
+                  {l.qty} × {formatBaht(l.unitPrice)}
+                  {l.isGift && ' · 🎁 ของแถม'}
+                </span>
+              </span>
+              <span className="text-right">
+                {l.discount > 0 && !l.isGift && <span className="block text-xs text-muted line-through">{formatBaht(l.unitPrice * l.qty)}</span>}
+                <span className={l.discount > 0 ? 'font-medium text-accent' : ''}>{formatBaht(l.unitPrice * l.qty - l.discount)}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <dl className="mt-3 flex flex-col gap-1 border-t border-line pt-3 text-sm">
+          <div className="flex justify-between"><dt className="text-muted">ยอดสินค้า</dt><dd>{formatBaht(order.subtotal)}</dd></div>
+          {order.discountTotal > 0 && (
+            <div className="flex justify-between"><dt className="text-muted">ส่วนลด{order.couponCode && ` (คูปอง ${order.couponCode})`}</dt><dd className="text-accent">-{formatBaht(order.discountTotal)}</dd></div>
+          )}
+          <div className="flex justify-between"><dt className="text-muted">ค่าจัดส่ง</dt><dd>{order.shippingFee === 0 ? 'ฟรี' : formatBaht(order.shippingFee)}</dd></div>
+          <div className="flex justify-between border-t border-line pt-2 text-base font-bold"><dt>ยอดชำระ</dt><dd>{formatBaht(order.total)}</dd></div>
+        </dl>
+      </section>
+
+      <section className="mt-4 grid gap-4 rounded-card bg-surface p-5 text-sm ring-1 ring-line sm:grid-cols-2">
+        <div>
+          <h2 className="font-semibold">จัดส่งถึง</h2>
+          <p className="mt-1">{order.customer.name}</p>
+          <p className="text-muted">{order.customer.phone}</p>
+          <p className="text-muted whitespace-pre-line">{order.customer.address}</p>
+        </div>
+        <div>
+          <h2 className="font-semibold">การชำระเงิน</h2>
+          <p className="mt-1">{PAYMENT_LABEL[order.paymentMethod]}</p>
+          {order.note && <p className="mt-2 text-muted">หมายเหตุ: {order.note}</p>}
+        </div>
+      </section>
+
+      <div className="mt-6 flex flex-wrap gap-2">
+        <Link href="/products" className={buttonStyles()}>
+          เลือกซื้อสินค้าต่อ
+        </Link>
+        <Link href="/" className={buttonStyles({ variant: 'secondary' })}>
+          กลับหน้าแรก
+        </Link>
+      </div>
+    </div>
+  );
+}

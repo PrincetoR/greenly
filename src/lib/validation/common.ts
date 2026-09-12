@@ -68,6 +68,18 @@ export interface FormState {
   ok?: boolean;
   message?: string;
   errors?: Record<string, string>;
+  /**
+   * ค่าที่ผู้ใช้กรอกมา — ส่งกลับเมื่อ validation ไม่ผ่าน
+   * เพราะ React รีเซ็ตฟอร์มหลัง action จบ ช่องแบบ uncontrolled จะว่างถ้าไม่ใส่ defaultValue จากตรงนี้
+   */
+  values?: Record<string, string>;
+}
+
+/** เก็บค่าจาก FormData เป็น string ทั้งหมด (ข้ามไฟล์) ไว้ส่งกลับให้ฟอร์ม */
+export function formValues(formData: FormData): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of formData.entries()) if (typeof v === 'string' && !(k in out)) out[k] = v;
+  return out;
 }
 
 /** slug ภาษาไทยมาถึง server แบบ percent-encoded — ถอดก่อนค้นเสมอ */

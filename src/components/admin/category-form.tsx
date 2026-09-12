@@ -15,6 +15,7 @@ export function CategoryForm({ category }: { category?: Category }) {
   // slug ตามชื่ออัตโนมัติจนกว่าผู้ใช้จะแก้เอง
   const [slugTouched, setSlugTouched] = useState(Boolean(category));
   const errors = state.errors ?? {};
+  const v = state.values ?? {};
 
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-[1fr_1fr_120px] sm:items-start">
@@ -46,10 +47,10 @@ export function CategoryForm({ category }: { category?: Category }) {
         />
       </Field>
       <Field label="ลำดับ" htmlFor="cat-order" error={errors.sortOrder}>
-        <input id="cat-order" name="sortOrder" type="number" defaultValue={category?.sortOrder ?? 100} min={0} />
+        <input id="cat-order" name="sortOrder" type="number" defaultValue={v.sortOrder ?? category?.sortOrder ?? 100} min={0} />
       </Field>
       <label className="flex items-center gap-2 text-sm sm:col-span-3">
-        <input type="checkbox" name="active" defaultChecked={category?.active ?? true} className="size-4 accent-brand" />
+        <input type="checkbox" name="active" defaultChecked={state.values ? v.active === 'on' : (category?.active ?? true)} className="size-4 accent-brand" />
         แสดงบนหน้าร้าน
       </label>
       <div className="flex gap-2 sm:col-span-3">
