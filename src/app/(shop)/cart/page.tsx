@@ -21,6 +21,7 @@ export default async function CartPage() {
   if (lines.length === 0) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-12">
+        <h1 className="mb-6 text-2xl font-bold sm:text-3xl">ตะกร้าสินค้า</h1>
         <EmptyState
           icon="🛒"
           title="ตะกร้ายังว่างอยู่"

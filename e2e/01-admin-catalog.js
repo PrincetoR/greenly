@@ -1,0 +1,112 @@
+const { BASE, launch, login, shot, ok, DATA, PUBLIC, UPLOAD_TMP } = require('./lib');
+const fs = require('fs');
+const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
+fs.writeFileSync(UPLOAD_TMP, png);
+
+(async () => {
+  const { browser, page } = await launch();
+  // login flow จริง
+  await login(page, 'admin');
+  ok(new URL(page.url()).pathname === '/admin', `login admin → ${page.url()}`);
+  ok(await page.locator('text=ผู้ดูแลระบบ').first().isVisible(), 'dashboard shows role');
+  await shot(page, 'p2-dashboard');
+
+  // wrong password
+  await page.context().clearCookies();
+  await page.goto(`${BASE}/admin/login`);
+  await page.fill('#username', 'admin'); await page.fill('#password', 'wrong');
+  await page.click('button[type=submit]');
+  await page.waitForSelector('form [role=alert]');
+  ok((await page.textContent('form [role=alert]')).includes('ไม่ถูกต้อง'), 'wrong password shows error');
+
+  await login(page, 'admin');
+
+  // categories: add
+  await page.goto(`${BASE}/admin/categories`);
+  await page.fill('#cat-name', 'ทดสอบหมวด');
+  ok((await page.inputValue('#cat-slug')) === 'ทดสอบหมวด', 'slug auto from name');
+  await page.click('button:has-text("เพิ่มหมวดหมู่")');
+  await page.waitForLoadState('networkidle');
+  ok(await page.locator('td:has-text("ทดสอบหมวด")').first().isVisible(), 'category added appears in table');
+  // categories: edit
+  const row = page.locator('tr', { hasText: 'ทดสอบหมวด' });
+  await row.locator('a:has-text("แก้ไข")').click();
+  await page.waitForURL(/edit=/);
+  await page.fill('#cat-name', 'ทดสอบหมวด 2');
+  await page.click('button:has-text("บันทึกการแก้ไข")');
+  await page.waitForURL(/\/admin\/categories$/);
+  ok(await page.locator('td:has-text("ทดสอบหมวด 2")').first().isVisible(), 'category edited');
+  await shot(page, 'p2-categories');
+
+  // products: create with upload
+  await page.goto(`${BASE}/admin/products/new`);
+  await page.fill('#name', 'สินค้าทดสอบ E2E');
+  await page.fill('#sku', 'SKU-E2E');
+  await page.fill('#price', '1,234.50');
+  await page.fill('#stock', '7');
+  await page.selectOption('#categoryId', { label: 'ทดสอบหมวด 2' });
+  await page.fill('#description', 'คำอธิบายทดสอบ');
+  await page.setInputFiles('input[type=file]', UPLOAD_TMP);
+  await page.waitForSelector('input[name=images]', { state: 'attached' });
+  const imgPath = await page.getAttribute('input[name=images]', 'value');
+  ok(imgPath && imgPath.startsWith('/uploads/'), `image uploaded → ${imgPath}`);
+  ok(fs.existsSync(PUBLIC + imgPath), 'uploaded file exists on disk');
+  await shot(page, 'p2-product-form');
+  await page.click('button:has-text("เพิ่มสินค้า")');
+  await page.waitForURL(/\/admin\/products\?saved=1/);
+  ok(await page.locator('text=สินค้าทดสอบ E2E').first().isVisible(), 'product appears in list');
+  const products = JSON.parse(fs.readFileSync(DATA + '/products.json', 'utf8'));
+  const created = products.find((p) => p.sku === 'SKU-E2E');
+  ok(created && created.price === 123450, `price stored as satang = ${created?.price}`);
+  ok(created && created.images[0] === imgPath, 'image path stored');
+
+  // validation error: duplicate slug
+  await page.goto(`${BASE}/admin/products/new`);
+  await page.fill('#name', 'อีกชิ้น'); await page.fill('#sku', 'SKU-X'); await page.fill('#price', '10'); await page.fill('#stock', '1');
+  await page.fill('#slug', created.slug);
+  await page.selectOption('#categoryId', { index: 1 });
+  await page.click('button:has-text("เพิ่มสินค้า")');
+  await page.waitForSelector('form p[role=alert]');
+  ok((await page.textContent('form p[role=alert]')).includes('slug'), 'duplicate slug error shown under field');
+
+  // toggle active + delete
+  await page.goto(`${BASE}/admin/products?q=SKU-E2E`);
+  await page.locator('tr', { hasText: 'SKU-E2E' }).locator('button:has-text("ปิดขาย")').click();
+  await page.waitForLoadState('networkidle');
+  ok(await page.locator('tr', { hasText: 'SKU-E2E' }).locator('text=ปิดขาย').first().isVisible(), 'toggle active works');
+  await page.goto(`${BASE}/admin/products/${created.id}`);
+  page.once('dialog', (d) => d.accept());
+  await page.click('button:has-text("ลบสินค้า")');
+  await page.waitForURL(/\/admin\/products$/);
+  ok(!(await page.locator('text=SKU-E2E').count()), 'product deleted');
+
+  // delete category (now empty)
+  await page.goto(`${BASE}/admin/categories`);
+  page.once('dialog', (d) => d.accept());
+  await page.locator('tr', { hasText: 'ทดสอบหมวด 2' }).locator('button:has-text("ลบ")').click();
+  await page.waitForLoadState('networkidle');
+  ok(!(await page.locator('td:has-text("ทดสอบหมวด 2")').count()), 'category deleted');
+  // delete category in use → warning
+  page.once('dialog', (d) => d.accept());
+  const busy = page.locator('tr', { hasText: 'เครื่องดื่มสุขภาพ' }).locator('button:has-text("ลบ")');
+  ok(await busy.isDisabled(), 'delete disabled for category in use');
+
+  // staff cannot see promotions menu, but can reach products
+  await page.context().clearCookies();
+  await login(page, 'staff', 'staff1234');
+  ok(!(await page.locator('nav a[href="/admin/promotions"]').count()), 'staff: no promotions menu');
+  await page.goto(`${BASE}/admin/products`);
+  ok(page.url().endsWith('/admin/products'), 'staff can open products');
+
+  // mobile shell
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto(`${BASE}/admin/products`);
+  await page.click('button[aria-label="เปิดเมนู"]');
+  ok(await page.locator('[role=dialog] nav a[href="/admin/orders"]').isVisible(), 'mobile drawer opens with menu');
+  await shot(page, 'p2-mobile-products');
+  const sw = await page.evaluate(() => document.documentElement.scrollWidth);
+  ok(sw <= 375, `no horizontal scroll on mobile (scrollWidth=${sw})`);
+
+  fs.rmSync(PUBLIC + imgPath, { force: true });
+  await browser.close();
+})().catch((e) => { console.error('💥', e); process.exit(1); });

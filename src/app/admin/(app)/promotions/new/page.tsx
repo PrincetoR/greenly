@@ -12,7 +12,7 @@ export default async function NewPromotionPage() {
   return (
     <div>
       <PageHeader title="สร้างโปรโมชัน" description="ตอบ 5 ข้อ แล้วกดสร้าง — แก้ไขได้ทุกเมื่อ" />
-      <PromotionForm categories={categories} products={products} />
+      <PromotionForm categories={categories} products={products} serverNow={new Date().toISOString()} />
     </div>
   );
 }

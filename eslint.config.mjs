@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // e2e เป็นสคริปต์ CommonJS รันด้วย node ตรง ๆ ไม่ใช่โค้ดแอป
+    "e2e/**",
   ]),
 ]);
 

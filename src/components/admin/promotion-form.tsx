@@ -37,8 +37,7 @@ interface Limit {
   value: string;
 }
 
-function initialState(p?: Promotion) {
-  const now = new Date();
+function initialState(p: Promotion | undefined, now: Date) {
   const in7 = new Date(now.getTime() + 7 * 86_400_000);
   return {
     type: p?.type ?? ('discount' as PromotionType),
@@ -65,12 +64,23 @@ function initialState(p?: Promotion) {
  * ฟอร์มโปรโมชัน — หน้าเดียว ไล่บนลงล่าง โชว์เฉพาะช่องของประเภทที่เลือก
  * ค่าที่กรอกทั้งหมดถูกส่งเป็น FormData ธรรมดา (hidden input สำหรับ state ที่ไม่ใช่ input ตรง ๆ)
  */
-export function PromotionForm({ promotion, categories, products }: { promotion?: Promotion; categories: Category[]; products: Product[] }) {
+export function PromotionForm({
+  promotion,
+  categories,
+  products,
+  serverNow,
+}: {
+  promotion?: Promotion;
+  categories: Category[];
+  products: Product[];
+  /** เวลาจาก server — ใช้เป็นค่าเริ่มต้นและคำนวณสถานะ เพื่อให้ HTML ฝั่ง server กับ client ตรงกันตอน hydrate */
+  serverNow: string;
+}) {
   const [state, action, pending] = useActionState<FormState, FormData>(savePromotion, {});
-  const [f, setF] = useState(() => initialState(promotion));
+  const now = useMemo(() => new Date(serverNow), [serverNow]);
+  const [f, setF] = useState(() => initialState(promotion, now));
   const set = <K extends keyof typeof f>(key: K, value: (typeof f)[K]) => setF((prev) => ({ ...prev, [key]: value }));
   const errors = state.errors ?? {};
-  const now = new Date();
 
   const names = useMemo(
     () => ({ categories: new Map(categories.map((c) => [c.id, c.name])), products: new Map(products.map((p) => [p.id, p.name])) }),

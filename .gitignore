@@ -45,3 +45,4 @@ data/*.tmp
 /public/uploads/*
 !/public/uploads/seed/
 /.claude/settings.local.json
+/e2e/shots/

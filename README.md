@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# E-commerce Prototype
 
-## Getting Started
+เว็บขายสินค้า + ระบบหลังบ้าน + โปรโมชันตั้งเวลา/จำกัดจำนวน — รันบนเครื่องเดียว ไม่ต้องติดตั้งฐานข้อมูล
 
-First, run the development server:
+## เริ่มใช้งาน
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run seed     # สร้างข้อมูลสาธิต (6 หมวด · 24 สินค้า · 5 โปร · 2 ผู้ใช้)
+npm run dev      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| ส่วน | URL | บัญชี |
+|---|---|---|
+| หน้าร้าน | `/` | — |
+| หลังบ้าน | `/admin` | `admin` / `admin1234` (ทุกสิทธิ์) · `staff` / `staff1234` (สินค้า หมวด คำสั่งซื้อ) |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ความสามารถ
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**หน้าร้าน** — หน้าแรก · สินค้าทั้งหมด/ค้นหา/เรียง · หมวดหมู่ · รายละเอียดสินค้า · โปรโมชัน · ตะกร้า · คูปอง · checkout (ชำระเงินจำลอง) · หน้าติดตามคำสั่งซื้อ · responsive ทุกอุปกรณ์
 
-## Learn More
+**หลังบ้าน** — แดชบอร์ด KPI · สินค้า (อัปโหลดรูปหลายรูป) · หมวดหมู่ · โปรโมชัน · คำสั่งซื้อ (เปลี่ยนสถานะ/ยกเลิกคืน stock) · ผู้ใช้ (admin/staff) · ตั้งค่าร้าน
 
-To learn more about Next.js, take a look at the following resources:
+**โปรโมชัน 3 ชนิด** — ลดราคา (%/บาท ต่อสินค้าหรือหมวด) · คูปองโค้ด (ลด/ส่งฟรี/ยอดขั้นต่ำ) · ซื้อ X แถม Y
+**ตั้งเวลา** เริ่ม–สิ้นสุด (โผล่/หายบนหน้าร้านเอง) · **จำกัดจำนวน** 3 แบบ: สิทธิ์รวม · ชิ้นต่อสินค้า · ครั้งต่อลูกค้า (นับจากเบอร์โทร)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## โครงสร้าง
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+data/                 ฐานข้อมูล JSON (อ่าน/เขียนผ่าน src/lib/db/store.ts เท่านั้น)
+public/uploads/       รูปที่อัปโหลด · seed/ = placeholder
+scripts/seed.ts       ข้อมูลสาธิต
+e2e/                  ทดสอบ end-to-end ด้วย Playwright + Chrome
+src/proxy.ts          กัน /admin/* (Next 16 ใช้ proxy แทน middleware)
+src/lib/types.ts      domain types
+src/lib/money.ts      เงินเป็นสตางค์ (integer) ทั้งระบบ
+src/lib/pricing/      pricing engine — pure function + unit tests (โปรทุกชนิดคิดที่นี่ที่เดียว)
+src/lib/db/           categories · products · promotions · orders · users · settings
+src/lib/auth/         scrypt password · HMAC session cookie · roles/permissions
+src/lib/actions/      server actions (ทุกตัวตรวจสิทธิ์เอง)
+src/components/       ui · shop · admin
+src/app/(shop)/       หน้าร้าน · src/app/admin/ หลังบ้าน
+```
 
-## Deploy on Vercel
+## คำสั่ง
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run dev          # dev server
+npm run build        # production build
+npm run start        # รัน production build
+npm run lint         # eslint
+npm run typecheck    # next typegen + tsc
+npm run test         # unit tests ของ pricing engine (node --test)
+npm run seed         # reset ข้อมูลสาธิตทั้งหมด (ทับ orders ด้วย)
+npm run e2e          # e2e ทุกไฟล์ (ต้องมี dev server รันอยู่ · ตั้ง BASE=http://localhost:3000 ได้)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## แนวคิดสำคัญ
+
+- **usage ของโปรคำนวณจาก orders** (ไม่นับ cancelled) — ไม่มี counter แยก ยกเลิกออเดอร์แล้วสิทธิ์คืนเอง
+- **ราคาทุกที่มาจาก `quote()`** ตัวเดียว: การ์ดสินค้า หน้าสินค้า ตะกร้า checkout จึงตรงกันเสมอ
+- **checkout คิดราคาใหม่ด้วยเบอร์โทร** — ถ้าสิทธิ์ต่อลูกค้าทำให้ยอด/ของแถมเปลี่ยน จะให้ลูกค้ายืนยันอีกครั้งก่อนสร้างออเดอร์
+- **ตัด stock แบบ all-or-nothing** รวมของแถม
+- `SESSION_SECRET` ใน `.env` สำหรับใช้จริง (ดู `.env.example`)

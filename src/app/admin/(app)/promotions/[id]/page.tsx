@@ -30,7 +30,7 @@ export default async function EditPromotionPage({ params }: PageProps<'/admin/pr
           </form>
         }
       />
-      <PromotionForm promotion={promotion} categories={categories} products={products} />
+      <PromotionForm promotion={promotion} categories={categories} products={products} serverNow={new Date().toISOString()} />
     </div>
   );
 }
