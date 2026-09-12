@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# app data
+data/*.tmp
+/public/uploads/*
+!/public/uploads/seed/
+/.claude/settings.local.json

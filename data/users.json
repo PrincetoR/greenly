@@ -1,0 +1,20 @@
+[
+  {
+    "id": "u-admin",
+    "username": "admin",
+    "passwordHash": "scrypt$647f1812c50236c27b3723c508338b27$d044578e72039601f243e83d74d9ec185898e7bfafe75447007d17d350712389721dc152432142bd218f42657e29216697f4202416973a9f5366abae135e6776",
+    "name": "ผู้ดูแลระบบ",
+    "role": "admin",
+    "active": true,
+    "createdAt": "2026-07-14T08:38:27.151Z"
+  },
+  {
+    "id": "u-staff",
+    "username": "staff",
+    "passwordHash": "scrypt$008197b3a2cd83599dc9c514e62fcf14$237700293c02c12ab9ae18f30d095cd9008c215461f7803dec8056fe16d403f26a162a19f6571fc3e48d1d70d8621fc77b1014cb150c8a04fe90a4fdd9e4850c",
+    "name": "พนักงานร้าน",
+    "role": "staff",
+    "active": true,
+    "createdAt": "2026-07-15T08:38:27.151Z"
+  }
+]

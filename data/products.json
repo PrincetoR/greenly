@@ -1,0 +1,410 @@
+[
+  {
+    "id": "p-001",
+    "sku": "SKU-0001",
+    "slug": "น้ำผักผลไม้สกัดเย็น-250-มล-p-001",
+    "name": "น้ำผักผลไม้สกัดเย็น 250 มล.",
+    "description": "สกัดเย็นวันต่อวัน ไม่ใส่น้ำตาล ไม่ผ่านความร้อน คงคุณค่าวิตามินครบถ้วน",
+    "categoryId": "c-drinks",
+    "price": 8900,
+    "stock": 120,
+    "images": [
+      "/uploads/seed/p-001.svg"
+    ],
+    "active": true,
+    "featured": true,
+    "createdAt": "2026-08-14T08:38:27.151Z",
+    "updatedAt": "2026-08-14T08:38:27.151Z"
+  },
+  {
+    "id": "p-002",
+    "sku": "SKU-0002",
+    "slug": "ชาเขียวมัทฉะออร์แกนิก-100-กรัม-p-002",
+    "name": "ชาเขียวมัทฉะออร์แกนิก 100 กรัม",
+    "description": "มัทฉะเกรดพิธีชงชาจากอุจิ บดละเอียด สีเขียวสด กลิ่นหอมนุ่ม",
+    "categoryId": "c-drinks",
+    "price": 35000,
+    "stock": 40,
+    "images": [
+      "/uploads/seed/p-002.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-15T08:38:27.151Z",
+    "updatedAt": "2026-08-15T08:38:27.151Z"
+  },
+  {
+    "id": "p-003",
+    "sku": "SKU-0003",
+    "slug": "คอมบูชารสขิงมะนาว-330-มล-p-003",
+    "name": "คอมบูชารสขิงมะนาว 330 มล.",
+    "description": "เครื่องดื่มหมักชาธรรมชาติ มีโพรไบโอติกส์ ซ่าเบา ๆ สดชื่น",
+    "categoryId": "c-drinks",
+    "price": 9500,
+    "stock": 80,
+    "images": [
+      "/uploads/seed/p-003.svg"
+    ],
+    "active": true,
+    "featured": true,
+    "createdAt": "2026-08-16T08:38:27.151Z",
+    "updatedAt": "2026-08-16T08:38:27.151Z"
+  },
+  {
+    "id": "p-004",
+    "sku": "SKU-0004",
+    "slug": "นมอัลมอนด์ไม่หวาน-1-ลิตร-p-004",
+    "name": "นมอัลมอนด์ไม่หวาน 1 ลิตร",
+    "description": "อัลมอนด์แท้ 8% ไม่เติมน้ำตาล เหมาะกับคนแพ้แลคโตส",
+    "categoryId": "c-drinks",
+    "price": 12900,
+    "stock": 60,
+    "images": [
+      "/uploads/seed/p-004.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-17T08:38:27.151Z",
+    "updatedAt": "2026-08-17T08:38:27.151Z"
+  },
+  {
+    "id": "p-005",
+    "sku": "SKU-0005",
+    "slug": "ข้าวโอ๊ตโรลด์-1-กก-p-005",
+    "name": "ข้าวโอ๊ตโรลด์ 1 กก.",
+    "description": "โอ๊ตเต็มเมล็ดจากออสเตรเลีย ใยอาหารสูง ต้มหรือแช่ค้างคืนก็ได้",
+    "categoryId": "c-grains",
+    "price": 15900,
+    "stock": 90,
+    "images": [
+      "/uploads/seed/p-005.svg"
+    ],
+    "active": true,
+    "featured": true,
+    "createdAt": "2026-08-18T08:38:27.151Z",
+    "updatedAt": "2026-08-18T08:38:27.151Z"
+  },
+  {
+    "id": "p-006",
+    "sku": "SKU-0006",
+    "slug": "เมล็ดเจีย-500-กรัม-p-006",
+    "name": "เมล็ดเจีย 500 กรัม",
+    "description": "โอเมก้า 3 สูง เพิ่มความอิ่ม ใส่ในโยเกิร์ตหรือสมูทตี้",
+    "categoryId": "c-grains",
+    "price": 22000,
+    "stock": 55,
+    "images": [
+      "/uploads/seed/p-006.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-19T08:38:27.151Z",
+    "updatedAt": "2026-08-19T08:38:27.151Z"
+  },
+  {
+    "id": "p-007",
+    "sku": "SKU-0007",
+    "slug": "อัลมอนด์อบธรรมชาติ-500-กรัม-p-007",
+    "name": "อัลมอนด์อบธรรมชาติ 500 กรัม",
+    "description": "อบแห้งไม่ใส่เกลือ ไม่ใส่น้ำมัน กรอบทุกเม็ด",
+    "categoryId": "c-grains",
+    "price": 28900,
+    "stock": 70,
+    "images": [
+      "/uploads/seed/p-007.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-20T08:38:27.151Z",
+    "updatedAt": "2026-08-20T08:38:27.151Z"
+  },
+  {
+    "id": "p-008",
+    "sku": "SKU-0008",
+    "slug": "ควินัว-3-สี-500-กรัม-p-008",
+    "name": "ควินัว 3 สี 500 กรัม",
+    "description": "โปรตีนครบ 9 ชนิด ปราศจากกลูเตน หุงง่ายใน 15 นาที",
+    "categoryId": "c-grains",
+    "price": 24500,
+    "stock": 45,
+    "images": [
+      "/uploads/seed/p-008.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-21T08:38:27.151Z",
+    "updatedAt": "2026-08-21T08:38:27.151Z"
+  },
+  {
+    "id": "p-009",
+    "sku": "SKU-0009",
+    "slug": "กราโนล่าน้ำผึ้งอัลมอนด์-300-กรัม-p-009",
+    "name": "กราโนล่าน้ำผึ้งอัลมอนด์ 300 กรัม",
+    "description": "อบกรอบด้วยน้ำผึ้งแท้ ไม่ใส่น้ำตาลทราย กินกับนมหรือโยเกิร์ต",
+    "categoryId": "c-snacks",
+    "price": 18900,
+    "stock": 100,
+    "images": [
+      "/uploads/seed/p-009.svg"
+    ],
+    "active": true,
+    "featured": true,
+    "createdAt": "2026-08-22T08:38:27.151Z",
+    "updatedAt": "2026-08-22T08:38:27.151Z"
+  },
+  {
+    "id": "p-010",
+    "sku": "SKU-0010",
+    "slug": "สาหร่ายอบกรอบรสดั้งเดิม-6-ซอง-p-010",
+    "name": "สาหร่ายอบกรอบรสดั้งเดิม 6 ซอง",
+    "description": "สาหร่ายเกาหลีอบด้วยน้ำมันมะกอก โซเดียมต่ำ",
+    "categoryId": "c-snacks",
+    "price": 9900,
+    "stock": 150,
+    "images": [
+      "/uploads/seed/p-010.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-23T08:38:27.151Z",
+    "updatedAt": "2026-08-23T08:38:27.151Z"
+  },
+  {
+    "id": "p-011",
+    "sku": "SKU-0011",
+    "slug": "โปรตีนบาร์ช็อกโกแลต-12-แท่ง-p-011",
+    "name": "โปรตีนบาร์ช็อกโกแลต 12 แท่ง",
+    "description": "โปรตีน 20 กรัมต่อแท่ง น้ำตาลต่ำ อิ่มนานเหมาะหลังออกกำลังกาย",
+    "categoryId": "c-snacks",
+    "price": 42000,
+    "stock": 35,
+    "images": [
+      "/uploads/seed/p-011.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-24T08:38:27.151Z",
+    "updatedAt": "2026-08-24T08:38:27.151Z"
+  },
+  {
+    "id": "p-012",
+    "sku": "SKU-0012",
+    "slug": "ถั่วลูกไก่อบกรอบ-150-กรัม-p-012",
+    "name": "ถั่วลูกไก่อบกรอบ 150 กรัม",
+    "description": "อบไม่ทอด โปรตีนและใยอาหารสูง กินเล่นแทนขนมกรุบกรอบ",
+    "categoryId": "c-snacks",
+    "price": 7900,
+    "stock": 130,
+    "images": [
+      "/uploads/seed/p-012.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-25T08:38:27.151Z",
+    "updatedAt": "2026-08-25T08:38:27.151Z"
+  },
+  {
+    "id": "p-013",
+    "sku": "SKU-0013",
+    "slug": "วิตามินซี-1000-มก-60-เม็ด-p-013",
+    "name": "วิตามินซี 1000 มก. 60 เม็ด",
+    "description": "เสริมภูมิคุ้มกัน ดูดซึมดี ทานวันละ 1 เม็ดหลังอาหาร",
+    "categoryId": "c-supplement",
+    "price": 39000,
+    "stock": 50,
+    "images": [
+      "/uploads/seed/p-013.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-26T08:38:27.151Z",
+    "updatedAt": "2026-08-26T08:38:27.151Z"
+  },
+  {
+    "id": "p-014",
+    "sku": "SKU-0014",
+    "slug": "โพรไบโอติกส์-10-สายพันธุ์-30-แคปซูล-p-014",
+    "name": "โพรไบโอติกส์ 10 สายพันธุ์ 30 แคปซูล",
+    "description": "จุลินทรีย์ดี 10,000 ล้าน CFU ดูแลระบบย่อยและลำไส้",
+    "categoryId": "c-supplement",
+    "price": 69000,
+    "stock": 30,
+    "images": [
+      "/uploads/seed/p-014.svg"
+    ],
+    "active": true,
+    "featured": true,
+    "createdAt": "2026-08-27T08:38:27.151Z",
+    "updatedAt": "2026-08-27T08:38:27.151Z"
+  },
+  {
+    "id": "p-015",
+    "sku": "SKU-0015",
+    "slug": "น้ำมันปลาโอเมก้า-3-90-แคปซูล-p-015",
+    "name": "น้ำมันปลาโอเมก้า 3 90 แคปซูล",
+    "description": "EPA/DHA เข้มข้น จากปลาน้ำลึกนอร์เวย์ ไม่มีกลิ่นคาว",
+    "categoryId": "c-supplement",
+    "price": 85000,
+    "stock": 25,
+    "images": [
+      "/uploads/seed/p-015.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-28T08:38:27.151Z",
+    "updatedAt": "2026-08-28T08:38:27.151Z"
+  },
+  {
+    "id": "p-016",
+    "sku": "SKU-0016",
+    "slug": "คอลลาเจนเปปไทด์-200-กรัม-p-016",
+    "name": "คอลลาเจนเปปไทด์ 200 กรัม",
+    "description": "ละลายง่ายในน้ำเย็น ไม่มีกลิ่น ไม่มีรส 5,000 มก. ต่อช้อน",
+    "categoryId": "c-supplement",
+    "price": 59000,
+    "stock": 40,
+    "images": [
+      "/uploads/seed/p-016.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-29T08:38:27.151Z",
+    "updatedAt": "2026-08-29T08:38:27.151Z"
+  },
+  {
+    "id": "p-017",
+    "sku": "SKU-0017",
+    "slug": "ขวดแก้วสมูทตี้พร้อมฝา-500-มล-p-017",
+    "name": "ขวดแก้วสมูทตี้พร้อมฝา 500 มล.",
+    "description": "แก้วบอโรซิลิเกตทนร้อน-เย็น ฝาไม้ไผ่พร้อมหลอดสแตนเลส",
+    "categoryId": "c-kitchen",
+    "price": 14900,
+    "stock": 60,
+    "images": [
+      "/uploads/seed/p-017.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-08-30T08:38:27.151Z",
+    "updatedAt": "2026-08-30T08:38:27.151Z"
+  },
+  {
+    "id": "p-018",
+    "sku": "SKU-0018",
+    "slug": "เครื่องชั่งอาหารดิจิทัล-p-018",
+    "name": "เครื่องชั่งอาหารดิจิทัล",
+    "description": "ละเอียด 1 กรัม สูงสุด 5 กก. หน้าจอ LED ถอดล้างได้",
+    "categoryId": "c-kitchen",
+    "price": 35900,
+    "stock": 20,
+    "images": [
+      "/uploads/seed/p-018.svg"
+    ],
+    "active": true,
+    "featured": true,
+    "createdAt": "2026-08-31T08:38:27.151Z",
+    "updatedAt": "2026-08-31T08:38:27.151Z"
+  },
+  {
+    "id": "p-019",
+    "sku": "SKU-0019",
+    "slug": "กล่องถนอมอาหารแก้ว-3-ชิ้น-p-019",
+    "name": "กล่องถนอมอาหารแก้ว 3 ชิ้น",
+    "description": "ฝาซิลิโคนล็อค 4 ด้าน เข้าไมโครเวฟและเตาอบได้",
+    "categoryId": "c-kitchen",
+    "price": 49000,
+    "stock": 30,
+    "images": [
+      "/uploads/seed/p-019.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-09-01T08:38:27.151Z",
+    "updatedAt": "2026-09-01T08:38:27.151Z"
+  },
+  {
+    "id": "p-020",
+    "sku": "SKU-0020",
+    "slug": "หลอดสแตนเลสพร้อมแปรง-4-ชิ้น-p-020",
+    "name": "หลอดสแตนเลสพร้อมแปรง 4 ชิ้น",
+    "description": "ใช้ซ้ำได้ ลดขยะพลาสติก มาพร้อมถุงผ้าพกพา",
+    "categoryId": "c-kitchen",
+    "price": 8900,
+    "stock": 200,
+    "images": [
+      "/uploads/seed/p-020.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-09-02T08:38:27.151Z",
+    "updatedAt": "2026-09-02T08:38:27.151Z"
+  },
+  {
+    "id": "p-021",
+    "sku": "SKU-0021",
+    "slug": "มะม่วงอบแห้งไม่ใส่น้ำตาล-200-กรัม-p-021",
+    "name": "มะม่วงอบแห้งไม่ใส่น้ำตาล 200 กรัม",
+    "description": "มะม่วงน้ำดอกไม้สุกอบลมร้อน หวานธรรมชาติ ไม่เติมน้ำตาล",
+    "categoryId": "c-dried",
+    "price": 14500,
+    "stock": 80,
+    "images": [
+      "/uploads/seed/p-021.svg"
+    ],
+    "active": true,
+    "featured": true,
+    "createdAt": "2026-09-03T08:38:27.151Z",
+    "updatedAt": "2026-09-03T08:38:27.151Z"
+  },
+  {
+    "id": "p-022",
+    "sku": "SKU-0022",
+    "slug": "แครนเบอร์รี่อบแห้ง-250-กรัม-p-022",
+    "name": "แครนเบอร์รี่อบแห้ง 250 กรัม",
+    "description": "เปรี้ยวอมหวาน แหล่งสารต้านอนุมูลอิสระ ใส่สลัดหรือกราโนล่า",
+    "categoryId": "c-dried",
+    "price": 16500,
+    "stock": 65,
+    "images": [
+      "/uploads/seed/p-022.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-09-04T08:38:27.151Z",
+    "updatedAt": "2026-09-04T08:38:27.151Z"
+  },
+  {
+    "id": "p-023",
+    "sku": "SKU-0023",
+    "slug": "กล้วยหอมอบกรอบ-100-กรัม-p-023",
+    "name": "กล้วยหอมอบกรอบ 100 กรัม",
+    "description": "อบกรอบไม่ทอด ไม่ใส่น้ำมัน หวานจากผลไม้ล้วน",
+    "categoryId": "c-dried",
+    "price": 5900,
+    "stock": 120,
+    "images": [
+      "/uploads/seed/p-023.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-09-05T08:38:27.151Z",
+    "updatedAt": "2026-09-05T08:38:27.151Z"
+  },
+  {
+    "id": "p-024",
+    "sku": "SKU-0024",
+    "slug": "ผลไม้รวมอบแห้ง-5-ชนิด-300-กรัม-p-024",
+    "name": "ผลไม้รวมอบแห้ง 5 ชนิด 300 กรัม",
+    "description": "มะม่วง สับปะรด มะละกอ แก้วมังกร กีวี ไม่ใส่สารกันบูด",
+    "categoryId": "c-dried",
+    "price": 19900,
+    "stock": 50,
+    "images": [
+      "/uploads/seed/p-024.svg"
+    ],
+    "active": true,
+    "featured": false,
+    "createdAt": "2026-09-06T08:38:27.151Z",
+    "updatedAt": "2026-09-06T08:38:27.151Z"
+  }
+]

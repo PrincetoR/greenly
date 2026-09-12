@@ -1,0 +1,137 @@
+[
+  {
+    "id": "promo-drinks20",
+    "name": "ลด 20% เครื่องดื่มสุขภาพ",
+    "type": "discount",
+    "active": true,
+    "startsAt": "2026-09-11T08:38:27.151Z",
+    "endsAt": "2026-09-26T08:38:27.151Z",
+    "scope": {
+      "kind": "categories",
+      "ids": [
+        "c-drinks"
+      ]
+    },
+    "discount": {
+      "mode": "percent",
+      "value": 20
+    },
+    "coupon": null,
+    "bogo": null,
+    "limits": {
+      "totalUses": null,
+      "perProductQty": 5,
+      "perCustomer": null
+    },
+    "createdAt": "2026-09-12T08:38:27.151Z",
+    "updatedAt": "2026-09-12T08:38:27.151Z"
+  },
+  {
+    "id": "promo-save100",
+    "name": "คูปอง SAVE100 ลดทันที 100 บาท",
+    "type": "coupon",
+    "active": true,
+    "startsAt": "2026-09-11T08:38:27.151Z",
+    "endsAt": "2026-10-12T08:38:27.151Z",
+    "scope": {
+      "kind": "all",
+      "ids": []
+    },
+    "discount": {
+      "mode": "fixed",
+      "value": 10000
+    },
+    "coupon": {
+      "code": "SAVE100",
+      "minSubtotal": 50000,
+      "freeShipping": false
+    },
+    "bogo": null,
+    "limits": {
+      "totalUses": 50,
+      "perProductQty": null,
+      "perCustomer": 1
+    },
+    "createdAt": "2026-09-12T08:38:27.151Z",
+    "updatedAt": "2026-09-12T08:38:27.151Z"
+  },
+  {
+    "id": "promo-snack-b2g1",
+    "name": "ขนมสุขภาพ ซื้อ 2 แถม 1",
+    "type": "bogo",
+    "active": true,
+    "startsAt": "2026-09-11T08:38:27.151Z",
+    "endsAt": "2026-09-19T08:38:27.151Z",
+    "scope": {
+      "kind": "categories",
+      "ids": [
+        "c-snacks"
+      ]
+    },
+    "discount": null,
+    "coupon": null,
+    "bogo": {
+      "buyQty": 2,
+      "getQty": 1
+    },
+    "limits": {
+      "totalUses": null,
+      "perProductQty": null,
+      "perCustomer": 1
+    },
+    "createdAt": "2026-09-12T08:38:27.151Z",
+    "updatedAt": "2026-09-12T08:38:27.151Z"
+  },
+  {
+    "id": "promo-upcoming",
+    "name": "Flash Sale อาหารเสริม ลด 150 บาท",
+    "type": "discount",
+    "active": true,
+    "startsAt": "2026-09-15T08:38:27.151Z",
+    "endsAt": "2026-09-17T08:38:27.151Z",
+    "scope": {
+      "kind": "categories",
+      "ids": [
+        "c-supplement"
+      ]
+    },
+    "discount": {
+      "mode": "fixed",
+      "value": 15000
+    },
+    "coupon": null,
+    "bogo": null,
+    "limits": {
+      "totalUses": 20,
+      "perProductQty": 2,
+      "perCustomer": 1
+    },
+    "createdAt": "2026-09-12T08:38:27.151Z",
+    "updatedAt": "2026-09-12T08:38:27.151Z"
+  },
+  {
+    "id": "promo-expired",
+    "name": "ต้อนรับเปิดร้าน ลด 10% ทั้งร้าน",
+    "type": "discount",
+    "active": true,
+    "startsAt": "2026-08-13T08:38:27.151Z",
+    "endsAt": "2026-09-02T08:38:27.151Z",
+    "scope": {
+      "kind": "all",
+      "ids": []
+    },
+    "discount": {
+      "mode": "percent",
+      "value": 10
+    },
+    "coupon": null,
+    "bogo": null,
+    "limits": {
+      "totalUses": null,
+      "perProductQty": null,
+      "perCustomer": null
+    },
+    "createdAt": "2026-09-12T08:38:27.151Z",
+    "updatedAt": "2026-09-12T08:38:27.151Z"
+  }
+]

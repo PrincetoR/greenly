@@ -1,0 +1,12 @@
+{
+  "storeName": "Greenly",
+  "tagline": "อาหารสุขภาพ ส่งตรงถึงบ้าน",
+  "shippingFee": 5000,
+  "freeShippingMin": 100000,
+  "lowStockThreshold": 5,
+  "contact": {
+    "phone": "02-000-0000",
+    "email": "hello@greenly.example",
+    "line": "@greenly"
+  }
+}
