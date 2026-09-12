@@ -103,3 +103,14 @@ export async function decrementStock(items: { productId: string; qty: number }[]
   });
   return shortage;
 }
+
+/** คืน stock เมื่อยกเลิก order — สินค้าที่ถูกลบไปแล้วข้าม */
+export async function restoreStock(items: { productId: string; qty: number }[]): Promise<void> {
+  await updateCollection<Product>(NAME, (products) => {
+    const now = nowIso();
+    return products.map((p) => {
+      const back = items.filter((i) => i.productId === p.id).reduce((s, i) => s + i.qty, 0);
+      return back > 0 ? { ...p, stock: p.stock + back, updatedAt: now } : p;
+    });
+  });
+}

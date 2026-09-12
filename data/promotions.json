@@ -4,8 +4,8 @@
     "name": "ลด 20% เครื่องดื่มสุขภาพ",
     "type": "discount",
     "active": true,
-    "startsAt": "2026-09-11T09:26:10.125Z",
-    "endsAt": "2026-09-26T09:26:10.125Z",
+    "startsAt": "2026-09-11T09:31:33.858Z",
+    "endsAt": "2026-09-26T09:31:33.858Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -23,16 +23,16 @@
       "perProductQty": 5,
       "perCustomer": null
     },
-    "createdAt": "2026-09-12T09:26:10.125Z",
-    "updatedAt": "2026-09-12T09:26:10.125Z"
+    "createdAt": "2026-09-12T09:31:33.858Z",
+    "updatedAt": "2026-09-12T09:31:33.858Z"
   },
   {
     "id": "promo-save100",
     "name": "คูปอง SAVE100 ลดทันที 100 บาท",
     "type": "coupon",
     "active": true,
-    "startsAt": "2026-09-11T09:26:10.125Z",
-    "endsAt": "2026-10-12T09:26:10.125Z",
+    "startsAt": "2026-09-11T09:31:33.858Z",
+    "endsAt": "2026-10-12T09:31:33.858Z",
     "scope": {
       "kind": "all",
       "ids": []
@@ -52,16 +52,16 @@
       "perProductQty": null,
       "perCustomer": 1
     },
-    "createdAt": "2026-09-12T09:26:10.125Z",
-    "updatedAt": "2026-09-12T09:26:10.125Z"
+    "createdAt": "2026-09-12T09:31:33.858Z",
+    "updatedAt": "2026-09-12T09:31:33.858Z"
   },
   {
     "id": "promo-snack-b2g1",
     "name": "ขนมสุขภาพ ซื้อ 2 แถม 1",
     "type": "bogo",
     "active": true,
-    "startsAt": "2026-09-11T09:26:10.125Z",
-    "endsAt": "2026-09-19T09:26:10.125Z",
+    "startsAt": "2026-09-11T09:31:33.858Z",
+    "endsAt": "2026-09-19T09:31:33.858Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -79,16 +79,16 @@
       "perProductQty": null,
       "perCustomer": 1
     },
-    "createdAt": "2026-09-12T09:26:10.125Z",
-    "updatedAt": "2026-09-12T09:26:10.125Z"
+    "createdAt": "2026-09-12T09:31:33.858Z",
+    "updatedAt": "2026-09-12T09:31:33.858Z"
   },
   {
     "id": "promo-upcoming",
     "name": "Flash Sale อาหารเสริม ลด 150 บาท",
     "type": "discount",
     "active": true,
-    "startsAt": "2026-09-15T09:26:10.125Z",
-    "endsAt": "2026-09-17T09:26:10.125Z",
+    "startsAt": "2026-09-15T09:31:33.858Z",
+    "endsAt": "2026-09-17T09:31:33.858Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -106,16 +106,16 @@
       "perProductQty": 2,
       "perCustomer": 1
     },
-    "createdAt": "2026-09-12T09:26:10.125Z",
-    "updatedAt": "2026-09-12T09:26:10.125Z"
+    "createdAt": "2026-09-12T09:31:33.858Z",
+    "updatedAt": "2026-09-12T09:31:33.858Z"
   },
   {
     "id": "promo-expired",
     "name": "ต้อนรับเปิดร้าน ลด 10% ทั้งร้าน",
     "type": "discount",
     "active": true,
-    "startsAt": "2026-08-13T09:26:10.125Z",
-    "endsAt": "2026-09-02T09:26:10.125Z",
+    "startsAt": "2026-08-13T09:31:33.858Z",
+    "endsAt": "2026-09-02T09:31:33.858Z",
     "scope": {
       "kind": "all",
       "ids": []
@@ -131,7 +131,7 @@
       "perProductQty": null,
       "perCustomer": null
     },
-    "createdAt": "2026-09-12T09:26:10.125Z",
-    "updatedAt": "2026-09-12T09:26:10.125Z"
+    "createdAt": "2026-09-12T09:31:33.858Z",
+    "updatedAt": "2026-09-12T09:31:33.858Z"
   }
 ]
