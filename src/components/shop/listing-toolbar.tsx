@@ -62,7 +62,8 @@ export function ListingToolbar({
       </div>
 
       {/* หัวข้อ: กำลังเปิดอะไรอยู่ (ทั้งหมด / ชื่อหมวด / ผลค้นหา) + จำนวน */}
-      <div className="flex h-10 min-w-0 basis-full items-center gap-2 sm:flex-1 sm:basis-auto">
+      {/* items-baseline: "24 รายการ" นั่งบนเส้นฐานเดียวกับหัวข้อ (ไม่ใช่กึ่งกลาง) */}
+      <div className="flex h-10 min-w-0 basis-full items-baseline gap-2 sm:flex-1 sm:basis-auto">
         {/*
          * line-height เต็มแถว 40px — truncate ใช้ overflow:hidden ถ้าบรรทัดเตี้ยกว่านั้น
          * วรรณยุกต์/สระบนของไทย (เช่น ไม้โทใน "ทั้ง") จะถูกตัดหัว
