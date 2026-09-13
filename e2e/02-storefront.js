@@ -7,9 +7,11 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   ok((await page.locator('a[href^="/category/"]').count()) >= 6, 'home: category chips');
   await shot(page, 'p3-home');
 
-  // header search
-  await page.fill('header input[type=search]', 'มะม่วง');
-  await page.press('header input[type=search]', 'Enter');
+  // ไม่มีช่องค้นหาใน header แล้ว — ค้นหาจากหน้ารายการ (พิมพ์แล้วมีผลทันที)
+  ok((await page.locator('header input[type=search]').count()) === 0, 'header ไม่มีช่องค้นหา');
+  await page.goto(`${BASE}/products`);
+  await page.waitForLoadState('networkidle'); // รอ hydrate ก่อนพิมพ์ ไม่งั้น onChange ยังไม่ผูก
+  await page.fill('main input[type=search]', 'มะม่วง');
   await page.waitForURL(/\/products\?q=/);
   ok((await page.locator('a[href^="/product/"]').count()) === 2, 'search "มะม่วง" → 2 results (ชื่อ + คำอธิบาย)');
   ok((await page.textContent('h1')).includes('มะม่วง'), 'search title shows term');

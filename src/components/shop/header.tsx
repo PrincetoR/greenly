@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
-import { Leaf, Menu, Search, ShoppingCart, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { Leaf, Menu, ShoppingCart, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import type { Category } from '@/lib/types';
 import { AccountMenu, ACCOUNT_ITEMS } from './account-menu';
@@ -69,11 +69,8 @@ export function ShopHeader({
           </div>
         </nav>
 
-        <div className="ml-auto hidden w-72 md:block lg:w-80">
-          <SearchForm />
-        </div>
-
-        <div className="ml-auto flex items-center gap-1 md:ml-0">
+        {/* ไม่มีช่องค้นหาใน header (พี่ต่อไม่ชอบ) — ค้นหาได้ในหน้ารายการสินค้า */}
+        <div className="ml-auto flex items-center gap-1">
           <AccountMenu wishlistCount={wishlistCount} className="hidden md:block" />
           <Link
             href="/cart"
@@ -104,8 +101,7 @@ export function ShopHeader({
 
       {/* drawer มือถือ */}
       <div id="mobile-menu" hidden={!open} className="border-t border-line bg-surface px-4 py-4 md:hidden">
-        <SearchForm autoFocus />
-        <nav aria-label="เมนูหลัก (มือถือ)" className="mt-3 flex flex-col">
+        <nav aria-label="เมนูหลัก (มือถือ)" className="flex flex-col">
           {nav.map((item) => (
             <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2.5 font-medium hover:bg-surface-alt">
               {item.label}
@@ -153,46 +149,5 @@ function NavLink({ item, pathname, className }: { item: NavItem; pathname: strin
     >
       {item.label}
     </Link>
-  );
-}
-
-/**
- * ช่องค้นหาในหัวเว็บ — ทรง pill พื้นเทาอ่อนไม่มีขอบ ให้กลืนกับ header (ช่องขอบขาวดูแข็ง)
- * ตั้งใจไม่อ่าน useSearchParams เพราะจะทำให้ header ทั้งก้อนถูก stream หลัง fallback
- * · คำค้นปัจจุบันแสดงที่ช่องในหน้ารายการแทน
- */
-function SearchForm({ autoFocus }: { autoFocus?: boolean }) {
-  const router = useRouter();
-  const [q, setQ] = useState('');
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    const term = q.trim();
-    router.push(term ? `/products?q=${encodeURIComponent(term)}` : '/products');
-  };
-
-  return (
-    <form role="search" onSubmit={submit} className="group/search relative">
-      <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted transition-colors group-focus-within/search:text-brand" aria-hidden />
-      <input
-        type="search"
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="ค้นหาสินค้า"
-        aria-label="ค้นหาสินค้า"
-        autoFocus={autoFocus}
-        className="h-10 rounded-full! border-transparent! bg-surface-alt! pr-9! pl-10! text-sm placeholder:text-muted focus:bg-surface! focus:shadow-[0_0_0_2px_var(--brand-soft)]! [&::-webkit-search-cancel-button]:hidden"
-      />
-      {q && (
-        <button
-          type="button"
-          onClick={() => setQ('')}
-          aria-label="ล้างคำค้น"
-          className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-muted hover:bg-line hover:text-ink"
-        >
-          <X className="size-3.5" aria-hidden />
-        </button>
-      )}
-    </form>
   );
 }

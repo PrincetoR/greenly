@@ -82,4 +82,4 @@ src/app/(shop)/       หน้าร้าน · src/app/admin/(app)/ หลั
 - id ที่ต้องผ่าน regex ความยาว ห้ามสร้างจาก base64url แล้วตัดอักขระทิ้ง (ความยาวไม่แน่นอน → พังแบบสุ่ม 39%) ใช้ hex
 - Playwright screenshot ค่าเริ่มต้นแอบใส่ `style="caret-color: transparent"` ให้ input → เจอ hydration mismatch ปลอม ใช้ `caret: 'initial'` เสมอ
 - slug ภาษาไทยมาถึง `params` แบบ percent-encoded → `decodeSlug()` ก่อนค้น
-- header ห้ามใช้ `useSearchParams` ไม่งั้นทั้ง header ถูก stream หลัง fallback
+- header **ไม่มีช่องค้นหา** (พี่ต่อไม่ชอบ เอาออก 2026-09-14) — ค้นหาที่หน้ารายการสินค้าเท่านั้น · (เดิม: header ห้ามใช้ `useSearchParams` ไม่งั้นถูก stream หลัง fallback)
