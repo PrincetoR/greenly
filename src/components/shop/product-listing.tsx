@@ -73,9 +73,21 @@ export function ProductListing({
       {/* card หมวดหมู่ซ้าย (ขอบบนตรงกับช่องค้นหา) · ช่องค้นหา + กริดคอลัมน์ขวา */}
       <div className="mt-4 md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4">
         <aside className="hidden md:block">
-          <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
+          {/*
+           * "ทั้งหมด" สูง 40px อยู่ระดับช่องค้นหา (card ขยับขึ้น 8px เท่า padding) · คั่นด้วยเส้น
+           * แล้วหมวดหมู่เริ่มที่ระดับขอบบนของการ์ดสินค้า (ช่องค้นหา 40 + gap 16)
+           */}
+          <nav aria-label="หมวดหมู่" className="sticky top-[72px] -mt-2 rounded-card bg-surface p-2 ring-1 ring-line">
+            <Link
+              href={links[0].href}
+              aria-current={links[0].active ? 'page' : undefined}
+              className={cn('flex h-10 items-center rounded-lg px-3 text-sm font-medium transition-colors', links[0].active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
+            >
+              {links[0].label}
+            </Link>
+            <div className="mt-2 mb-[7px] border-t border-line" aria-hidden />
             <ul className="flex flex-col gap-0.5">
-              {links.map((l) => (
+              {links.slice(1).map((l) => (
                 <li key={l.href}>
                   <Link
                     href={l.href}
