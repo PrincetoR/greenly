@@ -61,6 +61,12 @@ src/app/(shop)/       หน้าร้าน · src/app/admin/(app)/ หลั
 - comment ในโค้ดเป็นภาษาไทย อธิบาย "ทำไม" ไม่ใช่ "ทำอะไร"
 - `~/Projects/Prototype/e-commerce` และ `~/Projects/storefront-kit` เป็นตัวอ้างอย่างเดียว ห้ามยกโค้ด/แก้/ลบ
 
+## กฎตอนรัน dev / ทดสอบ
+- **ห้ามรัน `next dev` ซ้อนกัน 2 ตัวบน project เดียวกัน** (ทั้งคู่ใช้ `.next/dev` เดียวกัน → HMR พัง แก้ไฟล์แล้วไม่เปลี่ยน ต้อง restart)
+  · ก่อนรัน e2e ให้เช็ค `lsof -iTCP:3000 -sTCP:LISTEN` — ถ้าพี่ต่อรัน dev อยู่แล้ว ใช้ `BASE=http://localhost:3000` ยิงตัวนั้น
+  · ห้ามรัน `next build` ขณะ dev รันอยู่ (ไปใช้ typecheck/lint แทน แล้ว build ตอนจบ)
+- ถ้า HMR เพี้ยน: หยุด dev ทุกตัว → `rm -rf .next` → `npm run dev`
+
 ## บทเรียนจากการทดสอบ
 - id ที่ต้องผ่าน regex ความยาว ห้ามสร้างจาก base64url แล้วตัดอักขระทิ้ง (ความยาวไม่แน่นอน → พังแบบสุ่ม 39%) ใช้ hex
 - Playwright screenshot ค่าเริ่มต้นแอบใส่ `style="caret-color: transparent"` ให้ input → เจอ hydration mismatch ปลอม ใช้ `caret: 'initial'` เสมอ
