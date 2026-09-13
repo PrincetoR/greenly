@@ -67,9 +67,9 @@ export function ProductListing({
       {/* แถบข้าง — เฉพาะโหมด aside บนจอ md+ */}
       {aside && (
         <aside className="hidden md:block">
-          <nav aria-label="หมวดหมู่" className="sticky top-20">
-            <p className="px-3 text-xs font-semibold tracking-wide text-muted uppercase">หมวดหมู่</p>
-            <ul className="mt-2 flex flex-col gap-0.5">
+          <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface p-3 ring-1 ring-line">
+            <p className="px-3 pt-1 pb-2 text-xs font-semibold tracking-wide text-muted uppercase">หมวดหมู่</p>
+            <ul className="flex flex-col gap-0.5">
               {links.map((l) => (
                 <li key={l.href}>
                   <Link
