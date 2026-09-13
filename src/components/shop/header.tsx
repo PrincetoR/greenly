@@ -61,7 +61,7 @@ export function ShopHeader({
           ))}
         </nav>
 
-        <div className="ml-auto hidden w-60 md:block">
+        <div className="ml-auto hidden w-72 md:block lg:w-80">
           <SearchForm />
         </div>
 
@@ -134,8 +134,9 @@ export function ShopHeader({
 }
 
 /**
- * ช่องค้นหาในหัวเว็บ — ตั้งใจไม่อ่าน useSearchParams เพราะจะทำให้ header ทั้งก้อน
- * ถูก stream หลัง fallback (เห็นแถบว่างแวบหนึ่ง) · คำค้นปัจจุบันแสดงที่ช่องในหน้ารายการแทน
+ * ช่องค้นหาในหัวเว็บ — ทรง pill พื้นเทาอ่อนไม่มีขอบ ให้กลืนกับ header (ช่องขอบขาวดูแข็ง)
+ * ตั้งใจไม่อ่าน useSearchParams เพราะจะทำให้ header ทั้งก้อนถูก stream หลัง fallback
+ * · คำค้นปัจจุบันแสดงที่ช่องในหน้ารายการแทน
  */
 function SearchForm({ autoFocus }: { autoFocus?: boolean }) {
   const router = useRouter();
@@ -148,9 +149,27 @@ function SearchForm({ autoFocus }: { autoFocus?: boolean }) {
   };
 
   return (
-    <form role="search" onSubmit={submit} className="relative">
-      <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาสินค้า…" aria-label="ค้นหาสินค้า" autoFocus={autoFocus} className="pl-9!" />
-      <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
+    <form role="search" onSubmit={submit} className="group/search relative">
+      <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted transition-colors group-focus-within/search:text-brand" aria-hidden />
+      <input
+        type="search"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="ค้นหาสินค้า"
+        aria-label="ค้นหาสินค้า"
+        autoFocus={autoFocus}
+        className="h-10 rounded-full! border-transparent! bg-surface-alt! pr-9! pl-10! text-sm placeholder:text-muted focus:bg-surface! focus:shadow-[0_0_0_2px_var(--brand-soft)]! [&::-webkit-search-cancel-button]:hidden"
+      />
+      {q && (
+        <button
+          type="button"
+          onClick={() => setQ('')}
+          aria-label="ล้างคำค้น"
+          className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-muted hover:bg-line hover:text-ink"
+        >
+          <X className="size-3.5" aria-hidden />
+        </button>
+      )}
     </form>
   );
 }
