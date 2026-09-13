@@ -8,7 +8,7 @@ import { isValidRank, RANK_MAX, RANK_MIN, RANK_PRESETS } from '@/lib/analytics/r
 import { updateDashboardRank } from '@/lib/actions/settings';
 
 /**
- * รูปเฟืองมุมขวาของการ์ดอันดับ — กดแล้วเปิดป๊อปอัปเลือกจำนวนอันดับ (ปุ่มลัด 5/10/20 หรือพิมพ์เอง 1–50)
+ * รูปเฟืองมุมขวาของการ์ดอันดับ (ไอคอนเปล่า บรรทัดเดียวกับหัวข้อ ชิดขอบขวา) — กดแล้วเปิดป๊อปอัปเลือกจำนวนอันดับ (ปุ่มลัด 5/10/20 หรือพิมพ์เอง 1–50)
  * บันทึกลง settings ผ่าน server action → หน้าถูก revalidate โหลดข้อมูลตามจำนวนใหม่ทันที
  */
 export function RankSetting({ field, value, label }: { field: DashboardRankKey; value: number; label: string }) {
@@ -67,7 +67,8 @@ export function RankSetting({ field, value, label }: { field: DashboardRankKey; 
         aria-expanded={open}
         aria-label={`ตั้งค่าจำนวนอันดับ${label}`}
         title="ตั้งค่าจำนวนอันดับ"
-        className={cn('flex size-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-alt hover:text-ink', open && 'bg-surface-alt text-ink')}
+        // ไอคอนเปล่า ไม่มีกล่อง ขนาดเท่าตัวอักษร (16px) · สูงเท่าบรรทัดหัวข้อ (line-height 1.6em) ให้กึ่งกลางตรง h2 · ขอบขวาไอคอนตรงขอบเนื้อหาการ์ด
+        className={cn('flex h-[1.6em] items-center text-muted transition-colors hover:text-ink', open && 'text-ink')}
       >
         <Settings className="size-4" aria-hidden />
       </button>

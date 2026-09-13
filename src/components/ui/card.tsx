@@ -17,7 +17,8 @@ export function CardHeader({
 }) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-4">
-      <div className="min-w-0">
+      {/* กล่องหัวข้อขอพื้นที่อย่างน้อย 240px แล้วขยายเต็ม — คำอธิบายยาวจะตัดบรรทัดในกล่อง ไม่ดัน action ตกไปบรรทัดใหม่ (จอแคบยังตกได้) */}
+      <div className="min-w-0 flex-1 basis-60">
         <h2 className="font-semibold text-ink">{title}</h2>
         {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
       </div>
