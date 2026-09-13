@@ -85,10 +85,10 @@ export function ProductListing({
       <div className="min-w-0">
         {/*
          * หัวข้อ + ค้นหา + เรียงลำดับ แถวเดียว (ระดับ "หมวดหมู่สินค้า" ของ card ซ้าย)
-         * ติดใต้ header ตอนเลื่อน: พื้นทึบ + ขอบล่างไล่จาง 10px (.sticky-fade) ให้การ์ดค่อย ๆ หายก่อนถึงขอบ
+         * ติดใต้ header ตอนเลื่อน: พื้นทึบธรรมดา ไม่มีเบลอ/ไล่จาง (พี่ต่อลองแล้วไม่เอา)
          * -mx-1/px-1 ขยายแถบให้คลุม ring ของการ์ดที่วาดล้นออกนอกคอลัมน์ 1px (ไม่งั้นเห็นเส้นข้าง)
          */}
-        <div className="sticky-fade pt-4 pb-3 sm:pb-4 md:sticky md:top-[65px] md:z-20 md:-mx-1 md:bg-page md:px-1">
+        <div className="pt-4 pb-3 sm:pb-4 md:sticky md:top-[65px] md:z-20 md:-mx-1 md:bg-page md:px-1">
           <ListingToolbar
             title={title}
             description={description}
