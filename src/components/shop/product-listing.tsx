@@ -113,7 +113,7 @@ export function ProductListing({
             }
           />
         ) : (
-          <ProductGrid>{products.map((p, i) => (renderCard ? renderCard(p, i) : <ProductCard key={p.id} product={p} priority={i < 4} />))}</ProductGrid>
+          <ProductGrid snap>{products.map((p, i) => (renderCard ? renderCard(p, i) : <ProductCard key={p.id} product={p} priority={i < 4} />))}</ProductGrid>
         )}
       </div>
     </div>

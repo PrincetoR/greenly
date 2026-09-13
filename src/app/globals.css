@@ -132,6 +132,23 @@
 }
 
 @layer utilities {
+  /*
+   * หน้ารายการสินค้า (จอ md+): เลื่อนแล้ว snap ให้แถวการ์ดถัดไปชิดขอบล่างของแถบ sticky พอดี
+   * ระยะ = header 65 + gap 16 + แถบ 40 + gap 16 = 137px · ประกาศที่ html ผ่าน :has เพราะ scroll container คือ html
+   */
+  @media (min-width: 48rem) {
+    html:has(.snap-rows) {
+      scroll-snap-type: y mandatory;
+    }
+    .snap-rows > * {
+      scroll-snap-align: start;
+      scroll-margin-top: 137px;
+    }
+    /* ให้ท้ายหน้า (footer) เป็นจุด snap ด้วย ไม่งั้น mandatory จะเลื่อนลงไปไม่ถึงล่างสุด */
+    html:has(.snap-rows) footer {
+      scroll-snap-align: end;
+    }
+  }
   /* ซ่อน scrollbar แต่ยังเลื่อนได้ — ใช้กับแถบหมวดหมู่บนมือถือ */
   .scrollbar-none {
     scrollbar-width: none;

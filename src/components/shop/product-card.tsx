@@ -55,6 +55,7 @@ export function ProductCard({
   );
 }
 
-export function ProductGrid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">{children}</div>;
+export function ProductGrid({ children, snap = false }: { children: React.ReactNode; snap?: boolean }) {
+  // snap: ให้ scroll หยุดตรงขอบบนของแถวการ์ดพอดี (ใช้ในหน้ารายการที่มีแถบ sticky)
+  return <div className={`grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4${snap ? ' snap-rows' : ''}`}>{children}</div>;
 }
