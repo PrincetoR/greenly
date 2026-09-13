@@ -64,7 +64,7 @@ export function ProductListing({
 
       {/* หมวดหมู่เป็น chip เลื่อนแนวนอนบนมือถือ */}
       {/* py-1 เผื่อที่ให้ ring ของ chip — overflow-x-auto จะ clip แนวตั้งด้วย ทำให้เส้นขอบบนหาย */}
-      <ul className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 py-1 scrollbar-none sm:mx-0 sm:flex-wrap sm:px-0">
+      <ul className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 py-1 scrollbar-none sm:-mx-1 sm:flex-wrap sm:px-1">
         <li className="shrink-0">
           <Chip href={`/products${query({})}`} active={!current}>
             ทั้งหมด
