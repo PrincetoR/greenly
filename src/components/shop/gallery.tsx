@@ -14,7 +14,7 @@ export function Gallery({ images, alt }: { images: string[]; alt: string }) {
         <ProductImage src={current} alt={alt} priority />
       </div>
       {images.length > 1 && (
-        <ul className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <ul className="mt-2 flex gap-2 overflow-x-auto p-1 scrollbar-none">
           {images.map((src, i) => (
             <li key={src} className="shrink-0">
               <button
