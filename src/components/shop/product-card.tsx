@@ -4,10 +4,11 @@ import { formatBaht } from '@/lib/money';
 import { ProductImage } from '@/components/product-image';
 import { Badge } from '@/components/ui/badge';
 import { WishlistButton } from './wishlist-button';
+import { QuickAddButton } from './quick-add-button';
 
 /**
  * การ์ดสินค้าในกริด — ราคาที่แสดงส่งมาจากผู้เรียก (หลังคิดโปรแล้ว) ผ่าน priceSlot
- * ปุ่มหัวใจอยู่นอก <Link> (ซ้อนด้วย absolute) เพื่อไม่ให้กดแล้วเปิดหน้าสินค้า
+ * แถวล่าง: ราคา · หัวใจ · ใส่ตะกร้า — อยู่นอก <Link> เพื่อกดแล้วไม่เปิดหน้าสินค้า
  */
 export function ProductCard({
   product,
@@ -24,8 +25,8 @@ export function ProductCard({
 }) {
   const soldOut = product.stock <= 0;
   return (
-    <div className="group relative">
-      <Link href={`/product/${product.slug}`} className="flex h-full flex-col overflow-hidden rounded-card bg-surface ring-1 ring-line transition-shadow hover:shadow-lg">
+    <div className="group flex flex-col overflow-hidden rounded-card bg-surface ring-1 ring-line transition-shadow hover:shadow-lg">
+      <Link href={`/product/${product.slug}`} className="flex flex-1 flex-col">
         <div className="relative overflow-hidden">
           <ProductImage src={product.images[0]} alt={product.name} priority={priority} className="w-full transition-transform duration-300 group-hover:scale-[1.03]" />
           <div className="absolute top-2 left-2 flex flex-col items-start gap-1">{badge}</div>
@@ -37,13 +38,14 @@ export function ProductCard({
             </div>
           )}
         </div>
-        <div className="flex flex-1 flex-col p-3">
-          <h3 className="line-clamp-2 text-sm font-medium leading-snug">{product.name}</h3>
-          <div className="mt-auto pt-2">{priceSlot ?? <p className="font-bold">{formatBaht(product.price)}</p>}</div>
-        </div>
+        <h3 className="line-clamp-2 px-3 pt-3 text-sm font-medium leading-snug">{product.name}</h3>
       </Link>
-      <div className="absolute top-2 right-2">
-        <WishlistButton productId={product.id} saved={wishlisted} />
+      <div className="flex items-end justify-between gap-2 px-3 pt-2 pb-3">
+        <div className="min-w-0">{priceSlot ?? <p className="font-bold">{formatBaht(product.price)}</p>}</div>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <WishlistButton productId={product.id} saved={wishlisted} />
+          <QuickAddButton productId={product.id} soldOut={soldOut} />
+        </div>
       </div>
     </div>
   );

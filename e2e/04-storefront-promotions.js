@@ -14,10 +14,10 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
   ok(await page.locator('code:has-text("SAVE100")').isVisible(), 'home: coupon code shown');
   ok((await page.locator('text=เหลืออีก').count()) >= 3, 'home: countdown text');
   // drinks featured products show discounted price + badge
-  const kombucha = page.locator('a[href^="/product/"]', { hasText: 'คอมบูชา' }).first();
+  const kombucha = page.locator('.group', { hasText: 'คอมบูชา' }).first();
   ok((await kombucha.locator('text=-20%').count()) === 1, 'card: -20% badge on drinks');
   ok((await kombucha.locator('text=฿76').count()) === 1 && (await kombucha.locator('text=฿95').count()) === 1, 'card: ฿95 → ฿76');
-  const granola = page.locator('a[href^="/product/"]', { hasText: 'กราโนล่า' }).first();
+  const granola = page.locator('.group', { hasText: 'กราโนล่า' }).first();
   ok((await granola.locator('text=ซื้อ 2 แถม 1').count()) === 1, 'card: bogo badge on snacks');
   await shot(page, 'p5-home');
 

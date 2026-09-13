@@ -17,7 +17,7 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   // sort price asc
   await page.goto(`${BASE}/products?sort=price-asc`);
   // เรียงตามราคาตั้ง (ราคาเดิม) — การ์ดที่มีโปรจะโชว์ราคาเดิมแบบขีดฆ่า
-  const nums = await page.locator('main a[href^="/product/"]').evaluateAll((cards) =>
+  const nums = await page.locator('main .group').evaluateAll((cards) =>
     cards.map((c) => Number((c.querySelector('.line-through') ?? c.querySelector('span.font-bold')).textContent.replace(/[^\d.]/g, ''))),
   );
   ok(nums.length === 24 && nums.every((n, i) => i === 0 || n >= nums[i - 1]), `sort price asc (${nums.slice(0, 4).join(',')}…)`);
