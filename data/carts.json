@@ -1,1 +1,12 @@
-{}
+{
+  "g-ab3010a9b0a97a8d232b295c": {
+    "items": [
+      {
+        "productId": "p-006",
+        "qty": 2
+      }
+    ],
+    "couponCode": null,
+    "updatedAt": "2026-09-13T19:13:23.354Z"
+  }
+}
