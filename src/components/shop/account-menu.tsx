@@ -45,7 +45,7 @@ export function AccountMenu({ wishlistCount, className }: { wishlistCount: numbe
         aria-expanded={open}
         aria-label="เมนูบัญชี"
         title="เมนูบัญชี"
-        className={cn('flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-surface-alt', open ? 'bg-surface-alt text-brand' : 'text-ink')}
+        className={cn('flex size-9 items-center justify-center', open ? 'text-brand' : 'text-ink')}
       >
         <User className="size-5" aria-hidden />
       </button>

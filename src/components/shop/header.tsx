@@ -69,14 +69,14 @@ export function ShopHeader({
           </div>
         </nav>
 
-        {/* ไม่มีช่องค้นหาใน header (พี่ต่อไม่ชอบ) — ค้นหาได้ในหน้ารายการสินค้า */}
-        <div className="ml-auto flex items-center gap-1">
+        {/* ไม่มีช่องค้นหาใน header (พี่ต่อไม่ชอบ) — ค้นหาได้ในหน้ารายการสินค้า · ไอคอนชิดกัน ไม่มี hover effect */}
+        <div className="ml-auto flex items-center">
           <AccountMenu wishlistCount={wishlistCount} className="hidden md:block" />
           <Link
             href="/cart"
             aria-label={cartCount > 0 ? `ตะกร้า ${cartCount} ชิ้น` : 'ตะกร้า'}
             title="ตะกร้า"
-            className={cn('relative flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-surface-alt', pathname.startsWith('/cart') ? 'text-brand' : 'text-ink')}
+            className={cn('relative flex size-9 items-center justify-center', pathname.startsWith('/cart') ? 'text-brand' : 'text-ink')}
           >
             <ShoppingCart className="size-5" aria-hidden />
             {cartCount > 0 && (
@@ -92,7 +92,7 @@ export function ShopHeader({
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? 'ปิดเมนู' : 'เปิดเมนู'}
-            className="flex size-10 items-center justify-center rounded-lg hover:bg-surface-alt md:hidden"
+            className="flex size-9 items-center justify-center md:hidden"
           >
             {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
           </button>
