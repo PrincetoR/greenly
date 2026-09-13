@@ -58,8 +58,8 @@ export function ListingToolbar({
   return (
     /*
      * จอ md+: ใช้ grid คอลัมน์เดียวกับกริดสินค้า (md 3 / lg 4 คอลัมน์ gap 16) ให้ทุกขอบตรงกับการ์ด
-     * lg: หัวข้อ = การ์ด 1–2 · [ค้นหา+เรียง] = การ์ด 3–4 โดยค้นหาจบที่กึ่งกลางการ์ด 4 (75% ของช่วง + 4px = ครึ่ง gap)
-     *     และเรียงลำดับกินครึ่งหลังของการ์ด 4 (เว้น 8px จากค้นหา)
+     * lg: หัวข้อ = การ์ด 1–2 · [ค้นหา+เรียง] = การ์ด 3–4 โดย "ช่องว่าง 8px" ระหว่างค้นหากับเรียงลำดับ
+     *     อยู่กึ่งกลางการ์ด 4 พอดี (ค้นหา = 75% ของช่วง เพราะ 1.5w+g−4 = 0.75(2w+g) เมื่อ g=16)
      * md: หัวข้อ = การ์ด 1 · [ค้นหา+เรียง] = การ์ด 2–3 แบ่งแบบเดียวกัน
      */
     <div className="flex flex-wrap items-center gap-2 md:grid md:grid-cols-3 md:gap-4 lg:grid-cols-4">
@@ -79,7 +79,7 @@ export function ListingToolbar({
         {description && <span className="hidden truncate text-sm text-muted lg:inline">· {description}</span>}
       </div>
 
-      <div className="flex min-w-0 flex-1 basis-full items-center gap-2 md:col-span-2 md:grid md:grid-cols-[calc(75%+4px)_1fr] md:gap-2">
+      <div className="flex min-w-0 flex-1 basis-full items-center gap-2 md:col-span-2 md:grid md:grid-cols-[75%_1fr] md:gap-2">
       <div className="relative min-w-0 flex-1 md:flex-none">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
         <input

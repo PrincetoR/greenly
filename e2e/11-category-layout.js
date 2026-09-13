@@ -25,7 +25,8 @@ const { BASE, launch, ok, shot } = require('./lib');
   // ค้นหา = ขอบซ้ายการ์ด 3 → กึ่งกลางการ์ด 4 · เรียงลำดับ = ครึ่งหลังการ์ด 4
   const row = (await page.locator('main .group').evaluateAll((cs) => cs.map((c) => c.getBoundingClientRect()))).slice(0, 4);
   ok(Math.abs(searchBox.x - row[2].x) < 0.5, `ขอบซ้ายช่องค้นหา = ขอบซ้ายการ์ด 3 (${searchBox.x} = ${row[2].x})`);
-  ok(Math.abs(searchBox.x + searchBox.width - (row[3].x + row[3].width / 2)) < 0.5, 'ขอบขวาช่องค้นหา = กึ่งกลางการ์ด 4');
+  const mid4 = row[3].x + row[3].width / 2;
+  ok(Math.abs(searchBox.x + searchBox.width - (mid4 - 4)) < 0.5 && Math.abs(sortBox.x - (mid4 + 4)) < 0.5, `ช่องว่าง 8px ระหว่างค้นหา/เรียงลำดับ อยู่กึ่งกลางการ์ด 4 (${searchBox.x + searchBox.width} | ${mid4} | ${sortBox.x})`);
   ok(Math.abs(sortBox.x + sortBox.width - (row[3].x + row[3].width)) < 0.5, 'ขอบขวาเรียงลำดับ = ขอบขวาการ์ด 4');
   const headerBottom = await page.locator('header').evaluate((h) => h.getBoundingClientRect().bottom);
   ok((await page.locator('main aside nav').boundingBox()).y - headerBottom === 16, 'ระยะ header → เนื้อหา 16px');
