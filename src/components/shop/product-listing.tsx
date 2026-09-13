@@ -69,7 +69,7 @@ export function ProductListing({
          */}
         <nav aria-label="หมวดหมู่สินค้า" className="sticky top-[72px] -mt-2 rounded-card bg-surface p-2 ring-1 ring-line">
           {/* ขนาดใกล้เคียงหัวข้อหน้า (ย่อมกว่าหนึ่งขั้น) ให้ดูเป็นหัวข้อของคอลัมน์ ไม่ใช่รายการหนึ่ง */}
-          <p className="flex h-10 items-center px-3 text-lg font-bold">หมวดหมู่สินค้า</p>
+          <p className="flex h-10 items-center px-2 text-lg font-bold">หมวดหมู่สินค้า</p>
           <div className="mt-2 mb-[7px] border-t border-line" aria-hidden />
           <ul className="flex flex-col gap-0.5">
             {links.map((l) => (
@@ -89,7 +89,8 @@ export function ProductListing({
 
       <div className="min-w-0">
         {/* หัวข้อหน้าอยู่เหนือช่องค้นหา ในคอลัมน์ขวา */}
-        <div className="flex min-h-10 flex-wrap items-end justify-between gap-3">
+        {/* สูง 40 เท่าแถวหัว card หมวดหมู่ และจัดกึ่งกลางแนวตั้งให้ตัวอักษรสองฝั่งอยู่ระดับเดียวกัน */}
+        <div className="flex min-h-10 flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold sm:text-2xl">{title}</h1>
             {description && <p className="mt-1 text-sm text-muted">{description}</p>}
