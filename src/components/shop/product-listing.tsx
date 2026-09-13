@@ -50,7 +50,6 @@ export function ProductListing({
     ...categories.map((c) => ({ href: `/category/${c.slug}${query({})}`, label: c.name, active: current?.id === c.id })),
   ];
   const currentHref = links.find((l) => l.active)?.href ?? links[0].href;
-  const showHeading = Boolean(q || description);
 
   return (
     // ระยะจาก header ถึงเนื้อหา = 16px เท่าระยะระหว่างการ์ด
@@ -79,24 +78,18 @@ export function ProductListing({
       </aside>
 
       <div className="min-w-0">
-        {/*
-         * ไม่มีบรรทัดหัวข้อ (พี่ต่อเอาออก) — เหลือ h1 แบบ sr-only ให้ screen reader/SEO
-         * ยกเว้นหน้าที่ต้องบอกบริบท (ผลค้นหา / สินค้าในโปร) จึงแสดงหัวข้อเล็ก ๆ เหนือช่องค้นหา
-         */}
-        {showHeading ? (
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h1 className="text-xl font-bold">{title}</h1>
-              {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
-            </div>
-            <p className="text-sm text-muted">{products.length} รายการ</p>
-          </div>
-        ) : (
-          <h1 className="sr-only">{title}</h1>
-        )}
-
+        {/* หัวข้อ + ค้นหา + เรียงลำดับ อยู่แถวเดียวกัน (ระดับ "หมวดหมู่สินค้า" ของ card ซ้าย) */}
         <div>
-          <ListingToolbar basePath={basePath} q={q} sort={sort} categoryOptions={links} currentCategoryHref={currentHref} />
+          <ListingToolbar
+            title={title}
+            description={description}
+            count={products.length}
+            basePath={basePath}
+            q={q}
+            sort={sort}
+            categoryOptions={links}
+            currentCategoryHref={currentHref}
+          />
 
           {/* ระยะจากแถบค้นหาถึงกริด = ระยะระหว่างการ์ด (gap-3 / sm:gap-4) */}
           <div className="mt-3 sm:mt-4">

@@ -2,19 +2,19 @@
   {
     "id": "u-admin",
     "username": "admin",
-    "passwordHash": "scrypt$09f4e408b886b84712d122560149fce5$97beac79a07f6af6c338fd6d3653b201a87a1f079a60bddbd1220b2101b5c7153b9402389c1b08f6155efaa67c8bd48e2778ac42b639546523f4caf48a6ee7c4",
+    "passwordHash": "scrypt$3d72ed24603e098206ad724ea320b8f3$d049170367452a0445be51d688a35e7114de1a6265f90135f4750e251383c758acdc71a6eadb2a01936d610fbe913fff500f02d61b21d0ebaa9820d51fdc2cec",
     "name": "ผู้ดูแลระบบ",
     "role": "admin",
     "active": true,
-    "createdAt": "2026-07-15T19:49:42.998Z"
+    "createdAt": "2026-07-15T19:52:21.922Z"
   },
   {
     "id": "u-staff",
     "username": "staff",
-    "passwordHash": "scrypt$30616d313c94b40c3ed756f4532d9e61$3d84d9c29bc0ce83954aca8fd002bf8e4a6619b065f5638897fbc0f670ecd8720b8684545b2e8c7c49895d9156f09d89178b006b73a47dca6a8defd91c32d460",
+    "passwordHash": "scrypt$130adcb0c417e04c8955503993393c02$5eff4207d19c48ceb503d52ee6620b2943616c281a789e20042e9f17859a4a3b3e3f5f4a11fa8c8922918ce52fccffafbcef130b4f66c308fde88c7ba1de0af5",
     "name": "พนักงานร้าน",
     "role": "staff",
     "active": true,
-    "createdAt": "2026-07-16T19:49:42.998Z"
+    "createdAt": "2026-07-16T19:52:21.922Z"
   }
 ]

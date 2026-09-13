@@ -8,17 +8,24 @@ import { SORT_OPTIONS, type SortValue } from './sort-options';
 import { CategorySelect } from './category-select';
 
 /**
- * แถบเครื่องมือหน้ารายการ — ค้นหาแบบพิมพ์แล้วมีผลทันที (หน่วง 300ms) ไม่มีปุ่มค้นหา
+ * แถบเครื่องมือหน้ารายการ: [หัวข้อว่ากำลังเปิดอะไร … ค้นหา · เรียงลำดับ] ในแถวเดียว
+ * ค้นหาแบบพิมพ์แล้วมีผลทันที (หน่วง 300ms) ไม่มีปุ่มค้นหา
  * เรียงลำดับเป็น dropdown แบบเดียวกับเมนูบัญชี (ปุ่มมีพื้นหลังตอนเปิด) แทน <select> ของเบราว์เซอร์
  * ทุกอย่างยังลงท้ายที่ URL query (q, sort) → แชร์ลิงก์/กด back ได้เหมือนเดิม
  */
 export function ListingToolbar({
+  title,
+  description,
+  count,
   basePath,
   q,
   sort,
   categoryOptions,
   currentCategoryHref,
 }: {
+  title: string;
+  description?: string;
+  count: number;
   basePath: string;
   q: string;
   sort: SortValue;
@@ -54,7 +61,14 @@ export function ListingToolbar({
         <CategorySelect options={categoryOptions} value={currentCategoryHref} />
       </div>
 
-      <div className="relative min-w-0 flex-1 sm:max-w-xs sm:flex-none sm:basis-72">
+      {/* หัวข้อ: กำลังเปิดอะไรอยู่ (ทั้งหมด / ชื่อหมวด / ผลค้นหา) + จำนวน */}
+      <div className="flex h-10 min-w-0 basis-full items-center gap-2 sm:flex-1 sm:basis-auto">
+        <h1 className="truncate text-xl font-bold">{title}</h1>
+        <span className="shrink-0 text-sm text-muted">{count} รายการ</span>
+        {description && <span className="hidden truncate text-sm text-muted lg:inline">· {description}</span>}
+      </div>
+
+      <div className="relative min-w-0 flex-1 sm:flex-none sm:basis-64">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
         <input
           type="search"
@@ -107,7 +121,7 @@ function SortMenu({ value, onChange }: { value: SortValue; onChange: (v: SortVal
   }, [open]);
 
   return (
-    <div ref={ref} className="relative ml-auto">
+    <div ref={ref} className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
