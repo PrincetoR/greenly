@@ -87,7 +87,7 @@ export function ShopHeader({
         <nav aria-label="เมนูหลัก" className="flex min-w-0 items-center">
           <div className="flex min-w-0 items-center md:w-[var(--aside-w)] md:shrink-0 md:justify-between md:gap-2">
             {/* โลโก้ = ชื่อร้านตัวหนาอย่างเดียว (พี่ต่อเอาไอคอนออก) ขนาดใหญ่สุดที่ยังพอดีช่อง */}
-            <Link href="/" className="flex min-w-0 items-center text-2xl font-bold tracking-tight text-brand">
+            <Link href="/" className="flex min-w-0 items-center text-3xl font-bold tracking-tight text-brand">
               <span className="truncate">{storeName}</span>
             </Link>
             <NavLink item={NAV[0]} pathname={pathname} className="hidden shrink-0 md:block" />
