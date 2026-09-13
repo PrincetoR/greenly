@@ -82,7 +82,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
         {/* ไม่มีแถวสรุปรวม (สัดส่วนออเดอร์ที่ใช้โปร / AOV / ส่วนลดรวม) — พี่ต่อ: เป็นค่าเฉลี่ยรวม ไม่ใช่ข้อมูลเฉพาะโปร ดูแล้วงง เอาเฉพาะตารางรายโปร */}
         <CardHeader
           title={`โปรโมชันกระตุ้นยอดขาย ${ranks.topPromotions} อันดับ`}
-          description="เรียงตามยอดขายจากโปร · ยอดขายเฉลี่ยต่อวันระหว่างที่โปรเปิด เทียบกับช่วงก่อนเริ่มโปรที่ยาวเท่ากัน — ยังไม่ตัดปัจจัยอื่น (ฤดูกาล โปรซ้อน) ใช้เป็นสัญญาณให้ดูต่อ"
+          description="เรียงตามยอดขายจากโปร · เทียบยอดขาย/วัน ระหว่างโปรกับช่วงก่อนเริ่ม (ยังไม่ตัดปัจจัยอื่น)"
           action={<RankSetting field="topPromotions" value={ranks.topPromotions} label="โปรโมชัน" />}
         />
         {promo.items.length === 0 ? (
