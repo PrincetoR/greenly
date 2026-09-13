@@ -7,7 +7,7 @@ import { cn } from '@/lib/cn';
 
 /**
  * ปุ่มหัวใจ — สลับสถานะทันที (optimistic) แล้วให้ server ยืนยัน
- * variant "overlay" = ปุ่มกลมเล็กบนการ์ดสินค้า · "button" = ปุ่มเต็มข้างปุ่มใส่ตะกร้าในหน้าสินค้า
+ * variant "overlay" = ปุ่มกลมเล็กบนการ์ดสินค้า · "button" = ปุ่มสี่เหลี่ยม 48px ข้างปุ่มใส่ตะกร้าในหน้าสินค้า (ไอคอนอย่างเดียว)
  */
 export function WishlistButton({ productId, saved, variant = 'overlay' }: { productId: string; saved: boolean; variant?: 'overlay' | 'button' }) {
   const [state, action, pending] = useActionState<WishlistState, FormData>(toggleWishlist, { saved });
@@ -32,12 +32,12 @@ export function WishlistButton({ productId, saved, variant = 'overlay' }: { prod
           'inline-flex items-center justify-center gap-2 transition-colors',
           variant === 'overlay'
             ? 'size-9 rounded-full border border-line hover:bg-surface-alt'
-            : 'h-12 rounded-lg px-4 text-sm font-semibold border border-line hover:bg-surface-alt',
+            : 'size-12 rounded-lg border border-line hover:bg-surface-alt',
           optimistic ? 'text-accent' : 'text-muted hover:text-accent',
         )}
       >
         <Heart className="size-5" fill={optimistic ? 'currentColor' : 'none'} aria-hidden />
-        {variant === 'button' && <span className="hidden sm:inline">{optimistic ? 'อยู่ในรายการโปรด' : 'รายการโปรด'}</span>}
+
       </button>
     </form>
   );
