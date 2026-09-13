@@ -91,7 +91,7 @@ export function ProductListing({
         {/* หัวข้อหน้าอยู่เหนือช่องค้นหา ในคอลัมน์ขวา */}
         <div className="flex min-h-10 flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
+            <h1 className="text-xl font-bold sm:text-2xl">{title}</h1>
             {description && <p className="mt-1 text-sm text-muted">{description}</p>}
           </div>
           <p className="text-sm text-muted">{products.length} รายการ</p>
