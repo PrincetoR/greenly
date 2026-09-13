@@ -8,7 +8,7 @@ import { isValidRank, RANK_MAX, RANK_MIN, RANK_PRESETS } from '@/lib/analytics/r
 import { updateDashboardRank } from '@/lib/actions/settings';
 
 /**
- * รูปเฟืองมุมขวาของการ์ดอันดับ (ไอคอนเปล่า บรรทัดเดียวกับหัวข้อ ชิดขอบขวา) — กดแล้วเปิดป๊อปอัปเลือกจำนวนอันดับ (ปุ่มลัด 5/10/20 หรือพิมพ์เอง 1–50)
+ * รูปเฟืองมุมขวาบนของการ์ดอันดับ (ไอคอนเปล่า ห่างขอบบน/ขวาของ card 20px เท่ากัน) — กดแล้วเปิดป๊อปอัปเลือกจำนวนอันดับ (ปุ่มลัด 5/10/20 หรือพิมพ์เอง 1–50)
  * บันทึกลง settings ผ่าน server action → หน้าถูก revalidate โหลดข้อมูลตามจำนวนใหม่ทันที
  */
 export function RankSetting({ field, value, label }: { field: DashboardRankKey; value: number; label: string }) {
@@ -55,7 +55,8 @@ export function RankSetting({ field, value, label }: { field: DashboardRankKey; 
   };
 
   return (
-    <div ref={ref} className="relative">
+    // mt-1: header เว้นบน 16 + 4 = 20 เท่าระยะขอบขวา (px-5) → ไอคอนห่างขอบบน/ขวาของ card เท่ากัน 20px (พี่ต่อขอสมมาตร)
+    <div ref={ref} className="relative mt-1">
       <button
         type="button"
         onClick={() => {
@@ -67,8 +68,8 @@ export function RankSetting({ field, value, label }: { field: DashboardRankKey; 
         aria-expanded={open}
         aria-label={`ตั้งค่าจำนวนอันดับ${label}`}
         title="ตั้งค่าจำนวนอันดับ"
-        // ไอคอนเปล่า ไม่มีกล่อง ขนาดเท่าตัวอักษร (16px) · สูงเท่าบรรทัดหัวข้อ (line-height 1.6em) ให้กึ่งกลางตรง h2 · ขอบขวาไอคอนตรงขอบเนื้อหาการ์ด
-        className={cn('flex h-[1.6em] items-center text-muted transition-colors hover:text-ink', open && 'text-ink')}
+        // ไอคอนเปล่า ไม่มีกล่อง ขนาดเท่าตัวอักษร (16px) · กล่องปุ่มเท่าไอคอนพอดี ให้ขอบไอคอน = ขอบปุ่ม
+        className={cn('flex size-4 items-center justify-center text-muted transition-colors hover:text-ink', open && 'text-ink')}
       >
         <Settings className="size-4" aria-hidden />
       </button>
