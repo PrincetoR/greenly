@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, Heart, Package, User } from 'lucide-react';
+import { Heart, Package, User } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 export const ACCOUNT_ITEMS = [
@@ -12,8 +12,8 @@ export const ACCOUNT_ITEMS = [
 ] as const;
 
 /**
- * ปุ่มบัญชี (รูปคน + ลูกศรลงเล็ก ๆ) → เมนู โปรไฟล์ · รายการโปรด · ประวัติการสั่งซื้อ
- * วางไว้ซ้ายของตะกร้า ให้ตะกร้าอยู่ขวาสุดเสมอ (จุดสามจุดหลังตะกร้าดูเหมือนไปกั้นตะกร้า)
+ * ปุ่มบัญชี = ไอคอนรูปคนเฉย ๆ ขนาดเดียวกับตะกร้า (พี่ต่อไม่เอาวงกลม/ลูกศร) → เมนู โปรไฟล์ · รายการโปรด · ประวัติการสั่งซื้อ
+ * วางไว้ซ้ายของตะกร้า ให้ตะกร้าอยู่ขวาสุดเสมอ
  */
 export function AccountMenu({ wishlistCount, className }: { wishlistCount: number; className?: string }) {
   const [open, setOpen] = useState(false);
@@ -45,12 +45,9 @@ export function AccountMenu({ wishlistCount, className }: { wishlistCount: numbe
         aria-expanded={open}
         aria-label="เมนูบัญชี"
         title="เมนูบัญชี"
-        className={cn('flex h-10 items-center gap-0.5 rounded-lg pr-1.5 pl-2 transition-colors hover:bg-surface-alt', open && 'bg-surface-alt')}
+        className={cn('flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-surface-alt', open ? 'bg-surface-alt text-brand' : 'text-ink')}
       >
-        <span className="flex size-7 items-center justify-center rounded-full bg-surface-alt text-ink" aria-hidden>
-          <User className="size-4" />
-        </span>
-        <ChevronDown className={cn('size-3.5 text-muted transition-transform', open && 'rotate-180')} aria-hidden />
+        <User className="size-5" aria-hidden />
       </button>
 
       {open && (
