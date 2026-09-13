@@ -68,7 +68,8 @@ export function ProductListing({
          * คั่นด้วยเส้น แล้วรายการเริ่มที่ระดับขอบบนช่องค้นหา (หัวข้อ 40 + gap 16)
          */}
         <nav aria-label="หมวดหมู่สินค้า" className="sticky top-[72px] -mt-2 rounded-card bg-surface p-2 ring-1 ring-line">
-          <p className="flex h-10 items-center px-3 text-sm font-semibold">หมวดหมู่สินค้า</p>
+          {/* ขนาดใกล้เคียงหัวข้อหน้า (ย่อมกว่าหนึ่งขั้น) ให้ดูเป็นหัวข้อของคอลัมน์ ไม่ใช่รายการหนึ่ง */}
+          <p className="flex h-10 items-center px-3 text-lg font-bold">หมวดหมู่สินค้า</p>
           <div className="mt-2 mb-[7px] border-t border-line" aria-hidden />
           <ul className="flex flex-col gap-0.5">
             {links.map((l) => (
