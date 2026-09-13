@@ -1,9 +1,8 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import Link from 'next/link';
 import { addToCart, type CartActionState } from '@/lib/actions/cart';
-import { Button, buttonStyles } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Minus, Plus, ShoppingCart } from 'lucide-react';
 
 /**
@@ -53,13 +52,8 @@ export function AddToCart({ productId, stock }: { productId: string; stock: numb
         </Button>
       </div>
       {state.message && (
-        <p role="status" className={`flex flex-wrap items-center gap-2 text-sm ${state.ok ? 'text-ok' : 'text-danger'}`}>
+        <p role="status" className={`text-sm ${state.ok ? 'text-ok' : 'text-danger'}`}>
           {state.message}
-          {state.ok && (
-            <Link href="/cart" className={buttonStyles({ variant: 'secondary', size: 'sm' })}>
-              ไปที่ตะกร้า
-            </Link>
-          )}
         </p>
       )}
     </form>
