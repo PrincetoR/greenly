@@ -15,7 +15,7 @@ const { BASE, launch, login, ok } = require('./lib');
     ok((await page.locator('nav[aria-label="แถบสถานะ"] a[href="/account"]').textContent()).trim() === user, `${user}: แถบสถานะแสดงชื่อ login`);
     await page.click('header nav[aria-label="เมนูหลัก"] a[href="/admin"]');
     await page.waitForURL(/\/admin$/);
-    ok(await page.locator('h1:has-text("แดชบอร์ด")').isVisible(), `${user}: กดการจัดการ → แดชบอร์ด`);
+    ok(await page.locator('main aside nav ul a[aria-current=page][href="/admin"]').isVisible(), `${user}: กดการจัดการ → แดชบอร์ด`);
   }
 
   // logout แล้วเมนูหาย

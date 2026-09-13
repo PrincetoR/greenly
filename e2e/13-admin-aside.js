@@ -30,14 +30,21 @@ const near = (a, b) => Math.abs(a - b) < 0.5;
     r.selectNodeContents(a);
     return r.getBoundingClientRect().left;
   });
-  const h1 = await box(page, 'main h1');
   const content = await box(page, 'main > div > div.min-w-0');
+  const kpi = await box(page, 'main > div > div.min-w-0 .grid > *');
 
   ok(['x', 'y', 'width'].every((k) => near(card[k], shop.card[k])), `card เมนูตำแหน่ง/กว้างเท่า card หมวดหมู่ (${card.x},${card.y},${card.width})`);
   ok(near(line.y, shop.line.y) && near(first.y, shop.first.y) && near(heading.y, shop.heading.y), `เส้นคั่น ${line.y} · รายการแรก ${first.y} · หัว ${heading.y} ตรงกับหน้าสินค้า`);
   ok(near(pill.x + pill.width, card.x + card.width), `ขอบขวา "สินค้าทั้งหมด" = ขอบขวา card (${pill.x + pill.width} / ${card.x + card.width})`);
   ok(near(promoText, content.x), `"โปรโมชัน" เริ่มที่ขอบซ้ายเนื้อหา (${promoText} / ${content.x})`);
-  ok(near(h1.y + h1.height / 2, heading.y + heading.height / 2) && near(h1.y, card.y), `หัวข้อหน้า กึ่งกลางตรง "จัดการสินค้า" และขอบบนตรง card (${h1.y} / ${card.y})`);
+  ok(near(kpi.y, card.y) && near(kpi.x, content.x), `แดชบอร์ดไม่มีหัวข้อ — card KPI แรกขอบบน/ซ้ายตรง card เมนู (${kpi.x},${kpi.y} / ${content.x},${card.y})`);
+  ok((await page.locator('main h1').count()) === 0, 'แดชบอร์ดไม่มี h1');
+  // หน้าอื่นยังมีหัวข้อ: กึ่งกลางตรง "จัดการสินค้า"
+  await page.goto(`${BASE}/admin/orders`);
+  const h1 = await box(page, 'main h1');
+  const heading2 = await box(page, 'main aside nav p');
+  ok(near(h1.y + h1.height / 2, heading2.y + heading2.height / 2) && near(h1.y, card.y), `หน้าคำสั่งซื้อ: หัวข้อกึ่งกลางตรง "จัดการสินค้า" ขอบบนตรง card (${h1.y} / ${card.y})`);
+  await page.goto(`${BASE}/admin`);
   ok(await page.evaluate(() => getComputedStyle(document.querySelector('main aside nav div[aria-hidden]'), '::after').content === '""'), 'เส้นคั่นมีหัวลูกศร (divider-caret)');
   await shot(page, 'p13-admin-aside');
 

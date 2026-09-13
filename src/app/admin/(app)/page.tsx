@@ -8,7 +8,6 @@ import { promotionStatus } from '@/lib/pricing/status';
 import { formatBaht } from '@/lib/money';
 import { humanCountdown } from '@/lib/datetime';
 import { ORDER_STATUS_LABEL, ORDER_STATUS_TONE } from '@/lib/orders/labels';
-import { PageHeader } from '@/components/admin/page-header';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { buttonStyles } from '@/components/ui/button';
@@ -35,9 +34,7 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      {/* ไม่มีบรรทัดทักทาย/เวลา (พี่ต่อเอาออก) — ชื่อกับ role อยู่ใน card ผู้ใช้ทางซ้ายแล้ว */}
-      <PageHeader title="แดชบอร์ด" />
-
+      {/* ไม่มีหัวข้อ/บรรทัดทักทาย (พี่ต่อเอาออก) — แถว KPI เริ่มที่ขอบบนเดียวกับ card "จัดการสินค้า" · ชื่อหน้าอยู่ใน metadata.title */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="ยอดขายวันนี้" value={formatBaht(revenueToday)} sub={`${today.length} ออเดอร์`} />
         <Kpi label="รอยืนยัน/ชำระ" value={String(pending.length)} sub="ออเดอร์" href={canOrders ? '/admin/orders?status=pending' : undefined} tone={pending.length > 0 ? 'warn' : undefined} />
