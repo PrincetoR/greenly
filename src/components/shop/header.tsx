@@ -12,6 +12,9 @@ const NAV = [
   { href: '/products', label: 'สินค้าทั้งหมด' },
   { href: '/promotions', label: 'โปรโมชัน' },
 ] as const;
+/** โผล่เฉพาะเมื่อ login หลังบ้านอยู่ (admin/staff) — layout ฝั่ง server เป็นคนตัดสิน */
+const STAFF_NAV = { href: '/admin', label: 'การจัดการ' } as const;
+type NavItem = (typeof NAV)[number] | typeof STAFF_NAV;
 
 /**
  * หัวเว็บฝั่งลูกค้า — มุมขวา: [บัญชี ▾] [ตะกร้า] · ตะกร้าอยู่ขวาสุดเสมอ ไม่มีอะไรมากั้น
@@ -22,14 +25,18 @@ export function ShopHeader({
   categories,
   cartCount,
   wishlistCount,
+  isStaff = false,
 }: {
   storeName: string;
   categories: Category[];
   cartCount: number;
   wishlistCount: number;
+  /** login หลังบ้านอยู่ → แสดงเมนู "การจัดการ" */
+  isStaff?: boolean;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const nav: readonly NavItem[] = isStaff ? [...NAV, STAFF_NAV] : NAV;
 
   // ปิด drawer ทุกครั้งที่เปลี่ยนหน้า — ปรับ state ระหว่าง render ตามแนวทาง React แทน useEffect
   const [seenPath, setSeenPath] = useState(pathname);
@@ -56,7 +63,7 @@ export function ShopHeader({
             <NavLink item={NAV[0]} pathname={pathname} className="hidden shrink-0 md:block" />
           </div>
           <div className="ml-1 hidden items-center gap-1 md:flex">
-            {NAV.slice(1).map((item) => (
+            {nav.slice(1).map((item) => (
               <NavLink key={item.href} item={item} pathname={pathname} />
             ))}
           </div>
@@ -99,7 +106,7 @@ export function ShopHeader({
       <div id="mobile-menu" hidden={!open} className="border-t border-line bg-surface px-4 py-4 md:hidden">
         <SearchForm autoFocus />
         <nav aria-label="เมนูหลัก (มือถือ)" className="mt-3 flex flex-col">
-          {NAV.map((item) => (
+          {nav.map((item) => (
             <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2.5 font-medium hover:bg-surface-alt">
               {item.label}
             </Link>
@@ -134,7 +141,7 @@ export function ShopHeader({
   );
 }
 
-function NavLink({ item, pathname, className }: { item: (typeof NAV)[number]; pathname: string; className?: string }) {
+function NavLink({ item, pathname, className }: { item: NavItem; pathname: string; className?: string }) {
   return (
     <Link
       href={item.href}
