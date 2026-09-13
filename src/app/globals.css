@@ -32,7 +32,8 @@
   --info: #2563eb;
   --info-soft: #e5edff;
 
-  --radius: 12px;
+  /* มุมมนเดียวทั้งระบบ 6px (พี่ต่อสั่ง) — การ์ด ปุ่ม ช่องกรอก แถบเมนู ใช้ค่านี้หมด · วงกลม/pill ยังเป็น rounded-full */
+  --radius: 6px;
 
   /*
    * เส้นแนวตั้งร่วมของหน้าร้าน: คอลัมน์หมวดหมู่กว้าง --aside-w (gap 16px)
@@ -63,6 +64,10 @@
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
   --radius-card: var(--radius);
+  /* override scale ของ Tailwind ให้ rounded-md/lg/xl ที่ใช้อยู่ทั่วโค้ดเป็น 6px เท่ากันหมด */
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
   --font-sans: var(--font-thai), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -85,7 +90,7 @@
     width: 100%;
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: var(--radius);
     padding: 0.5rem 0.75rem;
     font: inherit;
     color: var(--ink);
