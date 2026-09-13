@@ -62,8 +62,30 @@ export function ProductListing({
     ...categories.map((c) => ({ href: `/category/${c.slug}${query({})}`, label: c.name, active: current?.id === c.id })),
   ];
 
+  const asideNav = aside && (
+    <aside className="hidden md:block">
+      <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
+        <p className="px-3 pt-2 pb-1 text-xs font-semibold tracking-wide text-muted uppercase">หมวดหมู่</p>
+        <ul className="flex flex-col">
+          {links.map((l) => (
+            <li key={l.href}>
+              <Link
+                href={l.href}
+                aria-current={l.active ? 'page' : undefined}
+                className={cn('block rounded-lg px-3 py-2 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
+              >
+                {l.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
+  );
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      {/* หัวข้อกว้างเต็ม */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
@@ -86,65 +108,48 @@ export function ProductListing({
         ))}
       </ul>
 
-      {/* ซ้าย: ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
-      <form action={basePath} className="mt-4 flex flex-wrap items-center gap-2">
-        <input type="search" name="q" defaultValue={q} placeholder="ค้นหาในรายการนี้" aria-label="ค้นหา" className="h-10 min-w-0 flex-1 sm:max-w-xs sm:flex-none sm:basis-72" />
-        <button type="submit" className={buttonStyles({ variant: 'secondary' })}>
-          ค้นหา
-        </button>
-        {q && (
-          <Link href={`${basePath}${query({ q: undefined })}`} className={buttonStyles({ variant: 'ghost' })}>
-            <X className="size-4" aria-hidden />
-            ล้างคำค้น
-          </Link>
-        )}
-        <select name="sort" defaultValue={sort} aria-label="เรียงลำดับ" className="ml-auto h-10 w-auto!">
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </form>
-
-      {/* แถวเนื้อหา: โหมด aside = card หมวดหมู่ซ้าย (ขอบบนตรงกับการ์ดสินค้า) + กริดขวา */}
-      <div className={cn('mt-6', aside && 'md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4')}>
-        {aside && (
-          <aside className="hidden md:block">
-            <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
-              <p className="px-3 pt-2 pb-1 text-xs font-semibold tracking-wide text-muted uppercase">หมวดหมู่</p>
-              <ul className="flex flex-col">
-                {links.map((l) => (
-                  <li key={l.href}>
-                    <Link
-                      href={l.href}
-                      aria-current={l.active ? 'page' : undefined}
-                      className={cn('block rounded-lg px-3 py-2 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
-                    >
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </aside>
-        )}
+      {/* โหมด aside: card หมวดหมู่อยู่ใต้หัวข้อทางซ้าย · ช่องค้นหา + กริดอยู่คอลัมน์ขวา ขอบซ้ายตรงกัน */}
+      <div className={cn('mt-4', aside && 'md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4')}>
+        {asideNav}
 
         <div className="min-w-0">
-          {products.length === 0 ? (
-            <EmptyState
-              icon={<SearchX />}
-              title={q ? `ไม่พบสินค้าที่ตรงกับ "${q}"` : 'ยังไม่มีสินค้าในหมวดนี้'}
-              description="ลองใช้คำค้นอื่น หรือดูสินค้าทั้งหมด"
-              action={
-                <Link href="/products" className={buttonStyles()}>
-                  ดูสินค้าทั้งหมด
-                </Link>
-              }
-            />
-          ) : (
-            <ProductGrid>{products.map((p, i) => (renderCard ? renderCard(p, i) : <ProductCard key={p.id} product={p} priority={i < 4} />))}</ProductGrid>
-          )}
+          {/* ซ้าย: ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
+          <form action={basePath} className="flex flex-wrap items-center gap-2">
+            <input type="search" name="q" defaultValue={q} placeholder="ค้นหาในรายการนี้" aria-label="ค้นหา" className="h-10 min-w-0 flex-1 sm:max-w-xs sm:flex-none sm:basis-72" />
+            <button type="submit" className={buttonStyles({ variant: 'secondary' })}>
+              ค้นหา
+            </button>
+            {q && (
+              <Link href={`${basePath}${query({ q: undefined })}`} className={buttonStyles({ variant: 'ghost' })}>
+                <X className="size-4" aria-hidden />
+                ล้างคำค้น
+              </Link>
+            )}
+            <select name="sort" defaultValue={sort} aria-label="เรียงลำดับ" className="ml-auto h-10 w-auto!">
+              {SORT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </form>
+
+          <div className="mt-6">
+            {products.length === 0 ? (
+              <EmptyState
+                icon={<SearchX />}
+                title={q ? `ไม่พบสินค้าที่ตรงกับ "${q}"` : 'ยังไม่มีสินค้าในหมวดนี้'}
+                description="ลองใช้คำค้นอื่น หรือดูสินค้าทั้งหมด"
+                action={
+                  <Link href="/products" className={buttonStyles()}>
+                    ดูสินค้าทั้งหมด
+                  </Link>
+                }
+              />
+            ) : (
+              <ProductGrid>{products.map((p, i) => (renderCard ? renderCard(p, i) : <ProductCard key={p.id} product={p} priority={i < 4} />))}</ProductGrid>
+            )}
+          </div>
         </div>
       </div>
     </div>
