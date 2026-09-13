@@ -42,31 +42,24 @@ export function ShopHeader({
     <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4">
         {/*
-         * ช่องโลโก้กว้าง = aside − (gap 8 + ml-4 16) − เมนู 1 ช่อง และเมนูแต่ละช่องกว้างคงที่
-         * → ขอบขวาของเมนูแรก "สินค้าทั้งหมด" ตรงกับขอบขวาของ card หมวดหมู่ในหน้ารายการเป๊ะ
+         * เส้นแนวตั้งร่วมกับหน้ารายการสินค้า (จอ md+):
+         * กล่องซ้ายกว้าง = --aside-w และดันเมนูแรกไปชิดขวา → ขอบขวา "สินค้าทั้งหมด" = ขอบขวา card หมวดหมู่
+         * เมนูถัดไปห่าง 4px + padding 12 → ข้อความ "โปรโมชัน" เริ่มตรงขอบซ้ายของการ์ดสินค้า/ช่องค้นหา
+         * ทุกเมนูกว้างตามข้อความ padding ซ้าย-ขวาเท่ากัน · โลโก้ยาวเกินจะถูกตัด
          */}
-        <Link
-          href="/"
-          className="flex items-center gap-1 truncate text-lg font-bold text-brand md:w-[calc(var(--aside-w)-1.5rem-var(--nav-item-w))]"
-        >
-          <Leaf className="size-5 shrink-0" aria-hidden />
-          <span className="truncate">{storeName}</span>
-        </Link>
-
-        <nav aria-label="เมนูหลัก" className="ml-4 hidden items-center gap-1 md:flex">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                // px-3 + gap-1 → ข้อความเมนูช่องที่ 2 เริ่มที่ 300+4+12 = 316 ตรงขอบซ้ายของการ์ดสินค้า/ช่องค้นหา
-                'w-[var(--nav-item-w)] rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors',
-                pathname.startsWith(item.href) ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt',
-              )}
-            >
-              {item.label}
+        <nav aria-label="เมนูหลัก" className="flex min-w-0 items-center">
+          <div className="flex min-w-0 items-center md:w-[var(--aside-w)] md:shrink-0 md:justify-between md:gap-2">
+            <Link href="/" className="flex min-w-0 items-center gap-1 text-lg font-bold text-brand">
+              <Leaf className="size-5 shrink-0" aria-hidden />
+              <span className="truncate">{storeName}</span>
             </Link>
-          ))}
+            <NavLink item={NAV[0]} pathname={pathname} className="hidden shrink-0 md:block" />
+          </div>
+          <div className="ml-1 hidden items-center gap-1 md:flex">
+            {NAV.slice(1).map((item) => (
+              <NavLink key={item.href} item={item} pathname={pathname} />
+            ))}
+          </div>
         </nav>
 
         <div className="ml-auto hidden w-72 md:block lg:w-80">
@@ -138,6 +131,21 @@ export function ShopHeader({
         )}
       </div>
     </header>
+  );
+}
+
+function NavLink({ item, pathname, className }: { item: (typeof NAV)[number]; pathname: string; className?: string }) {
+  return (
+    <Link
+      href={item.href}
+      className={cn(
+        'rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors',
+        pathname.startsWith(item.href) ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt',
+        className,
+      )}
+    >
+      {item.label}
+    </Link>
   );
 }
 
