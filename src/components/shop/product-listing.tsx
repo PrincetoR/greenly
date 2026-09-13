@@ -135,7 +135,8 @@ export function ProductListing({
             </select>
           </form>
 
-          <div className="mt-6">
+          {/* ระยะจากแถบค้นหาถึงกริด = ระยะระหว่างการ์ด (gap-3 / sm:gap-4) */}
+          <div className="mt-3 sm:mt-4">
             {products.length === 0 ? (
               <EmptyState
                 icon={<SearchX />}
