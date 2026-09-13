@@ -59,7 +59,8 @@ export function ShopHeader({
               key={item.href}
               href={item.href}
               className={cn(
-                'w-[var(--nav-item-w)] rounded-lg py-2 text-center text-sm font-medium transition-colors',
+                // px-3 + gap-1 → ข้อความเมนูช่องที่ 2 เริ่มที่ 300+4+12 = 316 ตรงขอบซ้ายของการ์ดสินค้า/ช่องค้นหา
+                'w-[var(--nav-item-w)] rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors',
                 pathname.startsWith(item.href) ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt',
               )}
             >
