@@ -14,8 +14,8 @@ const NAV = [
 ] as const;
 
 /**
- * หัวเว็บฝั่งลูกค้า — มุมขวามีแค่ ตะกร้า + จุดสามจุด (เมนูบัญชี) ให้โล่ง
- * mobile: ตะกร้า + ปุ่มเมนู → drawer รวมค้นหา · เมนูหลัก · บัญชี · หมวดหมู่ (จุดสามจุดซ่อนไว้)
+ * หัวเว็บฝั่งลูกค้า — มุมขวา: [บัญชี ▾] [ตะกร้า] · ตะกร้าอยู่ขวาสุดเสมอ ไม่มีอะไรมากั้น
+ * mobile: ตะกร้า + ปุ่มเมนู → drawer รวมค้นหา · เมนูหลัก · บัญชี · หมวดหมู่ (ปุ่มบัญชีซ่อนไว้)
  */
 export function ShopHeader({
   storeName,
@@ -65,7 +65,8 @@ export function ShopHeader({
           <SearchForm />
         </div>
 
-        <div className="ml-auto flex items-center md:ml-0">
+        <div className="ml-auto flex items-center gap-1 md:ml-0">
+          <AccountMenu wishlistCount={wishlistCount} className="hidden md:block" />
           <Link
             href="/cart"
             aria-label={cartCount > 0 ? `ตะกร้า ${cartCount} ชิ้น` : 'ตะกร้า'}
@@ -79,8 +80,6 @@ export function ShopHeader({
               </span>
             )}
           </Link>
-
-          <AccountMenu wishlistCount={wishlistCount} className="hidden md:block" />
 
           <button
             type="button"
