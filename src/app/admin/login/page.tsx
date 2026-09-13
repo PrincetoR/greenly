@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth/session';
 import { getSettings } from '@/lib/db/settings';
 import { LoginForm } from '@/components/admin/login-form';
+import { Leaf } from 'lucide-react';
 
 export const metadata = { title: 'เข้าสู่ระบบหลังบ้าน' };
 
@@ -14,9 +15,9 @@ export default async function LoginPage({ searchParams }: PageProps<'/admin/logi
     <main className="flex min-h-dvh items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="text-center">
-          <p className="text-3xl" aria-hidden>
-            🌿
-          </p>
+          <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand" aria-hidden>
+            <Leaf className="size-7" />
+          </span>
           <h1 className="mt-2 text-2xl font-bold">{storeName}</h1>
           <p className="text-sm text-muted">ระบบหลังบ้าน</p>
         </div>

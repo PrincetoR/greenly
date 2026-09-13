@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SearchX, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import type { Category, Product } from '@/lib/types';
 import { ProductCard, ProductGrid } from './product-card';
@@ -7,8 +8,8 @@ import { buttonStyles } from '@/components/ui/button';
 
 export const SORT_OPTIONS = [
   { value: 'newest', label: 'ใหม่ล่าสุด' },
-  { value: 'price-asc', label: 'ราคาต่ำ → สูง' },
-  { value: 'price-desc', label: 'ราคาสูง → ต่ำ' },
+  { value: 'price-asc', label: 'ราคาต่ำไปสูง' },
+  { value: 'price-desc', label: 'ราคาสูงไปต่ำ' },
   { value: 'name', label: 'ชื่อ ก–ฮ' },
 ] as const;
 export type SortValue = (typeof SORT_OPTIONS)[number]['value'];
@@ -91,7 +92,8 @@ export function ProductListing({
         </button>
         {q && (
           <Link href={`${basePath}${query({ q: undefined })}`} className={buttonStyles({ variant: 'ghost' })}>
-            ล้างคำค้น ✕
+            <X className="size-4" aria-hidden />
+            ล้างคำค้น
           </Link>
         )}
       </form>
@@ -99,7 +101,7 @@ export function ProductListing({
       <div className="mt-6">
         {products.length === 0 ? (
           <EmptyState
-            icon="🔍"
+            icon={<SearchX />}
             title={q ? `ไม่พบสินค้าที่ตรงกับ "${q}"` : 'ยังไม่มีสินค้าในหมวดนี้'}
             description="ลองใช้คำค้นอื่น หรือดูสินค้าทั้งหมด"
             action={

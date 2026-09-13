@@ -11,6 +11,7 @@ import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { buttonStyles } from '@/components/ui/button';
 import { AutoSubmitSelect } from '@/components/ui/auto-submit-select';
+import { Gift, ShoppingCart, Tag, X } from 'lucide-react';
 
 export const metadata = { title: 'ตะกร้าสินค้า' };
 
@@ -23,7 +24,7 @@ export default async function CartPage() {
       <div className="mx-auto max-w-3xl px-4 py-12">
         <h1 className="mb-6 text-2xl font-bold sm:text-3xl">ตะกร้าสินค้า</h1>
         <EmptyState
-          icon="🛒"
+          icon={<ShoppingCart />}
           title="ตะกร้ายังว่างอยู่"
           description="เลือกสินค้าที่ชอบแล้วกลับมาที่นี่ได้เลย"
           action={
@@ -61,11 +62,13 @@ export default async function CartPage() {
                       </Link>
                       {l.isGift ? (
                         <Badge tone="brand" className="mt-1">
-                          🎁 ของแถม · {l.promotionName}
+                          <Gift className="size-3" aria-hidden />
+                          ของแถม · {l.promotionName}
                         </Badge>
                       ) : l.promotionName ? (
                         <Badge tone="accent" className="mt-1">
-                          🏷️ {l.promotionName}
+                          <Tag className="size-3" aria-hidden />
+                          {l.promotionName}
                           {l.discountedQty < l.qty && ` (${l.discountedQty}/${l.qty} ชิ้น)`}
                         </Badge>
                       ) : null}
@@ -74,7 +77,7 @@ export default async function CartPage() {
                       <form action={removeFromCart}>
                         <input type="hidden" name="productId" value={l.productId} />
                         <button type="submit" aria-label={`นำ ${l.name} ออก`} className="rounded-md p-1 text-muted hover:bg-danger-soft hover:text-danger">
-                          ✕
+                          <X className="size-4" aria-hidden />
                         </button>
                       </form>
                     )}
@@ -129,7 +132,7 @@ export default async function CartPage() {
             ไปชำระเงิน
           </Link>
           <Link href="/products" className="text-center text-sm text-muted hover:text-ink">
-            ← เลือกซื้อต่อ
+            เลือกซื้อต่อ
           </Link>
         </aside>
       </div>

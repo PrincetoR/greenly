@@ -8,12 +8,6 @@ export const PROMOTION_TYPE_LABEL: Record<Promotion['type'], string> = {
   bogo: 'ซื้อแถม',
 };
 
-export const PROMOTION_TYPE_ICON: Record<Promotion['type'], string> = {
-  discount: '🏷️',
-  coupon: '🎟️',
-  bogo: '🎁',
-};
-
 type PromoLike = Pick<Promotion, 'type' | 'scope' | 'discount' | 'coupon' | 'bogo' | 'limits' | 'startsAt' | 'endsAt'>;
 
 /** "ลด 20%" / "ลด ฿100" / "ซื้อ 2 แถม 1" — ใช้บนป้ายที่มีที่น้อย */

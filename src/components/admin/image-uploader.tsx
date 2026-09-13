@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from 'react';
 import { uploadImage } from '@/lib/actions/upload';
 import { ProductImage } from '@/components/product-image';
 import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, ImagePlus, Loader2, Trash2 } from 'lucide-react';
 
 /**
  * อัปโหลดรูปหลายรูป — รูปแรกในลิสต์คือรูปปก
@@ -59,13 +60,13 @@ export function ImageUploader({ initial, max = 6 }: { initial: string[]; max?: n
             )}
             <div className="absolute inset-x-0 bottom-0 flex justify-center gap-1 bg-ink/60 p-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
               <IconBtn label="เลื่อนไปซ้าย" onClick={() => move(i, i - 1)} disabled={i === 0}>
-                ←
+                <ChevronLeft className="size-4" aria-hidden />
               </IconBtn>
               <IconBtn label="ลบรูป" onClick={() => setImages((p) => p.filter((_, j) => j !== i))}>
-                🗑
+                <Trash2 className="size-4" aria-hidden />
               </IconBtn>
               <IconBtn label="เลื่อนไปขวา" onClick={() => move(i, i + 1)} disabled={i === images.length - 1}>
-                →
+                <ChevronRight className="size-4" aria-hidden />
               </IconBtn>
             </div>
           </li>
@@ -74,9 +75,7 @@ export function ImageUploader({ initial, max = 6 }: { initial: string[]; max?: n
         {images.length < max && (
           <li>
             <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-line text-muted transition-colors hover:border-brand hover:text-brand">
-              <span className="text-2xl" aria-hidden>
-                {pending ? '⏳' : '＋'}
-              </span>
+              <span aria-hidden>{pending ? <Loader2 className="size-7 animate-spin" /> : <ImagePlus className="size-7" />}</span>
               <span className="text-xs">{pending ? 'กำลังอัปโหลด' : 'เพิ่มรูป'}</span>
               <input
                 ref={inputRef}

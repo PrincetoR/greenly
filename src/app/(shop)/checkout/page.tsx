@@ -40,7 +40,7 @@ export default async function CheckoutPage() {
             <OrderSummary quote={quote} freeShippingMin={settings.freeShippingMin} />
           </div>
           <Link href="/cart" className="mt-3 block text-center text-sm text-muted hover:text-ink">
-            ← แก้ไขตะกร้า
+            แก้ไขตะกร้า
           </Link>
         </aside>
       </div>

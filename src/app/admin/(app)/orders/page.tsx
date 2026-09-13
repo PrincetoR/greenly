@@ -10,6 +10,7 @@ import { Table, Td, Th } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/cn';
+import { Receipt } from 'lucide-react';
 
 export const metadata = { title: 'คำสั่งซื้อ' };
 
@@ -46,7 +47,7 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
       </div>
 
       {orders.length === 0 ? (
-        <EmptyState icon="🧾" title="ไม่มีคำสั่งซื้อ" description={q || status ? 'ลองเปลี่ยนตัวกรอง' : 'เมื่อลูกค้าสั่งซื้อ รายการจะขึ้นที่นี่'} />
+        <EmptyState icon={<Receipt />} title="ไม่มีคำสั่งซื้อ" description={q || status ? 'ลองเปลี่ยนตัวกรอง' : 'เมื่อลูกค้าสั่งซื้อ รายการจะขึ้นที่นี่'} />
       ) : (
         <>
           <div className="hidden md:block">

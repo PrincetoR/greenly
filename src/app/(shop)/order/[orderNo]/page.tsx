@@ -11,6 +11,7 @@ import { ProductImage } from '@/components/product-image';
 import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
 import { buttonStyles } from '@/components/ui/button';
+import { CheckCircle2, Gift, Lock } from 'lucide-react';
 
 export const metadata = { title: 'คำสั่งซื้อ' };
 
@@ -24,8 +25,8 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
   if (!guestId || !order.guestIds.includes(guestId)) {
     return (
       <div className="mx-auto max-w-md px-4 py-12">
-        <span className="text-4xl" aria-hidden>
-          🔒
+        <span className="flex size-14 items-center justify-center rounded-full bg-surface-alt text-muted" aria-hidden>
+          <Lock className="size-7" />
         </span>
         <h1 className="mt-3 text-2xl font-bold">ยืนยันตัวตนเพื่อดูคำสั่งซื้อ</h1>
         <p className="mt-1 text-sm text-muted">
@@ -36,7 +37,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
           <OrderLookupForm orderNo={order.orderNo} compact />
         </div>
         <Link href="/orders" className="mt-4 block text-sm text-muted hover:text-ink">
-          ← คำสั่งซื้อของฉัน
+          คำสั่งซื้อของฉัน
         </Link>
       </div>
     );
@@ -45,8 +46,9 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       {sp.new && (
-        <Alert tone="ok" className="mb-6 text-base">
-          🎉 สั่งซื้อสำเร็จ! ขอบคุณที่อุดหนุน {settings.storeName}
+        <Alert tone="ok" className="mb-6 flex items-center gap-2 text-base">
+          <CheckCircle2 className="size-5 shrink-0" aria-hidden />
+          สั่งซื้อสำเร็จ! ขอบคุณที่อุดหนุน {settings.storeName}
         </Alert>
       )}
 
@@ -91,7 +93,12 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
                 <span className="block">{l.name}</span>
                 <span className="text-xs text-muted">
                   {l.qty} × {formatBaht(l.unitPrice)}
-                  {l.isGift && ' · 🎁 ของแถม'}
+                  {l.isGift && (
+                    <>
+                      {' · '}
+                      <Gift className="inline size-3 align-[-2px]" aria-hidden /> ของแถม
+                    </>
+                  )}
                 </span>
               </span>
               <span className="text-right">

@@ -38,22 +38,25 @@ export function isRole(value: unknown): value is Role {
  * เมนูหลังบ้าน = แหล่งความจริงเดียวของ "หน้าไหนต้องใช้สิทธิ์อะไร"
  * sidebar, proxy และ layout อ่านจากตรงนี้ทั้งหมด — เมนูที่เห็นกับหน้าที่เข้าได้จึงตรงกันเสมอ
  */
+export type AdminIconName = 'dashboard' | 'products' | 'categories' | 'promotions' | 'orders' | 'users' | 'settings';
+
 export interface AdminMenuItem {
   href: string;
   label: string;
-  icon: string;
+  /** ชื่อไอคอน — map เป็น component ใน components/admin/icons.tsx (ไฟล์นี้ต้อง pure ไม่ import React) */
+  icon: AdminIconName;
   /** null = ทุกคนที่ล็อกอินหลังบ้านได้ */
   permission: Permission | null;
 }
 
 export const ADMIN_MENU: AdminMenuItem[] = [
-  { href: '/admin', label: 'แดชบอร์ด', icon: '📊', permission: null },
-  { href: '/admin/products', label: 'สินค้า', icon: '📦', permission: 'catalog.manage' },
-  { href: '/admin/categories', label: 'หมวดหมู่', icon: '🗂️', permission: 'catalog.manage' },
-  { href: '/admin/promotions', label: 'โปรโมชัน', icon: '🏷️', permission: 'promotion.manage' },
-  { href: '/admin/orders', label: 'คำสั่งซื้อ', icon: '🧾', permission: 'order.manage' },
-  { href: '/admin/users', label: 'ผู้ใช้', icon: '👥', permission: 'user.manage' },
-  { href: '/admin/settings', label: 'ตั้งค่าร้าน', icon: '⚙️', permission: 'settings.manage' },
+  { href: '/admin', label: 'แดชบอร์ด', icon: 'dashboard', permission: null },
+  { href: '/admin/products', label: 'สินค้า', icon: 'products', permission: 'catalog.manage' },
+  { href: '/admin/categories', label: 'หมวดหมู่', icon: 'categories', permission: 'catalog.manage' },
+  { href: '/admin/promotions', label: 'โปรโมชัน', icon: 'promotions', permission: 'promotion.manage' },
+  { href: '/admin/orders', label: 'คำสั่งซื้อ', icon: 'orders', permission: 'order.manage' },
+  { href: '/admin/users', label: 'ผู้ใช้', icon: 'users', permission: 'user.manage' },
+  { href: '/admin/settings', label: 'ตั้งค่าร้าน', icon: 'settings', permission: 'settings.manage' },
 ];
 
 export function visibleMenu(role: Role): AdminMenuItem[] {

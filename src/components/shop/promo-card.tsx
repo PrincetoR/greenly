@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Category, Product, Promotion } from '@/lib/types';
-import { describePromotion, PROMOTION_TYPE_ICON, shortDiscount } from '@/lib/promotions/describe';
+import { describePromotion, shortDiscount } from '@/lib/promotions/describe';
+import { PromoTypeIcon } from './promo-type-icon';
 import { promotionStatus, type PromotionStatus } from '@/lib/pricing/status';
 import type { PromotionUsageStats } from '@/lib/pricing/types';
 import { humanCountdown, formatDateTime } from '@/lib/datetime';
@@ -39,8 +40,8 @@ export function PromoCard({
   return (
     <article className={cn('flex flex-col gap-3 rounded-card bg-surface p-5 ring-1 ring-line', !live && 'opacity-80')}>
       <div className="flex items-start gap-3">
-        <span className={cn('flex size-12 shrink-0 items-center justify-center rounded-xl text-2xl', promo.type === 'bogo' ? 'bg-brand-soft' : 'bg-accent-soft')} aria-hidden>
-          {PROMOTION_TYPE_ICON[promo.type]}
+        <span className={cn('flex size-12 shrink-0 items-center justify-center rounded-xl', promo.type === 'bogo' ? 'bg-brand-soft text-brand' : 'bg-accent-soft text-accent')} aria-hidden>
+          <PromoTypeIcon type={promo.type} className="size-6" />
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -72,7 +73,7 @@ export function PromoCard({
         {left !== null && <span className={cn(left <= 5 && 'font-semibold text-accent')}>เหลือ {left} สิทธิ์</span>}
         {!promo.coupon && (
           <Link href={promoHref(promo, categories)} className="ml-auto font-semibold text-brand hover:underline">
-            ดูสินค้าในโปร →
+            ดูสินค้าในโปร
           </Link>
         )}
       </div>

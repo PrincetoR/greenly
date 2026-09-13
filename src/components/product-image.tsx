@@ -1,3 +1,4 @@
+import { ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 /**
@@ -17,8 +18,8 @@ export function ProductImage({
 }) {
   if (!src) {
     return (
-      <div className={cn('flex aspect-square shrink-0 items-center justify-center bg-surface-alt text-4xl text-muted', className)} aria-hidden>
-        🛍️
+      <div className={cn('flex aspect-square shrink-0 items-center justify-center bg-surface-alt text-muted', className)} aria-hidden>
+        <ShoppingBag className="size-[30%]" />
       </div>
     );
   }

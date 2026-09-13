@@ -6,6 +6,7 @@ import { promotionStatus } from '@/lib/pricing/status';
 import { PromoCard } from '@/components/shop/promo-card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { buttonStyles } from '@/components/ui/button';
+import { Tag } from 'lucide-react';
 
 export const metadata = { title: 'โปรโมชัน' };
 
@@ -24,7 +25,7 @@ export default async function PromotionsPage() {
       {live.length === 0 ? (
         <div className="mt-3">
           <EmptyState
-            icon="🏷️"
+            icon={<Tag />}
             title="ตอนนี้ยังไม่มีโปรโมชัน"
             description={upcoming.length > 0 ? 'มีโปรกำลังจะมาเร็ว ๆ นี้ ดูด้านล่าง' : 'ติดตามโปรใหม่ได้ที่นี่'}
             action={

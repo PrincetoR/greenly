@@ -6,7 +6,9 @@ import { savePromotion } from '@/lib/actions/promotions';
 import { cn } from '@/lib/cn';
 import { formatBaht, satangToInput, toSatang } from '@/lib/money';
 import { toDatetimeLocal, fromDatetimeLocal, humanCountdown } from '@/lib/datetime';
-import { describePromotion, PROMOTION_TYPE_ICON } from '@/lib/promotions/describe';
+import { describePromotion } from '@/lib/promotions/describe';
+import { PromoTypeIcon } from '@/components/shop/promo-type-icon';
+import { ArrowRight } from 'lucide-react';
 import { promotionStatus, PROMOTION_STATUS_LABEL } from '@/lib/pricing/status';
 import type { FormState } from '@/lib/validation/common';
 import type { Category, Product, Promotion, PromotionType } from '@/lib/types';
@@ -170,8 +172,8 @@ export function PromotionForm({
                     on ? 'bg-brand-soft ring-2 ring-brand' : 'bg-surface ring-line hover:ring-muted',
                   )}
                 >
-                  <span className="text-2xl" aria-hidden>
-                    {PROMOTION_TYPE_ICON[t.value]}
+                  <span className={cn('flex size-10 items-center justify-center rounded-lg', on ? 'bg-brand text-white' : 'bg-surface-alt text-muted')} aria-hidden>
+                    <PromoTypeIcon type={t.value} className="size-5" />
                   </span>
                   <span className="mt-1 block font-semibold">{t.title}</span>
                   <span className="mt-0.5 block text-xs text-muted">{t.desc}</span>
@@ -310,7 +312,7 @@ export function PromotionForm({
                     <span className="text-muted">{examplePrice.name}</span>
                     <br />
                     <span className="text-muted line-through">{formatBaht(examplePrice.before)}</span>
-                    <span className="mx-2">→</span>
+                    <ArrowRight className="mx-2 inline size-4 align-[-2px] text-muted" aria-hidden />
                     <span className="text-lg font-bold text-accent">{formatBaht(examplePrice.after)}</span>
                   </p>
                 ) : (

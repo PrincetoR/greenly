@@ -1,0 +1,79 @@
+// รายการโปรด (ไม่ต้อง login, อยู่ข้ามการปิดเบราว์เซอร์) + ไอคอน header เรียง wishlist · cart · profile + ไม่มี emoji/ลูกศรในเมนู
+const { BASE, launch, ok, shot, DATA } = require('./lib');
+const { chromium } = require('playwright');
+const fs = require('fs');
+const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u;
+const GRANOLA = '/product/กราโนล่าน้ำผึ้งอัลมอนด์-300-กรัม-p-009';
+
+(async () => {
+  fs.writeFileSync(`${DATA}/wishlists.json`, '{}\n');
+  let { browser, ctx, page } = await launch();
+
+  // header: 3 ไอคอนเรียงถูกลำดับ มุมขวา เป็น svg
+  await page.goto(`${BASE}/`);
+  const order = await page.locator('header a[title]').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+  ok(JSON.stringify(order) === JSON.stringify(['/wishlist', '/cart', '/orders']), `header icons order: ${order.join(' · ')}`);
+  ok((await page.locator('header svg').count()) >= 5, 'header uses svg icons');
+  const headerText = await page.textContent('header');
+  ok(!EMOJI.test(headerText), 'header has no emoji');
+  const rightX = await page.locator('header a[title="บัญชีของฉัน"]').evaluate((a) => a.getBoundingClientRect().right);
+  ok(rightX > 1100, `icons at right edge (x=${Math.round(rightX)})`);
+
+  // heart on card → wishlist page
+  const card = page.locator('a[href^="/product/"]', { hasText: 'กราโนล่า' }).first();
+  const heart = card.locator('xpath=..').locator('button[aria-label="เพิ่มในรายการโปรด"]');
+  await heart.click();
+  await page.waitForFunction(() => document.querySelector('header a[title="รายการโปรด"] span')?.textContent === '1');
+  ok(true, 'heart on card → wishlist badge = 1');
+  ok(new URL(page.url()).pathname === '/', 'clicking heart did not navigate to product');
+  await page.goto(`${BASE}/wishlist`);
+  ok((await page.locator('a[href^="/product/"]').count()) === 1 && (await page.locator('text=กราโนล่า').count()) >= 1, 'wishlist page shows granola');
+  ok(await page.locator('button[aria-pressed="true"]').first().isVisible(), 'heart filled on wishlist page');
+  await shot(page, 'p10-wishlist');
+
+  // product page: toggle off via big button
+  await page.goto(BASE + GRANOLA);
+  const bigBtn = page.locator('button[aria-pressed="true"]:visible').first();
+  ok((await bigBtn.textContent()).includes('อยู่ในรายการโปรด'), 'product page shows "อยู่ในรายการโปรด"');
+  await bigBtn.click();
+  await page.waitForFunction(() => !document.querySelector('header a[title="รายการโปรด"] span'));
+  ok(true, 'toggle off → badge gone');
+  await page.locator('button[aria-pressed="false"]:visible').first().click();
+  await page.waitForFunction(() => document.querySelector('header a[title="รายการโปรด"] span')?.textContent === '1');
+
+  // persists after browser restart
+  const state = await ctx.storageState();
+  await browser.close();
+  browser = await chromium.launch({ channel: 'chrome', headless: true });
+  ctx = await browser.newContext({ storageState: state, locale: 'th-TH' });
+  page = await ctx.newPage();
+  await page.goto(`${BASE}/wishlist`);
+  ok((await page.locator('a[href^="/product/"]').count()) === 1, 'wishlist persists after reopening browser');
+
+  // no emoji / arrows anywhere in visible UI (shop + admin)
+  const { login } = require('./lib');
+  const bad = [];
+  for (const path of ['/', '/products', '/promotions', '/cart', '/orders', '/wishlist', GRANOLA]) {
+    await page.goto(BASE + path);
+    const t = await page.evaluate(() => document.body.innerText);
+    if (EMOJI.test(t)) bad.push(`${path}: emoji`);
+    if (/[→←]/.test(t)) bad.push(`${path}: arrow`);
+  }
+  await login(page, 'admin');
+  for (const path of ['/admin', '/admin/products', '/admin/promotions', '/admin/promotions/new', '/admin/orders', '/admin/categories', '/admin/users', '/admin/settings']) {
+    await page.goto(BASE + path);
+    const t = await page.evaluate(() => document.body.innerText);
+    if (EMOJI.test(t)) bad.push(`${path}: emoji`);
+    if (/[→←]/.test(t)) bad.push(`${path}: arrow`);
+  }
+  ok(bad.length === 0, `no emoji/arrows in UI text ${bad.join(', ')}`);
+
+  // mobile: icons + hamburger fit
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto(`${BASE}/`);
+  ok((await page.evaluate(() => document.documentElement.scrollWidth)) <= 375, 'mobile no h-scroll');
+  ok((await page.locator('header a[title]').count()) === 3 && (await page.locator('button[aria-label="เปิดเมนู"]').isVisible()), 'mobile: 3 icons + menu button');
+  await page.screenshot({ path: `${require('./lib').SHOT}/p10-mobile-header.png`, caret: 'initial' });
+  await browser.close();
+  fs.writeFileSync(`${DATA}/wishlists.json`, '{}\n');
+})().catch((e) => { console.error('💥', e); process.exit(1); });

@@ -8,6 +8,7 @@ import { ProductImage } from '@/components/product-image';
 import { OrderLookupForm } from '@/components/shop/order-lookup-form';
 import { Badge } from '@/components/ui/badge';
 import { buttonStyles } from '@/components/ui/button';
+import { Package } from 'lucide-react';
 
 export const metadata = { title: 'คำสั่งซื้อของฉัน' };
 
@@ -26,8 +27,8 @@ export default async function MyOrdersPage() {
 
       {orders.length === 0 ? (
         <div className="mt-6 rounded-card border border-dashed border-line bg-surface px-6 py-10 text-center">
-          <span className="text-4xl" aria-hidden>
-            📦
+          <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-surface-alt text-muted" aria-hidden>
+            <Package className="size-7" />
           </span>
           <p className="mt-3 font-semibold">ยังไม่มีคำสั่งซื้อในเครื่องนี้</p>
           <p className="mt-1 text-sm text-muted">เคยสั่งจากเครื่องอื่น? ค้นหาด้วยเลขที่คำสั่งซื้อและเบอร์โทรด้านล่าง</p>

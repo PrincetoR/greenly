@@ -244,6 +244,7 @@ async function main() {
     write('promotions', promotions),
     write('orders', orders),
     write('carts', {}),
+    write('wishlists', {}),
     write('users', users),
     write('settings', settings),
     ...products.map((p) => {

@@ -49,16 +49,16 @@ async function placeOrder(page, path, qty, phone, coupon) {
 
   // status flow A: pending → paid → shipped → done
   await page.goto(`${BASE}/admin/orders/${A.id}`);
-  ok(await page.locator('button:has-text("→ ชำระแล้ว")').isVisible() && await page.locator('button:has-text("ยกเลิกคำสั่งซื้อ")').isVisible(), 'pending: next = paid / cancel');
+  ok(await page.locator('button:text-is("ชำระแล้ว")').isVisible() && await page.locator('button:has-text("ยกเลิกคำสั่งซื้อ")').isVisible(), 'pending: next = paid / cancel');
   ok(await page.locator('text=คูปอง SAVE100').first().isVisible(), 'detail shows coupon');
   ok((await page.locator('span:has-text("ลด 20% เครื่องดื่มสุขภาพ")').count()) >= 1, 'detail shows promo usage badges');
   await shot(page, 'p7-order-detail');
-  await page.click('button:has-text("→ ชำระแล้ว")');
-  await page.waitForSelector('button:has-text("→ จัดส่งแล้ว")');
+  await page.click('button:text-is("ชำระแล้ว")');
+  await page.waitForSelector('button:text-is("จัดส่งแล้ว")');
   ok(true, 'paid: next = shipped');
-  await page.click('button:has-text("→ จัดส่งแล้ว")');
-  await page.waitForSelector('button:has-text("→ สำเร็จ")');
-  await page.click('button:has-text("→ สำเร็จ")');
+  await page.click('button:text-is("จัดส่งแล้ว")');
+  await page.waitForSelector('button:text-is("สำเร็จ")');
+  await page.click('button:text-is("สำเร็จ")');
   await page.waitForSelector('text=สถานะสุดท้ายแล้ว');
   ok(read('orders').find((o) => o.id === A.id).status === 'done', 'A → done');
 

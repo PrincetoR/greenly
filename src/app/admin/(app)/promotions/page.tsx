@@ -3,7 +3,9 @@ import { requirePermission } from '@/lib/auth/session';
 import { listCategories } from '@/lib/db/categories';
 import { listProducts } from '@/lib/db/products';
 import { loadPromotionContext } from '@/lib/promotions/service';
-import { describePromotion, PROMOTION_TYPE_ICON, PROMOTION_TYPE_LABEL } from '@/lib/promotions/describe';
+import { describePromotion, PROMOTION_TYPE_LABEL } from '@/lib/promotions/describe';
+import { PromoTypeIcon } from '@/components/shop/promo-type-icon';
+import { Plus, Tag } from 'lucide-react';
 import { promotionStatus, PROMOTION_STATUS_LABEL, type PromotionStatus } from '@/lib/pricing/status';
 import { formatDateTime, humanCountdown } from '@/lib/datetime';
 import { duplicatePromotion, togglePromotionActive } from '@/lib/actions/promotions';
@@ -39,7 +41,8 @@ export default async function PromotionsPage({ searchParams }: PageProps<'/admin
         description={`กำลังใช้งาน ${count('live')} · ยังไม่เริ่ม ${count('scheduled')} · ทั้งหมด ${rows.length}`}
         action={
           <Link href="/admin/promotions/new" className={buttonStyles()}>
-            ＋ สร้างโปรโมชัน
+            <Plus className="size-4" aria-hidden />
+            สร้างโปรโมชัน
           </Link>
         }
       />
@@ -58,7 +61,7 @@ export default async function PromotionsPage({ searchParams }: PageProps<'/admin
 
       {shown.length === 0 ? (
         <EmptyState
-          icon="🏷️"
+          icon={<Tag />}
           title="ยังไม่มีโปรโมชัน"
           description="สร้างโปรแรกได้ใน 1 นาที — ลดราคา คูปอง หรือซื้อแถม"
           action={
@@ -72,8 +75,8 @@ export default async function PromotionsPage({ searchParams }: PageProps<'/admin
           {shown.map(({ p, status, u }) => (
             <li key={p.id} className={cn('rounded-card bg-surface p-4 ring-1 ring-line', status === 'ended' && 'opacity-70')}>
               <div className="flex flex-wrap items-start gap-3">
-                <span className="text-2xl" aria-hidden>
-                  {PROMOTION_TYPE_ICON[p.type]}
+                <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-lg', p.type === 'bogo' ? 'bg-brand-soft text-brand' : 'bg-accent-soft text-accent')} aria-hidden>
+                  <PromoTypeIcon type={p.type} className="size-5" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -86,7 +89,7 @@ export default async function PromotionsPage({ searchParams }: PageProps<'/admin
                   </div>
                   <p className="mt-1 text-sm text-muted">{describePromotion(p, names)}</p>
                   <p className="mt-1 text-xs text-muted">
-                    {formatDateTime(p.startsAt)} → {formatDateTime(p.endsAt)}
+                    {formatDateTime(p.startsAt)} ถึง {formatDateTime(p.endsAt)}
                     {status === 'live' && ` · เหลืออีก ${humanCountdown(p.endsAt, now)}`}
                     {status === 'scheduled' && ` · เริ่มใน ${humanCountdown(p.startsAt, now)}`}
                   </p>

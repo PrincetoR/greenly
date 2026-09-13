@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
 import { Button, buttonStyles } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Package, Plus } from 'lucide-react';
 
 export const metadata = { title: 'สินค้า' };
 
@@ -42,7 +43,8 @@ export default async function ProductsPage({ searchParams }: PageProps<'/admin/p
         description={`ทั้งหมด ${all.length} รายการ`}
         action={
           <Link href="/admin/products/new" className={buttonStyles()}>
-            ＋ เพิ่มสินค้า
+            <Plus className="size-4" aria-hidden />
+            เพิ่มสินค้า
           </Link>
         }
       />
@@ -72,7 +74,7 @@ export default async function ProductsPage({ searchParams }: PageProps<'/admin/p
 
       {products.length === 0 ? (
         <EmptyState
-          icon="📦"
+          icon={<Package />}
           title="ไม่พบสินค้า"
           description={q || categoryId || status ? 'ลองเปลี่ยนคำค้นหรือตัวกรอง' : 'เริ่มจากเพิ่มสินค้าชิ้นแรก'}
           action={

@@ -24,7 +24,7 @@ const readPromos = () => JSON.parse(fs.readFileSync(DATA + '/promotions.json', '
   await page.click('[role=radiogroup] [role=radio]:has-text("เลือกหมวดหมู่")');
   await page.click('label:has-text("ธัญพืชและถั่ว")');
   await page.fill('#discountValue', '15');
-  ok((await page.textContent('text=ตัวอย่าง >> xpath=..')).includes('→'), 'live price example shown');
+  ok((await page.locator('text=ตัวอย่าง >> xpath=..').locator('.line-through').count()) === 1, 'live price example shown');
   // limits: enable per-product 3 and per-customer 2
   const switches = page.locator('input[role=switch]');
   const n = await switches.count();

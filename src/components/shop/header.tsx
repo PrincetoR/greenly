@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
+import { Heart, Leaf, Menu, Search, ShoppingCart, User, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import type { Category } from '@/lib/types';
 
@@ -10,21 +11,28 @@ const NAV = [
   { href: '/products', label: 'สินค้าทั้งหมด' },
   { href: '/promotions', label: 'โปรโมชัน' },
 ] as const;
-/** เมนูเพิ่มเติมเฉพาะใน drawer มือถือ (desktop ใช้ไอคอน) */
-const MOBILE_ONLY_NAV = [{ href: '/orders', label: '📦 คำสั่งซื้อของฉัน' }] as const;
+
+/** ไอคอนมุมขวา เรียง wishlist · cart · profile — ทุกจอ */
+const ACTIONS = [
+  { href: '/wishlist', label: 'รายการโปรด', Icon: Heart, countKey: 'wishlist' },
+  { href: '/cart', label: 'ตะกร้า', Icon: ShoppingCart, countKey: 'cart' },
+  { href: '/orders', label: 'บัญชีของฉัน', Icon: User, countKey: null },
+] as const;
 
 /**
- * หัวเว็บฝั่งลูกค้า — desktop: โลโก้ · เมนู · ช่องค้นหา · ตะกร้า
- * mobile: โลโก้ · ตะกร้า · ปุ่มเมนู → drawer ที่มีช่องค้นหา + เมนู + หมวดหมู่
+ * หัวเว็บฝั่งลูกค้า — desktop: โลโก้ · เมนู · ช่องค้นหา · ไอคอน 3 ตัว
+ * mobile: โลโก้ · ไอคอน 3 ตัว · ปุ่มเมนู → drawer ที่มีช่องค้นหา + เมนู + หมวดหมู่
  */
 export function ShopHeader({
   storeName,
   categories,
   cartCount,
+  wishlistCount,
 }: {
   storeName: string;
   categories: Category[];
   cartCount: number;
+  wishlistCount: number;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -35,12 +43,13 @@ export function ShopHeader({
     setSeenPath(pathname);
     setOpen(false);
   }
+  const counts = { wishlist: wishlistCount, cart: cartCount };
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
-        <Link href="/" className="flex items-center gap-2 text-lg font-bold text-brand">
-          <span aria-hidden>🌿</span>
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4">
+        <Link href="/" className="flex items-center gap-1.5 text-lg font-bold text-brand">
+          <Leaf className="size-5" aria-hidden />
           {storeName}
         </Link>
 
@@ -59,55 +68,58 @@ export function ShopHeader({
           ))}
         </nav>
 
-        <div className="ml-auto hidden w-64 md:block">
+        <div className="ml-auto hidden w-60 md:block">
           <SearchForm />
         </div>
 
-        <Link
-          href="/orders"
-          aria-label="คำสั่งซื้อของฉัน"
-          title="คำสั่งซื้อของฉัน"
-          className={cn('ml-auto flex size-10 items-center justify-center rounded-lg text-xl hover:bg-surface-alt md:ml-0', pathname.startsWith('/order') && 'bg-brand-soft')}
-        >
-          📦
-        </Link>
+        <div className="ml-auto flex items-center md:ml-0">
+          {ACTIONS.map(({ href, label, Icon, countKey }) => {
+            const count = countKey ? counts[countKey] : 0;
+            const active = href === '/orders' ? pathname.startsWith('/order') : pathname.startsWith(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-label={count > 0 ? `${label} ${count} รายการ` : label}
+                title={label}
+                className={cn('relative flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-surface-alt', active ? 'text-brand' : 'text-ink')}
+              >
+                <Icon className="size-5" aria-hidden />
+                {count > 0 && (
+                  <span className="absolute top-0.5 right-0.5 min-w-4 rounded-full bg-accent px-1 text-center text-[10px] font-bold leading-4 text-white">
+                    {count > 99 ? '99+' : count}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
 
-        <Link
-          href="/cart"
-          aria-label={`ตะกร้า ${cartCount} ชิ้น`}
-          className="relative flex size-10 items-center justify-center rounded-lg text-xl hover:bg-surface-alt"
-        >
-          🛒
-          {cartCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-5 rounded-full bg-accent px-1 text-center text-[11px] font-bold leading-5 text-white">
-              {cartCount > 99 ? '99+' : cartCount}
-            </span>
-          )}
-        </Link>
-
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? 'ปิดเมนู' : 'เปิดเมนู'}
-          className="flex size-10 items-center justify-center rounded-lg text-xl hover:bg-surface-alt md:hidden"
-        >
-          {open ? '✕' : '☰'}
-        </button>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? 'ปิดเมนู' : 'เปิดเมนู'}
+            className="flex size-10 items-center justify-center rounded-lg hover:bg-surface-alt md:hidden"
+          >
+            {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
+          </button>
+        </div>
       </div>
 
       {/* drawer มือถือ */}
-      <div
-        id="mobile-menu"
-        hidden={!open}
-        className="border-t border-line bg-surface px-4 py-4 md:hidden"
-      >
+      <div id="mobile-menu" hidden={!open} className="border-t border-line bg-surface px-4 py-4 md:hidden">
         <SearchForm autoFocus />
         <nav aria-label="เมนูหลัก (มือถือ)" className="mt-3 flex flex-col">
-          {[...NAV, ...MOBILE_ONLY_NAV].map((item) => (
+          {NAV.map((item) => (
             <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2.5 font-medium hover:bg-surface-alt">
               {item.label}
+            </Link>
+          ))}
+          {ACTIONS.map(({ href, label, Icon }) => (
+            <Link key={href} href={href} className="flex items-center gap-2 rounded-lg px-3 py-2.5 font-medium hover:bg-surface-alt">
+              <Icon className="size-4 text-muted" aria-hidden />
+              {label}
             </Link>
           ))}
         </nav>
@@ -146,18 +158,8 @@ function SearchForm({ autoFocus }: { autoFocus?: boolean }) {
 
   return (
     <form role="search" onSubmit={submit} className="relative">
-      <input
-        type="search"
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="ค้นหาสินค้า…"
-        aria-label="ค้นหาสินค้า"
-        autoFocus={autoFocus}
-        className="pl-9!"
-      />
-      <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" aria-hidden>
-        🔍
-      </span>
+      <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาสินค้า…" aria-label="ค้นหาสินค้า" autoFocus={autoFocus} className="pl-9!" />
+      <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
     </form>
   );
 }

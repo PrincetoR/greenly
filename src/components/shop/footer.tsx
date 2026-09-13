@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Leaf } from 'lucide-react';
 import type { Settings } from '@/lib/types';
 
 export function ShopFooter({ settings }: { settings: Settings }) {
@@ -7,7 +8,10 @@ export function ShopFooter({ settings }: { settings: Settings }) {
     <footer className="mt-16 border-t border-line bg-surface">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div>
-          <p className="text-lg font-bold text-brand">🌿 {storeName}</p>
+          <p className="flex items-center gap-1.5 text-lg font-bold text-brand">
+            <Leaf className="size-5" aria-hidden />
+            {storeName}
+          </p>
           <p className="mt-1 text-sm text-muted">{tagline}</p>
         </div>
         <div className="text-sm">
@@ -16,6 +20,7 @@ export function ShopFooter({ settings }: { settings: Settings }) {
             <li><Link href="/products" className="hover:text-ink">สินค้าทั้งหมด</Link></li>
             <li><Link href="/promotions" className="hover:text-ink">โปรโมชัน</Link></li>
             <li><Link href="/cart" className="hover:text-ink">ตะกร้าสินค้า</Link></li>
+            <li><Link href="/wishlist" className="hover:text-ink">รายการโปรด</Link></li>
             <li><Link href="/orders" className="hover:text-ink">คำสั่งซื้อของฉัน</Link></li>
           </ul>
         </div>

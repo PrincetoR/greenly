@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import Link from 'next/link';
 import { addToCart, type CartActionState } from '@/lib/actions/cart';
 import { Button, buttonStyles } from '@/components/ui/button';
+import { Minus, Plus, ShoppingCart } from 'lucide-react';
 
 /**
  * ตัวเลือกจำนวน + ปุ่มใส่ตะกร้า — บนมือถือถูกวางไว้ในแถบ sticky ด้านล่าง
@@ -20,8 +21,8 @@ export function AddToCart({ productId, stock }: { productId: string; stock: numb
       <input type="hidden" name="productId" value={productId} />
       <div className="flex items-center gap-3">
         <div className="flex h-11 items-center rounded-lg ring-1 ring-line">
-          <button type="button" aria-label="ลดจำนวน" onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={soldOut || qty <= 1} className="size-11 text-lg disabled:opacity-40">
-            −
+          <button type="button" aria-label="ลดจำนวน" onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={soldOut || qty <= 1} className="flex size-11 items-center justify-center disabled:opacity-40">
+            <Minus className="size-4" aria-hidden />
           </button>
           <input
             type="number"
@@ -34,12 +35,21 @@ export function AddToCart({ productId, stock }: { productId: string; stock: numb
             className="h-11 w-14 border-0! text-center ring-0!"
             disabled={soldOut}
           />
-          <button type="button" aria-label="เพิ่มจำนวน" onClick={() => setQty((q) => Math.min(max, q + 1))} disabled={soldOut || qty >= max} className="size-11 text-lg disabled:opacity-40">
-            ＋
+          <button type="button" aria-label="เพิ่มจำนวน" onClick={() => setQty((q) => Math.min(max, q + 1))} disabled={soldOut || qty >= max} className="flex size-11 items-center justify-center disabled:opacity-40">
+            <Plus className="size-4" aria-hidden />
           </button>
         </div>
         <Button type="submit" size="lg" disabled={soldOut || pending} className="flex-1">
-          {soldOut ? 'สินค้าหมด' : pending ? 'กำลังใส่ตะกร้า…' : '🛒 ใส่ตะกร้า'}
+          {soldOut ? (
+            'สินค้าหมด'
+          ) : pending ? (
+            'กำลังใส่ตะกร้า…'
+          ) : (
+            <>
+              <ShoppingCart className="size-5" aria-hidden />
+              ใส่ตะกร้า
+            </>
+          )}
         </Button>
       </div>
       {state.message && (
@@ -47,7 +57,7 @@ export function AddToCart({ productId, stock }: { productId: string; stock: numb
           {state.message}
           {state.ok && (
             <Link href="/cart" className={buttonStyles({ variant: 'secondary', size: 'sm' })}>
-              ไปที่ตะกร้า →
+              ไปที่ตะกร้า
             </Link>
           )}
         </p>

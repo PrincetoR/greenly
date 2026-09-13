@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ConfirmButton } from '@/components/ui/confirm-button';
+import { Gift } from 'lucide-react';
 
 export const metadata = { title: 'รายละเอียดคำสั่งซื้อ' };
 
@@ -33,7 +34,7 @@ export default async function OrderDetailPage({ params, searchParams }: PageProp
         description={`${formatDateTime(order.createdAt)} · อัปเดต ${formatDateTime(order.updatedAt)}`}
         action={
           <Link href="/admin/orders" className="text-sm text-muted hover:text-ink">
-            ← รายการทั้งหมด
+            รายการทั้งหมด
           </Link>
         }
       />
@@ -54,7 +55,12 @@ export default async function OrderDetailPage({ params, searchParams }: PageProp
                     </Link>
                     <span className="text-xs text-muted">
                       {l.qty} × {formatBaht(l.unitPrice)}
-                      {l.isGift && ' · 🎁 ของแถม'}
+                      {l.isGift && (
+                        <>
+                          {' · '}
+                          <Gift className="inline size-3 align-[-2px]" aria-hidden /> ของแถม
+                        </>
+                      )}
                       {l.promotionId && ` · ${promoName.get(l.promotionId) ?? l.promotionId}`}
                     </span>
                   </span>
@@ -98,7 +104,8 @@ export default async function OrderDetailPage({ params, searchParams }: PageProp
                 {ORDER_STATUS_LABEL[order.status]}
               </Badge>
               {next.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="w-full text-xs text-muted">เปลี่ยนสถานะเป็น</span>
                   {next.map((s) => (
                     <form key={s} action={changeOrderStatus}>
                       <input type="hidden" name="id" value={order.id} />
@@ -108,7 +115,7 @@ export default async function OrderDetailPage({ params, searchParams }: PageProp
                           ยกเลิกคำสั่งซื้อ
                         </ConfirmButton>
                       ) : (
-                        <Button type="submit">→ {ORDER_STATUS_LABEL[s]}</Button>
+                        <Button type="submit">{ORDER_STATUS_LABEL[s]}</Button>
                       )}
                     </form>
                   ))}

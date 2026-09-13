@@ -6,7 +6,7 @@ Path: `~/Projects/e-commerce` · **build ครบ 8 phase แล้ว (2026-09
 Memory: `Brain/Memories/EcommercePrototype.md`
 
 ## Stack
-Next.js 16 (App Router · Server Components · Server Actions · `proxy.ts` แทน middleware) · React 19 · Tailwind v4 · TypeScript · zod
+Next.js 16 (App Router · Server Components · Server Actions · `proxy.ts` แทน middleware) · React 19 · Tailwind v4 · TypeScript · zod · lucide-react (ไอคอน SVG)
 ไม่มี DB — `src/lib/db/store.ts` อ่าน/เขียน `data/*.json` (atomic + write queue)
 
 ## คำสั่ง
@@ -35,6 +35,7 @@ src/lib/pricing/      quote() pure · status · usage (นับจาก orders
 src/lib/promotions/   describe (ประโยคสรุป) · service (loadPromotionContext)
 src/lib/cart/         storage (ตะกร้า+คูปองใน data/carts.json ผูก guest id) · service (loadCart → quote)
 src/lib/guest.ts      guest id cookie `ec_guest` 1 ปี — ตัวตนลูกค้าแบบไม่ต้อง login (readGuestId / ensureGuestId ใน action เท่านั้น)
+src/lib/wishlist/     รายการโปรดผูก guest id (data/wishlists.json) · WishlistButton optimistic
 src/lib/actions/      server actions ต่อ entity — ทุกตัวเรียก requirePermission()
 src/lib/validation/   zod schemas · FormState { errors, values } · formValues()
 src/components/ui     Button/Badge/Card/Field/EmptyState/Alert/Table/Switch/ConfirmButton
@@ -52,6 +53,9 @@ src/app/(shop)/       หน้าร้าน · src/app/admin/(app)/ หลั
 - ทุก server action ตรวจสิทธิ์เอง (proxy กันแค่ชั้นแรก)
 - ฟอร์มที่ใช้ `useActionState`: เมื่อ validation ไม่ผ่านต้องคืน `values: formValues(formData)` และ input ใช้ `defaultValue={v.x ?? ...}` — เพราะ React รีเซ็ตฟอร์มหลัง action จบ
 - client component ที่ใช้เวลาปัจจุบัน ให้รับ `serverNow`/`initial` จาก server เพื่อกัน hydration mismatch
+- **ห้ามใช้ emoji เป็นไอคอน** (พี่ต่อไม่เอา) ใช้ `lucide-react` · ไอคอนเมนูหลังบ้านเป็นชื่อใน roles.ts map ที่ `components/admin/icons.tsx` · ไอคอนประเภทโปรที่ `components/shop/promo-type-icon.tsx`
+- **ไม่ใส่ลูกศร →/← ท้ายหรือหน้าเมนู/ลิงก์/ปุ่ม** (พี่ต่อสั่งเอาออกทั้งหมด)
+- header ลูกค้า: ไอคอนมุมขวาเรียง wishlist · cart · profile(→ /orders) ทุกจอ
 - สไตล์ input/select/textarea อยู่ใน `globals.css` — ไม่ใส่ class ซ้ำที่ element
 - comment ในโค้ดเป็นภาษาไทย อธิบาย "ทำไม" ไม่ใช่ "ทำอะไร"
 - `~/Projects/Prototype/e-commerce` และ `~/Projects/storefront-kit` เป็นตัวอ้างอย่างเดียว ห้ามยกโค้ด/แก้/ลบ

@@ -5,6 +5,7 @@ import { applyCoupon, removeCoupon, type CartActionState } from '@/lib/actions/c
 import type { Quote } from '@/lib/pricing/types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
+import { Check } from 'lucide-react';
 
 /** ช่องกรอกคูปอง — ผลลัพธ์อ่านจาก quote.coupon ที่ server คิดมา ไม่เดาเองฝั่ง client */
 export function CouponBox({ coupon }: { coupon: Quote['coupon'] }) {
@@ -14,8 +15,11 @@ export function CouponBox({ coupon }: { coupon: Quote['coupon'] }) {
   if (applied) {
     return (
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-ok-soft px-3 py-2 text-sm">
-        <span>
-          ✅ ใช้คูปอง <b className="font-mono">{coupon.code}</b> — {coupon.message}
+        <span className="flex items-center gap-1.5">
+          <Check className="size-4 shrink-0" aria-hidden />
+          <span>
+            ใช้คูปอง <b className="font-mono">{coupon.code}</b> — {coupon.message}
+          </span>
         </span>
         <form action={removeCoupon}>
           <button type="submit" className="text-xs text-muted underline hover:text-ink">

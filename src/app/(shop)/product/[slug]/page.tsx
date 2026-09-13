@@ -15,6 +15,8 @@ import { PriceTag } from '@/components/shop/price-tag';
 import { Countdown } from '@/components/shop/countdown';
 import { Section } from '@/components/shop/section';
 import { Badge } from '@/components/ui/badge';
+import { WishlistButton } from '@/components/shop/wishlist-button';
+import { Gift, Tag } from 'lucide-react';
 
 export async function generateMetadata({ params }: PageProps<'/product/[slug]'>) {
   const { slug } = await params;
@@ -79,7 +81,7 @@ export default async function ProductPage({ params }: PageProps<'/product/[slug]
               <ul className="mt-3 flex flex-col gap-2">
                 {d.promotion && (
                   <li className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-accent-soft px-3 py-2 text-sm">
-                    <span aria-hidden>🏷️</span>
+                    <Tag className="size-4 text-accent" aria-hidden />
                     <span className="font-semibold text-accent">{d.promotion.name}</span>
                     <span className="text-muted">
                       <Countdown to={d.promotion.endsAt} initial={humanCountdown(d.promotion.endsAt, now)} />
@@ -89,7 +91,7 @@ export default async function ProductPage({ params }: PageProps<'/product/[slug]
                 )}
                 {d.bogo && (
                   <li className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-brand-soft px-3 py-2 text-sm">
-                    <span aria-hidden>🎁</span>
+                    <Gift className="size-4 text-brand" aria-hidden />
                     <span className="font-semibold text-brand">
                       ซื้อ {d.bogo.bogo!.buyQty} แถม {d.bogo.bogo!.getQty}
                     </span>
@@ -113,8 +115,11 @@ export default async function ProductPage({ params }: PageProps<'/product/[slug]
               {settings.freeShippingMin !== null && <Badge tone="info">ส่งฟรีเมื่อซื้อครบ {formatBaht(settings.freeShippingMin)}</Badge>}
             </div>
 
-            <div className="mt-6 hidden md:block">
-              <AddToCart productId={product.id} stock={product.stock} />
+            <div className="mt-6 hidden md:flex md:flex-wrap md:items-start md:gap-3">
+              <div className="min-w-64 flex-1">
+                <AddToCart productId={product.id} stock={product.stock} />
+              </div>
+              <WishlistButton productId={product.id} saved={ctx.wishlist.includes(product.id)} variant="button" />
             </div>
 
             {product.description && (
@@ -137,8 +142,11 @@ export default async function ProductPage({ params }: PageProps<'/product/[slug]
         </Section>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 p-3 backdrop-blur md:hidden">
-        <AddToCart productId={product.id} stock={product.stock} />
+      <div className="fixed inset-x-0 bottom-0 z-30 flex items-start gap-2 border-t border-line bg-surface/95 p-3 backdrop-blur md:hidden">
+        <div className="flex-1">
+          <AddToCart productId={product.id} stock={product.stock} />
+        </div>
+        <WishlistButton productId={product.id} saved={ctx.wishlist.includes(product.id)} variant="button" />
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ export function PromoProductCard({ product, ctx, priority }: { product: Product;
     <ProductCard
       product={product}
       priority={priority}
+      wishlisted={ctx.wishlist.includes(product.id)}
       priceSlot={<PriceTag price={d.price} original={d.original} />}
       badge={
         <>

@@ -12,6 +12,7 @@ import { PageHeader } from '@/components/admin/page-header';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { buttonStyles } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 export const metadata = { title: 'แดชบอร์ด' };
 
@@ -80,7 +81,8 @@ export default async function AdminDashboard() {
             action={
               canPromo ? (
                 <Link href="/admin/promotions/new" className={buttonStyles({ size: 'sm' })}>
-                  ＋ สร้างโปร
+                  <Plus className="size-4" aria-hidden />
+                  สร้างโปร
                 </Link>
               ) : undefined
             }
@@ -125,7 +127,7 @@ export default async function AdminDashboard() {
             }
           />
           {lowStock.length === 0 ? (
-            <p className="p-5 text-sm text-muted">สต็อกทุกรายการยังเพียงพอ 👍</p>
+            <p className="p-5 text-sm text-muted">สต็อกทุกรายการยังเพียงพอ</p>
           ) : (
             <ul className="grid gap-x-6 divide-y divide-line sm:grid-cols-2 sm:divide-y-0">
               {lowStock.slice(0, 8).map((p) => (
