@@ -28,6 +28,31 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   ok((await page.locator('main ol').nth(1).locator('> li').count()) === 10, 'สินค้าขายดี 10 อันดับ');
   await shot(page, 'p14-dashboard-day');
 
+  // รูปเฟือง → เปลี่ยนจำนวนอันดับ (ปุ่มลัด + พิมพ์เอง) → หน้าโหลดข้อมูลตามค่าใหม่ + เก็บลง settings
+  await page.click('button[aria-label="ตั้งค่าจำนวนอันดับสินค้า"]');
+  await page.click('form[role=dialog] button:has-text("5")');
+  await page.waitForFunction(() => document.querySelector('main h2:nth-of-type(1)') && [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'สินค้าขายดี 5 อันดับ'));
+  ok((await page.locator('main ol').nth(1).locator('> li').count()) === 5 && (await page.locator('form[role=dialog]').count()) === 0, 'เฟืองสินค้า: กด 5 → หัวข้อ+รายการเป็น 5 อันดับ ป๊อปอัปปิด');
+  ok(JSON.parse(require('node:fs').readFileSync(`${DATA}/settings.json`, 'utf8')).dashboard.topProducts === 5, 'settings.json เก็บ topProducts = 5');
+  await page.click('button[aria-label="ตั้งค่าจำนวนอันดับหมวดหมู่"]');
+  await page.fill('form[role=dialog] input[name=value]', '3');
+  await page.press('form[role=dialog] input[name=value]', 'Enter');
+  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'หมวดหมู่ขายดี 3 อันดับ'));
+  ok((await page.locator('main ol').first().locator('> li').count()) === 3, 'เฟืองหมวดหมู่: พิมพ์ 3 + Enter → 3 อันดับ');
+  await page.click('button[aria-label="ตั้งค่าจำนวนอันดับหมวดหมู่"]');
+  await page.fill('form[role=dialog] input[name=value]', '99');
+  await page.press('form[role=dialog] input[name=value]', 'Enter');
+  ok(await page.locator('form[role=dialog] [role=alert]').isVisible(), 'ค่านอกช่วง 1–50 → แจ้งเตือน ไม่บันทึก');
+  await page.keyboard.press('Escape');
+  ok((await page.locator('form[role=dialog]').count()) === 0, 'Esc ปิดป๊อปอัป');
+  // คืนค่า 10 ให้เทสต์ถัดไป
+  await page.click('button[aria-label="ตั้งค่าจำนวนอันดับหมวดหมู่"]');
+  await page.click('form[role=dialog] button:has-text("10")');
+  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'หมวดหมู่ขายดี 10 อันดับ'));
+  await page.click('button[aria-label="ตั้งค่าจำนวนอันดับสินค้า"]');
+  await page.click('form[role=dialog] button:has-text("10")');
+  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'สินค้าขายดี 10 อันดับ'));
+
   // รายเดือน / รายปี
   await page.click('nav[aria-label="ช่วงเวลา"] a:has-text("รายเดือน")');
   await page.waitForURL(/range=month/);

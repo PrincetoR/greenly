@@ -143,4 +143,12 @@ export interface Settings {
   /** แจ้งเตือนสินค้าใกล้หมดเมื่อ stock ต่ำกว่าหรือเท่ากับค่านี้ */
   lowStockThreshold: number;
   contact: { phone: string; email: string; line: string };
+  /** แดชบอร์ด: แสดงหมวด/สินค้าขายดีกี่อันดับ (ตั้งจากรูปเฟืองบนการ์ด) */
+  dashboard: DashboardRanks;
 }
+
+export interface DashboardRanks {
+  topCategories: number;
+  topProducts: number;
+}
+export type DashboardRankKey = keyof DashboardRanks;

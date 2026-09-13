@@ -11,12 +11,13 @@ export const DEFAULT_SETTINGS: Settings = {
   freeShippingMin: null,
   lowStockThreshold: 5,
   contact: { phone: '', email: '', line: '' },
+  dashboard: { topCategories: 10, topProducts: 10 },
 };
 
 export async function getSettings(): Promise<Settings> {
   const stored = await readDocument<Partial<Settings>>(NAME, {});
   // ผสานกับ default เผื่อไฟล์เก่าขาด field ที่เพิ่มมาทีหลัง
-  return { ...DEFAULT_SETTINGS, ...stored, contact: { ...DEFAULT_SETTINGS.contact, ...stored.contact } };
+  return { ...DEFAULT_SETTINGS, ...stored, contact: { ...DEFAULT_SETTINGS.contact, ...stored.contact }, dashboard: { ...DEFAULT_SETTINGS.dashboard, ...stored.dashboard } };
 }
 
 export async function saveSettings(patch: Partial<Settings>): Promise<Settings> {
@@ -25,5 +26,6 @@ export async function saveSettings(patch: Partial<Settings>): Promise<Settings> 
     ...doc,
     ...patch,
     contact: { ...DEFAULT_SETTINGS.contact, ...doc.contact, ...patch.contact },
+    dashboard: { ...DEFAULT_SETTINGS.dashboard, ...doc.dashboard, ...patch.dashboard },
   }));
 }

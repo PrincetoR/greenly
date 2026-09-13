@@ -360,6 +360,7 @@ const settings: Settings = {
   freeShippingMin: 100000,
   lowStockThreshold: 5,
   contact: { phone: '02-000-0000', email: 'hello@greenly.example', line: '@greenly' },
+  dashboard: { topCategories: 10, topProducts: 10 },
 };
 
 async function main() {

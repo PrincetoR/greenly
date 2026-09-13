@@ -18,6 +18,7 @@ import { Table, Td, Th } from '@/components/ui/table';
 import { BarChart, Delta, RangeTabs, Stat } from '@/components/admin/analytics';
 import { PromoTypeIcon } from '@/components/shop/promo-type-icon';
 import { ProductImage } from '@/components/product-image';
+import { RankSetting } from '@/components/admin/rank-setting';
 
 export const metadata = { title: 'แดชบอร์ด' };
 
@@ -45,7 +46,8 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
   const sales = salesReport(orders, range, now);
   const promo = promotionReport(orders, promotions, now, sales.window);
   const cats = categoryReport(orders, products, categories, sales.window, sales.previousWindow);
-  const top = topProducts(orders, sales.window, 10);
+  const ranks = settings.dashboard;
+  const top = topProducts(orders, sales.window, ranks.topProducts);
   const hint = RANGES.find((r) => r.value === range)!.hint;
   const bestCat = cats[0]?.revenue > 0 ? cats[0].category.id : null;
   const worstCat = cats.length > 1 && cats[cats.length - 1].revenue < (cats[0]?.revenue ?? 0) ? cats[cats.length - 1].category.id : null;
@@ -143,9 +145,13 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
       <div className="grid gap-4 lg:grid-cols-2">
         {/* หมวดหมู่ขายดี / ขายไม่ดี */}
         <Card className="min-w-0">
-          <CardHeader title="หมวดหมู่ขายดี 10 อันดับ" description={`ตามรายได้ ${hint} · เทียบช่วงก่อนหน้า · ไม่นับของแถม`} />
+          <CardHeader
+            title={`หมวดหมู่ขายดี ${ranks.topCategories} อันดับ`}
+            description={`ตามรายได้ ${hint} · เทียบช่วงก่อนหน้า · ไม่นับของแถม`}
+            action={<RankSetting field="topCategories" value={ranks.topCategories} label="หมวดหมู่" />}
+          />
           <ol className="flex flex-col gap-4 p-5">
-            {cats.slice(0, 10).map((c) => (
+            {cats.slice(0, ranks.topCategories).map((c) => (
               <li key={c.category.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1">
                 <p className="flex min-w-0 items-center gap-2 text-sm font-medium">
                   <span className="truncate">{c.category.name}</span>
@@ -167,7 +173,11 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
 
         {/* สินค้าขายดี */}
         <Card className="min-w-0">
-          <CardHeader title="สินค้าขายดี 10 อันดับ" description={`ตามจำนวนชิ้นที่ขายได้ ${hint}`} />
+          <CardHeader
+            title={`สินค้าขายดี ${ranks.topProducts} อันดับ`}
+            description={`ตามจำนวนชิ้นที่ขายได้ ${hint}`}
+            action={<RankSetting field="topProducts" value={ranks.topProducts} label="สินค้า" />}
+          />
           {top.length === 0 ? (
             <p className="p-5 text-sm text-muted">ยังไม่มีออเดอร์ในช่วงนี้</p>
           ) : (
