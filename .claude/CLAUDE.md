@@ -74,6 +74,7 @@ src/app/(shop)/       หน้าร้าน · src/app/admin/(app)/ หลั
 - `sticky` ใน CSS grid ต้องใส่ที่ตัว grid item เอง (ลูกข้างในขยับได้แค่ในช่องที่สูงเท่าเนื้อหา) — sticky search bar เคยทำแล้วพี่ต่อไม่ชอบ revert แล้ว
 
 ## บทเรียนจากการทดสอบ
+- **ข้อความไทยที่ใช้ `truncate`/overflow-hidden ต้องมี line-height สูงพอ** (≥ 1.6 หรือเต็มแถว) ไม่งั้นวรรณยุกต์/สระบน (ไม้โท, ั) โดนตัดหัว — เจอที่หัวข้อหน้ารายการและชื่อสินค้าบนการ์ด
 - container ที่ `overflow-x-auto` จะ clip แนวตั้งด้วย → `ring` (box-shadow) ของลูกโดนตัดขอบบน/ล่าง ต้องใส่ `py-1` ให้เสมอ
 - id ที่ต้องผ่าน regex ความยาว ห้ามสร้างจาก base64url แล้วตัดอักขระทิ้ง (ความยาวไม่แน่นอน → พังแบบสุ่ม 39%) ใช้ hex
 - Playwright screenshot ค่าเริ่มต้นแอบใส่ `style="caret-color: transparent"` ให้ input → เจอ hydration mismatch ปลอม ใช้ `caret: 'initial'` เสมอ

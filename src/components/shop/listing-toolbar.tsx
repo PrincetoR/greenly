@@ -63,8 +63,11 @@ export function ListingToolbar({
 
       {/* หัวข้อ: กำลังเปิดอะไรอยู่ (ทั้งหมด / ชื่อหมวด / ผลค้นหา) + จำนวน */}
       <div className="flex h-10 min-w-0 basis-full items-center gap-2 sm:flex-1 sm:basis-auto">
-        {/* text-2xl (line 32) ยังอยู่ในแถว 40px → ระยะห่างทุกอย่างเท่าเดิม */}
-        <h1 className="truncate text-2xl leading-8 font-bold">{title}</h1>
+        {/*
+         * line-height เต็มแถว 40px — truncate ใช้ overflow:hidden ถ้าบรรทัดเตี้ยกว่านั้น
+         * วรรณยุกต์/สระบนของไทย (เช่น ไม้โทใน "ทั้ง") จะถูกตัดหัว
+         */}
+        <h1 className="truncate text-2xl leading-10 font-bold">{title}</h1>
         <span className="shrink-0 text-sm text-muted">{count} รายการ</span>
         {description && <span className="hidden truncate text-sm text-muted lg:inline">· {description}</span>}
       </div>

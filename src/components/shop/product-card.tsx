@@ -39,7 +39,8 @@ export function ProductCard({
           )}
         </div>
         {/* ชื่อบรรทัดเดียว ตัดด้วย … (title เต็มโชว์ตอน hover) ให้การ์ดทุกใบสูงเท่ากัน */}
-        <h3 className="truncate px-3 pt-3 text-sm font-medium leading-snug" title={product.name}>
+        {/* leading-6 เผื่อที่ให้วรรณยุกต์ไทย — truncate (overflow hidden) จะตัดหัวถ้าบรรทัดเตี้ย */}
+        <h3 className="truncate px-3 pt-3 text-sm leading-6 font-medium" title={product.name}>
           {product.name}
         </h3>
       </Link>
