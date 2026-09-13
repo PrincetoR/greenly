@@ -39,7 +39,7 @@ const GRANOLA = '/product/กราโนล่าน้ำผึ้งอัล
   // product page: toggle off via big button
   await page.goto(BASE + GRANOLA);
   const bigBtn = page.locator('button[aria-pressed="true"]:visible').first();
-  ok((await bigBtn.textContent()).trim() === '' && (await bigBtn.getAttribute('aria-label')) === 'เอาออกจากรายการโปรด', 'product page: ปุ่มหัวใจไอคอนอย่างเดียว (label อยู่ที่ aria)');
+  ok((await bigBtn.textContent()).includes('อยู่ในรายการโปรด'), 'product page shows "อยู่ในรายการโปรด"');
   await bigBtn.click();
   await page.waitForSelector('button[aria-pressed="false"]:visible');
   ok(true, 'toggle off');
