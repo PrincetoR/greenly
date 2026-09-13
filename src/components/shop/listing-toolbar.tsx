@@ -133,7 +133,8 @@ function SortMenu({ value, onChange }: { value: SortValue; onChange: (v: SortVal
         aria-expanded={open}
         aria-label={`เรียงลำดับ: ${current.label}`}
         className={cn(
-          'flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-medium ring-1 ring-line transition-colors hover:bg-surface-alt',
+          // ใช้ border จริง (อยู่ในกล่อง) ไม่ใช่ ring (วาดนอกกล่อง) ให้สูงเท่าช่องค้นหาเป๊ะ 40px
+          'flex h-10 items-center gap-2 rounded-lg border border-line px-3 text-sm font-medium transition-colors hover:bg-surface-alt',
           open ? 'bg-surface-alt' : 'bg-surface',
         )}
       >
