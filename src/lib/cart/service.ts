@@ -1,5 +1,5 @@
 import 'server-only';
-import { readCart, readCoupon, type CartItem } from './cookie';
+import { readCart, readCoupon, type CartItem } from './storage';
 import { findProductsByIds } from '@/lib/db/products';
 import { loadPromotionContext } from '@/lib/promotions/service';
 import { quote } from '@/lib/pricing/quote';
@@ -15,7 +15,7 @@ export interface CartView {
 }
 
 /**
- * ประกอบตะกร้าจาก cookie + ราคาปัจจุบัน + โปรที่ live ณ ตอนนี้
+ * ประกอบตะกร้าจาก storage (guest) + ราคาปัจจุบัน + โปรที่ live ณ ตอนนี้
  * ใช้ทั้งหน้า /cart /checkout และ placeOrder (ส่ง customerKey ให้ perCustomer มีผล)
  */
 export async function loadCart(customerKey?: string | null): Promise<CartView> {

@@ -240,6 +240,7 @@ describe('usageFromOrders', () => {
     id: 'o',
     orderNo: 'OD',
     status: 'paid',
+    guestIds: [],
     customer: { name: 'ก', phone: '081-234-5678', email: '', address: '' },
     lines: [],
     subtotal: 0,

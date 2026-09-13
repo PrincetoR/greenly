@@ -1,7 +1,7 @@
 /**
  * สร้างข้อมูลสาธิตใหม่ทั้งหมด: data/*.json + รูป placeholder ใน public/uploads/seed/
  *   npm run seed
- * ระวัง: เขียนทับ orders/products/promotions ที่มีอยู่ (ใช้เพื่อ reset demo)
+ * ระวัง: เขียนทับ orders/carts/products/promotions ที่มีอยู่ (ใช้เพื่อ reset demo)
  *
  * รันด้วย tsx จึง import โมดูลที่มี 'server-only' ไม่ได้ — เขียนไฟล์ตรง ๆ ที่นี่
  */
@@ -243,6 +243,7 @@ async function main() {
     write('products', products),
     write('promotions', promotions),
     write('orders', orders),
+    write('carts', {}),
     write('users', users),
     write('settings', settings),
     ...products.map((p) => {

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { MAX_QTY_PER_LINE, readCart, writeCart, writeCoupon, type CartItem } from '@/lib/cart/cookie';
+import { MAX_QTY_PER_LINE, readCart, writeCart, writeCoupon, type CartItem } from '@/lib/cart/storage';
 import { findProduct } from '@/lib/db/products';
 
 export interface CartActionState {

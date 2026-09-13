@@ -2,8 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { writeCart, writeCoupon } from '@/lib/cart/cookie';
+import { writeCart, writeCoupon } from '@/lib/cart/storage';
 import { loadCart } from '@/lib/cart/service';
+import { ensureGuestId } from '@/lib/guest';
 import { createOrder } from '@/lib/db/orders';
 import { decrementStock, findProductsByIds } from '@/lib/db/products';
 import { formatBaht } from '@/lib/money';
@@ -88,8 +89,11 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     isGift: l.isGift,
   }));
 
+  // ผูก order กับเบราว์เซอร์นี้ → กลับมาดูได้ที่ "คำสั่งซื้อของฉัน" โดยไม่ต้อง login
+  const guestId = await ensureGuestId();
   const order = await createOrder({
     status: 'pending',
+    guestIds: [guestId],
     customer: { name: customer.name, phone: customer.phone, email: customer.email, address: customer.address },
     lines,
     subtotal: quote.subtotal,

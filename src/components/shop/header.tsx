@@ -10,6 +10,8 @@ const NAV = [
   { href: '/products', label: 'สินค้าทั้งหมด' },
   { href: '/promotions', label: 'โปรโมชัน' },
 ] as const;
+/** เมนูเพิ่มเติมเฉพาะใน drawer มือถือ (desktop ใช้ไอคอน) */
+const MOBILE_ONLY_NAV = [{ href: '/orders', label: '📦 คำสั่งซื้อของฉัน' }] as const;
 
 /**
  * หัวเว็บฝั่งลูกค้า — desktop: โลโก้ · เมนู · ช่องค้นหา · ตะกร้า
@@ -62,9 +64,18 @@ export function ShopHeader({
         </div>
 
         <Link
+          href="/orders"
+          aria-label="คำสั่งซื้อของฉัน"
+          title="คำสั่งซื้อของฉัน"
+          className={cn('ml-auto flex size-10 items-center justify-center rounded-lg text-xl hover:bg-surface-alt md:ml-0', pathname.startsWith('/order') && 'bg-brand-soft')}
+        >
+          📦
+        </Link>
+
+        <Link
           href="/cart"
           aria-label={`ตะกร้า ${cartCount} ชิ้น`}
-          className="relative ml-auto flex size-10 items-center justify-center rounded-lg text-xl hover:bg-surface-alt md:ml-0"
+          className="relative flex size-10 items-center justify-center rounded-lg text-xl hover:bg-surface-alt"
         >
           🛒
           {cartCount > 0 && (
@@ -94,7 +105,7 @@ export function ShopHeader({
       >
         <SearchForm autoFocus />
         <nav aria-label="เมนูหลัก (มือถือ)" className="mt-3 flex flex-col">
-          {NAV.map((item) => (
+          {[...NAV, ...MOBILE_ONLY_NAV].map((item) => (
             <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2.5 font-medium hover:bg-surface-alt">
               {item.label}
             </Link>

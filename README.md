@@ -17,7 +17,7 @@ npm run dev      # http://localhost:3000
 
 ## ความสามารถ
 
-**หน้าร้าน** — หน้าแรก · สินค้าทั้งหมด/ค้นหา/เรียง · หมวดหมู่ · รายละเอียดสินค้า · โปรโมชัน · ตะกร้า · คูปอง · checkout (ชำระเงินจำลอง) · หน้าติดตามคำสั่งซื้อ · responsive ทุกอุปกรณ์
+**หน้าร้าน** — หน้าแรก · สินค้าทั้งหมด/ค้นหา/เรียง · หมวดหมู่ · รายละเอียดสินค้า · โปรโมชัน · ตะกร้า · คูปอง · checkout (ชำระเงินจำลอง) · **คำสั่งซื้อของฉัน** (ไม่ต้อง login — ระบบจำเบราว์เซอร์ไว้ 1 ปี, เครื่องอื่นค้นด้วยเลขที่+เบอร์โทร) · responsive ทุกอุปกรณ์
 
 **หลังบ้าน** — แดชบอร์ด KPI · สินค้า (อัปโหลดรูปหลายรูป) · หมวดหมู่ · โปรโมชัน · คำสั่งซื้อ (เปลี่ยนสถานะ/ยกเลิกคืน stock) · ผู้ใช้ (admin/staff) · ตั้งค่าร้าน
 
@@ -35,7 +35,7 @@ src/proxy.ts          กัน /admin/* (Next 16 ใช้ proxy แทน midd
 src/lib/types.ts      domain types
 src/lib/money.ts      เงินเป็นสตางค์ (integer) ทั้งระบบ
 src/lib/pricing/      pricing engine — pure function + unit tests (โปรทุกชนิดคิดที่นี่ที่เดียว)
-src/lib/db/           categories · products · promotions · orders · users · settings
+src/lib/db/           categories · products · promotions · orders · carts · users · settings
 src/lib/auth/         scrypt password · HMAC session cookie · roles/permissions
 src/lib/actions/      server actions (ทุกตัวตรวจสิทธิ์เอง)
 src/components/       ui · shop · admin
@@ -61,4 +61,5 @@ npm run e2e          # e2e ทุกไฟล์ (ต้องมี dev server 
 - **ราคาทุกที่มาจาก `quote()`** ตัวเดียว: การ์ดสินค้า หน้าสินค้า ตะกร้า checkout จึงตรงกันเสมอ
 - **checkout คิดราคาใหม่ด้วยเบอร์โทร** — ถ้าสิทธิ์ต่อลูกค้าทำให้ยอด/ของแถมเปลี่ยน จะให้ลูกค้ายืนยันอีกครั้งก่อนสร้างออเดอร์
 - **ตัด stock แบบ all-or-nothing** รวมของแถม
+- **ลูกค้าไม่ต้อง login** — cookie `ec_guest` (1 ปี) ผูกตะกร้า (`data/carts.json`) และคำสั่งซื้อ (`order.guestIds`) · เปลี่ยนเครื่องแล้วยืนยันด้วยเลขที่ + เบอร์โทร ระบบจะผูกเครื่องใหม่ให้
 - `SESSION_SECRET` ใน `.env` สำหรับใช้จริง (ดู `.env.example`)

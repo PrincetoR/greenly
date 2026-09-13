@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { findOrderByNo } from '@/lib/db/orders';
 import { getSettings } from '@/lib/db/settings';
+import { readGuestId } from '@/lib/guest';
+import { OrderLookupForm } from '@/components/shop/order-lookup-form';
 import { formatBaht } from '@/lib/money';
 import { formatDateTime } from '@/lib/datetime';
 import { ORDER_STATUS_LABEL, ORDER_STATUS_TONE, PAYMENT_LABEL } from '@/lib/orders/labels';
@@ -15,8 +17,30 @@ export const metadata = { title: 'คำสั่งซื้อ' };
 export default async function OrderPage({ params, searchParams }: PageProps<'/order/[orderNo]'>) {
   const { orderNo } = await params;
   const sp = await searchParams;
-  const [order, settings] = await Promise.all([findOrderByNo(orderNo), getSettings()]);
+  const [order, settings, guestId] = await Promise.all([findOrderByNo(orderNo), getSettings(), readGuestId()]);
   if (!order) notFound();
+
+  // รู้แค่เลขที่ยังไม่พอ — ต้องเป็นเครื่องที่สั่ง หรือยืนยันด้วยเบอร์โทรก่อน (กันคนเดาเลขมาดูที่อยู่ลูกค้า)
+  if (!guestId || !order.guestIds.includes(guestId)) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-12">
+        <span className="text-4xl" aria-hidden>
+          🔒
+        </span>
+        <h1 className="mt-3 text-2xl font-bold">ยืนยันตัวตนเพื่อดูคำสั่งซื้อ</h1>
+        <p className="mt-1 text-sm text-muted">
+          คำสั่งซื้อ <span className="font-mono font-semibold text-ink">{order.orderNo}</span> ไม่ได้สั่งจากเครื่องนี้ กรอกเบอร์โทรที่ใช้สั่งเพื่อดูรายละเอียด
+          — ระบบจะจำเครื่องนี้ไว้ให้
+        </p>
+        <div className="mt-6 rounded-card bg-surface p-5 ring-1 ring-line">
+          <OrderLookupForm orderNo={order.orderNo} compact />
+        </div>
+        <Link href="/orders" className="mt-4 block text-sm text-muted hover:text-ink">
+          ← คำสั่งซื้อของฉัน
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -105,8 +129,8 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
         <Link href="/products" className={buttonStyles()}>
           เลือกซื้อสินค้าต่อ
         </Link>
-        <Link href="/" className={buttonStyles({ variant: 'secondary' })}>
-          กลับหน้าแรก
+        <Link href="/orders" className={buttonStyles({ variant: 'secondary' })}>
+          คำสั่งซื้อของฉัน
         </Link>
       </div>
     </div>

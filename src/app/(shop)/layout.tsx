@@ -1,6 +1,6 @@
 import { ShopHeader } from '@/components/shop/header';
 import { ShopFooter } from '@/components/shop/footer';
-import { cartCount, readCart } from '@/lib/cart/cookie';
+import { cartCount, readCart } from '@/lib/cart/storage';
 import { listCategories } from '@/lib/db/categories';
 import { getSettings } from '@/lib/db/settings';
 

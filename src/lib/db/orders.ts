@@ -1,22 +1,53 @@
 import 'server-only';
 import type { Order, OrderStatus } from '@/lib/types';
+import { normalizeCustomerKey } from '@/lib/pricing/usage';
 import { newId, nowIso, readCollection, updateCollection } from './store';
 
 const NAME = 'orders';
 
+/** order รุ่นแรกไม่มี guestIds — เติมให้ตอนอ่านเพื่อไม่ต้อง migrate ไฟล์ */
+async function readOrders(): Promise<Order[]> {
+  return (await readCollection<Order>(NAME)).map((o) => ({ ...o, guestIds: o.guestIds ?? [] }));
+}
+
 export async function listOrders(opts: { status?: OrderStatus } = {}): Promise<Order[]> {
-  const items = await readCollection<Order>(NAME);
+  const items = await readOrders();
   return items
     .filter((o) => !opts.status || o.status === opts.status)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
+/** คำสั่งซื้อของลูกค้าคนนี้ (guest id) ล่าสุดก่อน */
+export async function listOrdersByGuest(guestId: string): Promise<Order[]> {
+  return (await readOrders()).filter((o) => o.guestIds.includes(guestId)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
 export async function findOrder(id: string): Promise<Order | undefined> {
-  return (await readCollection<Order>(NAME)).find((o) => o.id === id);
+  return (await readOrders()).find((o) => o.id === id);
 }
 
 export async function findOrderByNo(orderNo: string): Promise<Order | undefined> {
-  return (await readCollection<Order>(NAME)).find((o) => o.orderNo === orderNo);
+  const needle = orderNo.trim().toUpperCase();
+  return (await readOrders()).find((o) => o.orderNo === needle);
+}
+
+/**
+ * ผูก order เข้ากับ guest id ปัจจุบัน เมื่อพิสูจน์ได้ว่ารู้เบอร์โทรที่ใช้สั่ง
+ * = วิธี "เข้าถึงออเดอร์เก่าจากเครื่องอื่น" โดยไม่ต้องมีบัญชี · คืน order ถ้าสำเร็จ
+ */
+export async function claimOrder(orderNo: string, phone: string, guestId: string): Promise<Order | undefined> {
+  const key = normalizeCustomerKey(phone);
+  if (!key) return undefined;
+  let claimed: Order | undefined;
+  await updateCollection<Order>(NAME, (items) =>
+    items.map((o) => {
+      if (o.orderNo !== orderNo.trim().toUpperCase() || normalizeCustomerKey(o.customer.phone) !== key) return o;
+      const guestIds = o.guestIds ?? [];
+      claimed = guestIds.includes(guestId) ? { ...o, guestIds } : { ...o, guestIds: [...guestIds, guestId], updatedAt: nowIso() };
+      return claimed;
+    }),
+  );
+  return claimed;
 }
 
 /** เลขที่ order อ่านง่าย: OD-20260912-0007 (running ต่อวัน) */

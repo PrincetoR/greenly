@@ -117,6 +117,8 @@ export interface Order {
   id: string;
   orderNo: string;
   status: OrderStatus;
+  /** guest id (cookie) ของเบราว์เซอร์ที่สั่ง + เครื่องอื่นที่ยืนยันด้วยเบอร์โทรแล้ว — ใช้แสดง "คำสั่งซื้อของฉัน" */
+  guestIds: string[];
   customer: OrderCustomer;
   lines: OrderLine[];
   subtotal: number;
