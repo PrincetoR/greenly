@@ -28,7 +28,7 @@ export function ProductCard({
     <div className="group flex flex-col overflow-hidden rounded-card bg-surface ring-1 ring-line transition-shadow hover:shadow-lg">
       <Link href={`/product/${product.slug}`} className="flex flex-1 flex-col">
         <div className="relative overflow-hidden">
-          <ProductImage src={product.images[0]} alt={product.name} priority={priority} className="w-full transition-transform duration-300 group-hover:scale-[1.03]" />
+          <ProductImage src={product.images[0]} alt={product.name} priority={priority} ratio="landscape" className="w-full transition-transform duration-300 group-hover:scale-[1.03]" />
           <div className="absolute top-2 left-2 flex flex-col items-start gap-1">{badge}</div>
           {soldOut && (
             <div className="absolute inset-0 flex items-center justify-center bg-surface/70">
