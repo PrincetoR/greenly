@@ -14,7 +14,7 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   // รายวัน (ค่าเริ่มต้น)
   await page.goto(`${BASE}/admin`);
   ok((await page.locator('main h1').count()) === 0 && (await page.locator('main > div > div.min-w-0 > div > div.grid:first-child > *').count()) === 4, 'KPI 4 ใบ ไม่มีหัวข้อ');
-  ok((await page.locator('main h2').allTextContents()).map((t) => t.trim()).join('|') === 'ยอดขาย|โปรโมชันกระตุ้นยอดขาย|หมวดหมู่ขายดี 10 อันดับ|สินค้าขายดี 10 อันดับ', 'การ์ดสถิติ 4 ใบ (ไม่มีรายการออเดอร์/โปร/สต็อกแบบเดิม)');
+  ok((await page.locator('main h2').allTextContents()).map((t) => t.trim()).join('|') === 'ยอดขาย|โปรโมชันกระตุ้นยอดขาย 10 อันดับ|หมวดหมู่ขายดี 10 อันดับ|สินค้าขายดี 10 อันดับ', 'การ์ดสถิติ 4 ใบ (ไม่มีรายการออเดอร์/โปร/สต็อกแบบเดิม)');
   ok((await page.locator('ul[aria-label="ยอดขายต่อช่วง"] > li').count()) === 30, 'รายวัน: กราฟ 30 แท่ง');
   ok((await page.locator('nav[aria-label="ช่วงเวลา"] a[aria-current=page]').textContent()).trim() === 'รายวัน', 'แท็บรายวัน active');
   const revenueText = await page.locator('main h2:has-text("ยอดขาย")').locator('xpath=ancestor::div[contains(@class,"rounded-card")]').locator('p.text-2xl').first().textContent();
@@ -45,6 +45,14 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   ok(await page.locator('form[role=dialog] [role=alert]').isVisible(), 'ค่านอกช่วง 1–50 → แจ้งเตือน ไม่บันทึก');
   await page.keyboard.press('Escape');
   ok((await page.locator('form[role=dialog]').count()) === 0, 'Esc ปิดป๊อปอัป');
+  await page.click('button[aria-label="ตั้งค่าจำนวนอันดับโปรโมชัน"]');
+  await page.fill('form[role=dialog] input[name=value]', '2');
+  await page.press('form[role=dialog] input[name=value]', 'Enter');
+  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'โปรโมชันกระตุ้นยอดขาย 2 อันดับ'));
+  ok((await page.locator('main table tbody tr').count()) === 2, 'เฟืองโปรโมชัน: พิมพ์ 2 → ตาราง 2 แถว');
+  await page.click('button[aria-label="ตั้งค่าจำนวนอันดับโปรโมชัน"]');
+  await page.click('form[role=dialog] button:has-text("10")');
+  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'โปรโมชันกระตุ้นยอดขาย 10 อันดับ'));
   // คืนค่า 10 ให้เทสต์ถัดไป
   await page.click('button[aria-label="ตั้งค่าจำนวนอันดับหมวดหมู่"]');
   await page.click('form[role=dialog] button:has-text("10")');

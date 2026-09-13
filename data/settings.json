@@ -8,5 +8,10 @@
     "phone": "02-000-0000",
     "email": "hello@greenly.example",
     "line": "@greenly"
+  },
+  "dashboard": {
+    "topPromotions": 10,
+    "topCategories": 10,
+    "topProducts": 10
   }
 }

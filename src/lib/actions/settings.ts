@@ -46,7 +46,7 @@ export async function updateDashboardRank(formData: FormData): Promise<{ ok: boo
   await requireSession();
   const key = String(formData.get('key') ?? '');
   const value = Number.parseInt(String(formData.get('value') ?? ''), 10);
-  if (key !== 'topCategories' && key !== 'topProducts') return { ok: false, message: 'ไม่รู้จักการตั้งค่านี้' };
+  if (key !== 'topPromotions' && key !== 'topCategories' && key !== 'topProducts') return { ok: false, message: 'ไม่รู้จักการตั้งค่านี้' };
   if (!isValidRank(value)) return { ok: false, message: `ต้องเป็นจำนวนเต็ม ${RANK_MIN}–${RANK_MAX}` };
   const { dashboard } = await getSettings();
   await saveSettings({ dashboard: { ...dashboard, [key as DashboardRankKey]: value } });

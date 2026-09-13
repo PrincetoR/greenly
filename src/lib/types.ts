@@ -148,6 +148,7 @@ export interface Settings {
 }
 
 export interface DashboardRanks {
+  topPromotions: number;
   topCategories: number;
   topProducts: number;
 }

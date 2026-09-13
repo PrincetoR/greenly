@@ -31,6 +31,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
   const [orders, products, categories, ctx] = await Promise.all([listOrders(), listProducts(), listCategories(), loadPromotionContext()]);
   const { settings, promotions, usage, now } = ctx;
   const range = parseRange(sp.range);
+  const ranks = settings.dashboard;
 
   const startOfToday = new Date(now);
   startOfToday.setHours(0, 0, 0, 0);
@@ -46,7 +47,6 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
   const sales = salesReport(orders, range, now);
   const promo = promotionReport(orders, promotions, now, sales.window);
   const cats = categoryReport(orders, products, categories, sales.window, sales.previousWindow);
-  const ranks = settings.dashboard;
   const top = topProducts(orders, sales.window, ranks.topProducts);
   const hint = RANGES.find((r) => r.value === range)!.hint;
   const bestCat = cats[0]?.revenue > 0 ? cats[0].category.id : null;
@@ -81,8 +81,9 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
       <Card>
         {/* ไม่มีแถวสรุปรวม (สัดส่วนออเดอร์ที่ใช้โปร / AOV / ส่วนลดรวม) — พี่ต่อ: เป็นค่าเฉลี่ยรวม ไม่ใช่ข้อมูลเฉพาะโปร ดูแล้วงง เอาเฉพาะตารางรายโปร */}
         <CardHeader
-          title="โปรโมชันกระตุ้นยอดขาย"
-          description="ยอดขายเฉลี่ยต่อวันระหว่างที่โปรเปิด เทียบกับช่วงก่อนเริ่มโปรที่ยาวเท่ากัน — ยังไม่ตัดปัจจัยอื่น (ฤดูกาล โปรซ้อน) ใช้เป็นสัญญาณให้ดูต่อ"
+          title={`โปรโมชันกระตุ้นยอดขาย ${ranks.topPromotions} อันดับ`}
+          description="เรียงตามยอดขายจากโปร · ยอดขายเฉลี่ยต่อวันระหว่างที่โปรเปิด เทียบกับช่วงก่อนเริ่มโปรที่ยาวเท่ากัน — ยังไม่ตัดปัจจัยอื่น (ฤดูกาล โปรซ้อน) ใช้เป็นสัญญาณให้ดูต่อ"
+          action={<RankSetting field="topPromotions" value={ranks.topPromotions} label="โปรโมชัน" />}
         />
         {promo.items.length === 0 ? (
           <p className="px-5 py-4 text-sm text-muted">ไม่มีโปรโมชันที่เปิดในช่วงนี้</p>
@@ -100,7 +101,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
                 </tr>
               </thead>
               <tbody>
-                {promo.items.map((it) => {
+                {promo.items.slice(0, ranks.topPromotions).map((it) => {
                   const st = promotionStatus(it.promotion, now, usage[it.promotion.id]);
                   return (
                     <tr key={it.promotion.id}>
