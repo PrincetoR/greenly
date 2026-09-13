@@ -54,21 +54,21 @@ export function ShopHeader({
   return (
     <>
       {/* แถบสถานะ — ไม่ sticky (แถบหลักยังติดที่ top-0 ระยะ 65px ที่หน้ารายการใช้จึงไม่เปลี่ยน) */}
-      {/* พื้นขาวต่อเนื่องกับแถบหลัก ไม่มีเส้นคั่น · ลิงก์สีเทา ชื่อผู้ใช้สีเข้ม */}
-      <div className="status-bar hidden bg-surface text-xs text-muted md:block">
+      {/* พื้นสีแบรนด์แบบ Shopee · ลิงก์ขาวโปร่ง ชื่อผู้ใช้ขาวเข้ม */}
+      <div className="status-bar hidden bg-brand text-xs text-white/85 md:block">
         {/* เว้นบน-ล่าง 2px — แถบสูง 24px */}
         <div className="mx-auto flex max-w-6xl items-end px-4 py-0.5 leading-5">
           {tagline && <p className="truncate">{tagline}</p>}
           <nav aria-label="แถบสถานะ" className="ml-auto flex items-center gap-4">
-            <Link href="/wishlist" className="flex items-center gap-1 hover:text-ink">
+            <Link href="/wishlist" className="flex items-center gap-1 hover:text-white">
               <Heart className="size-3.5" aria-hidden />
               รายการโปรด{wishlistCount > 0 && ` (${wishlistCount})`}
             </Link>
-            <Link href="/orders" className="flex items-center gap-1 hover:text-ink">
+            <Link href="/orders" className="flex items-center gap-1 hover:text-white">
               <Package className="size-3.5" aria-hidden />
               ประวัติการสั่งซื้อ
             </Link>
-            <Link href="/account" className="flex items-center gap-1 font-medium text-ink hover:text-brand">
+            <Link href="/account" className="flex items-center gap-1 font-medium text-white">
               <User className="size-3.5" aria-hidden />
               {userName ?? 'guest'}
             </Link>
