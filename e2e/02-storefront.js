@@ -44,17 +44,16 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   ok((await page.locator('h2:has-text("สินค้าในหมวดเดียวกัน")').count()) === 1, 'related products');
   await shot(page, 'p3-product');
 
-  // add to cart → badge
-  await page.click('button[aria-label="เพิ่มจำนวน"] >> nth=0');
+  // add to cart (ทีละ 1 ไม่มีช่องจำนวน) → badge
+  await page.waitForLoadState('networkidle');
+  ok((await page.locator('input[name=qty]:visible').count()) === 0 && (await page.locator('button[aria-label="เพิ่มจำนวน"]').count()) === 0, 'ไม่มีตัวเลือกจำนวนในหน้าสินค้า');
   await page.click('button:has-text("ใส่ตะกร้า") >> nth=0');
   await page.waitForSelector('[role=status]:has-text("ใส่ตะกร้าแล้ว")');
   ok(true, 'add to cart feedback');
+  await page.waitForFunction(() => document.querySelector('a[href="/cart"] span')?.textContent === '1');
+  await page.click('button:has-text("ใส่ตะกร้า") >> nth=0');
   await page.waitForFunction(() => document.querySelector('a[href="/cart"] span')?.textContent === '2');
-  ok(true, 'cart badge = 2');
-  // qty clamp to stock: add 99 more of a product with stock 20
-  await page.goto(`${BASE}/product/${encodeURIComponent('เครื่องชั่งอาหารดิจิทัล')}-p-018`);
-  await page.fill('input[name=qty] >> nth=0', '99');
-  ok((await page.inputValue('input[name=qty] >> nth=0')) === '20', 'qty input clamped to stock 20');
+  ok(true, 'cart badge = 2 after 2 clicks');
 
   // 404
   const res = await page.goto(`${BASE}/product/does-not-exist`);

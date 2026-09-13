@@ -6,9 +6,14 @@ const GRANOLA = '/product/กราโนล่าน้ำผึ้งอัล
 
 async function add(page, path, qty) {
   await page.goto(BASE + path);
-  await page.fill('input[name=qty]:visible', String(qty));
-  await page.click('button:has-text("ใส่ตะกร้า"):visible');
-  await page.waitForSelector('[role=status]:has-text("ใส่ตะกร้าแล้ว")');
+  await page.waitForLoadState('networkidle');
+  // ปุ่มใส่ทีละ 1 ชิ้น (ไม่มีช่องจำนวนแล้ว) → กดซ้ำตามจำนวน รอ badge ตะกร้าเพิ่มทุกครั้ง
+  const badge = () => page.evaluate(() => Number(document.querySelector('header a[title="ตะกร้า"] span')?.textContent ?? 0));
+  for (let i = 0; i < qty; i++) {
+    const before = await badge();
+    await page.click('button:has-text("ใส่ตะกร้า"):visible');
+    await page.waitForFunction((b) => Number(document.querySelector('header a[title="ตะกร้า"] span')?.textContent ?? 0) > b, before);
+  }
 }
 
 (async () => {
