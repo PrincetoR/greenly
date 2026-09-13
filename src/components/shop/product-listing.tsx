@@ -1,23 +1,14 @@
 import Link from 'next/link';
-import { SearchX, X } from 'lucide-react';
+import { SearchX } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import type { Category, Product } from '@/lib/types';
 import { ProductCard, ProductGrid } from './product-card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { buttonStyles } from '@/components/ui/button';
-import { CategorySelect } from './category-select';
+import { ListingToolbar } from './listing-toolbar';
+import type { SortValue } from './sort-options';
 
-export const SORT_OPTIONS = [
-  { value: 'newest', label: 'ใหม่ล่าสุด' },
-  { value: 'price-asc', label: 'ราคาต่ำไปสูง' },
-  { value: 'price-desc', label: 'ราคาสูงไปต่ำ' },
-  { value: 'name', label: 'ชื่อ ก–ฮ' },
-] as const;
-export type SortValue = (typeof SORT_OPTIONS)[number]['value'];
-
-export function parseSort(value: unknown): SortValue {
-  return SORT_OPTIONS.some((o) => o.value === value) ? (value as SortValue) : 'newest';
-}
+export { SORT_OPTIONS, parseSort, type SortValue } from './sort-options';
 
 /**
  * หน้ารายการสินค้า ใช้ร่วมกันระหว่าง /products และ /category/[slug]
@@ -105,29 +96,7 @@ export function ProductListing({
         )}
 
         <div>
-          {/* มือถือ: dropdown หมวดหมู่ · ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
-          <form action={basePath} className="flex flex-wrap items-center gap-2">
-            <div className="w-full md:hidden">
-              <CategorySelect options={links} value={currentHref} />
-            </div>
-            <input type="search" name="q" defaultValue={q} placeholder="ค้นหาในรายการนี้" aria-label="ค้นหา" className="h-10 min-w-0 flex-1 sm:max-w-xs sm:flex-none sm:basis-72" />
-            <button type="submit" className={buttonStyles({ variant: 'secondary' })}>
-              ค้นหา
-            </button>
-            {q && (
-              <Link href={`${basePath}${query({ q: undefined })}`} className={buttonStyles({ variant: 'ghost' })}>
-                <X className="size-4" aria-hidden />
-                ล้างคำค้น
-              </Link>
-            )}
-            <select name="sort" defaultValue={sort} aria-label="เรียงลำดับ" className="ml-auto h-10 w-auto!">
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </form>
+          <ListingToolbar basePath={basePath} q={q} sort={sort} categoryOptions={links} currentCategoryHref={currentHref} />
 
           {/* ระยะจากแถบค้นหาถึงกริด = ระยะระหว่างการ์ด (gap-3 / sm:gap-4) */}
           <div className="mt-3 sm:mt-4">

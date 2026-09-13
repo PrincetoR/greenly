@@ -19,7 +19,7 @@ const { BASE, launch, ok, shot } = require('./lib');
   const firstCard = await page.locator('main .group').first().boundingBox();
   ok(Math.abs(promoTextLeft - firstCard.x) < 0.5, `ข้อความ "โปรโมชัน" เริ่มตรงขอบซ้ายการ์ดสินค้า (${promoTextLeft} = ${firstCard.x})`);
   const nav = await page.locator('main aside nav').boundingBox();
-  const input = await page.locator('main input[name=q]').boundingBox();
+  const input = await page.locator('main input[aria-label="ค้นหา"]').boundingBox();
   ok(nav.y === input.y, `ขอบบน card หมวดหมู่ตรงกับช่องค้นหา (${nav.y} = ${input.y})`);
   const line = await page.locator('main aside nav div[aria-hidden]').boundingBox();
   ok(line.y === input.y + input.height, `เส้นคั่นอยู่ระดับขอบล่างช่องค้นหา (${line.y} = ${input.y + input.height})`);

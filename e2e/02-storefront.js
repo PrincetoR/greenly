@@ -28,9 +28,10 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   ok((await page.locator('a[href^="/product/"]').count()) === 4, 'category page → 4 products');
   ok((await page.getAttribute('main a[aria-current=page]', 'href')).startsWith('/category/'), 'active chip marked');
   // search within category keeps basePath
-  await page.fill('main input[type=search]', 'เจีย');
-  await page.click('main button:has-text("ค้นหา")');
+  await page.fill('main input[type=search]', 'เจีย'); // พิมพ์แล้วค้นทันที ไม่มีปุ่ม
   await page.waitForURL(/\/category\/.*\?q=/);
+  ok((await page.locator('main button:has-text("ค้นหา")').count()) === 0, 'ไม่มีปุ่มค้นหา');
+  ok(await page.locator('main input[type=search]').evaluate((i) => document.activeElement === i), 'พิมพ์ค้นหาแล้ว focus ยังอยู่ที่ช่อง');
   ok((await page.locator('a[href^="/product/"]').count()) === 1, 'search within category');
 
   // product detail
