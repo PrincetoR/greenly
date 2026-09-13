@@ -72,6 +72,11 @@
 }
 
 @layer base {
+  /* ปิดอาการเด้ง (rubber-band) ตอนเลื่อนสุดหน้าบน macOS/iOS — พี่ต่อไม่ชอบ */
+  html,
+  body {
+    overscroll-behavior: none;
+  }
   body {
     background: var(--bg);
     color: var(--ink);
