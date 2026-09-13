@@ -14,11 +14,12 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   // รายวัน (ค่าเริ่มต้น)
   await page.goto(`${BASE}/admin`);
   ok((await page.locator('main h1').count()) === 0 && (await page.locator('main > div > div.min-w-0 > div > div.grid:first-child > *').count()) === 4, 'KPI 4 ใบ ไม่มีหัวข้อ');
-  ok((await page.locator('main h2').allTextContents()).map((t) => t.trim()).join('|') === 'ยอดขาย|โปรโมชันกระตุ้นยอดขายได้แค่ไหน|หมวดหมู่ไหนขายดี|สินค้าขายดี 5 อันดับ', 'การ์ดสถิติ 4 ใบ (ไม่มีรายการออเดอร์/โปร/สต็อกแบบเดิม)');
+  ok((await page.locator('main h2').allTextContents()).map((t) => t.trim()).join('|') === 'ยอดขาย|โปรโมชันกระตุ้นยอดขาย|หมวดหมู่ไหนขายดี|สินค้าขายดี 5 อันดับ', 'การ์ดสถิติ 4 ใบ (ไม่มีรายการออเดอร์/โปร/สต็อกแบบเดิม)');
   ok((await page.locator('ul[aria-label="ยอดขายต่อช่วง"] > li').count()) === 30, 'รายวัน: กราฟ 30 แท่ง');
   ok((await page.locator('nav[aria-label="ช่วงเวลา"] a[aria-current=page]').textContent()).trim() === 'รายวัน', 'แท็บรายวัน active');
   const revenueText = await page.locator('main h2:has-text("ยอดขาย")').locator('xpath=ancestor::div[contains(@class,"rounded-card")]').locator('p.text-2xl').first().textContent();
   ok(/^฿[\d,]+/.test(revenueText.trim()), `ยอดขาย 30 วัน = ${revenueText.trim()}`);
+  ok((await page.locator('main h2:has-text("โปรโมชันกระตุ้นยอดขาย")').locator('xpath=ancestor::div[contains(@class,"rounded-card")]').locator('p.text-2xl').count()) === 0, 'การ์ดโปร: ไม่มีแถวสรุปรวมเหนือตาราง (พี่ต่อเอาออก)');
   ok((await page.locator('main table tbody tr').count()) >= 4, 'ตารางโปรโมชัน: มีโปรที่คาบเกี่ยว 30 วัน (กลางเดือน + 3 ตัวที่กำลังใช้)');
   const midMonth = page.locator('main table tbody tr', { hasText: 'ลด 10% ทั้งร้าน กลางเดือน' });
   ok((await midMonth.count()) === 1 && !/\b0\b/.test((await midMonth.locator('td').nth(1).textContent()).trim()), 'โปรกลางเดือนมีออเดอร์ที่ใช้ > 0');

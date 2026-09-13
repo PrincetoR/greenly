@@ -47,7 +47,6 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
   const cats = categoryReport(orders, products, categories, sales.window, sales.previousWindow);
   const top = topProducts(orders, sales.window, 5);
   const hint = RANGES.find((r) => r.value === range)!.hint;
-  const discountShare = sales.current.revenue + sales.current.discount > 0 ? (sales.current.discount / (sales.current.revenue + sales.current.discount)) * 100 : 0;
   const bestCat = cats[0]?.revenue > 0 ? cats[0].category.id : null;
   const worstCat = cats.length > 1 && cats[cats.length - 1].revenue < (cats[0]?.revenue ?? 0) ? cats[cats.length - 1].category.id : null;
 
@@ -78,20 +77,16 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
 
       {/* โปรโมชันกระตุ้นยอดขายได้ไหม */}
       <Card>
+        {/* ไม่มีแถวสรุปรวม (สัดส่วนออเดอร์ที่ใช้โปร / AOV / ส่วนลดรวม) — พี่ต่อ: เป็นค่าเฉลี่ยรวม ไม่ใช่ข้อมูลเฉพาะโปร ดูแล้วงง เอาเฉพาะตารางรายโปร */}
         <CardHeader
-          title="โปรโมชันกระตุ้นยอดขายได้แค่ไหน"
+          title="โปรโมชันกระตุ้นยอดขาย"
           description="ยอดขายเฉลี่ยต่อวันระหว่างที่โปรเปิด เทียบกับช่วงก่อนเริ่มโปรที่ยาวเท่ากัน — ยังไม่ตัดปัจจัยอื่น (ฤดูกาล โปรซ้อน) ใช้เป็นสัญญาณให้ดูต่อ"
         />
-        <div className="grid gap-4 p-5 sm:grid-cols-3">
-          <Stat label="ออเดอร์ที่ใช้โปร" value={`${Math.round(promo.share)}%`} sub={`${promo.withPromo.orders.toLocaleString('th-TH')} จาก ${(promo.withPromo.orders + promo.withoutPromo.orders).toLocaleString('th-TH')} ออเดอร์ (${hint})`} />
-          <Stat label="เฉลี่ยต่อออเดอร์ (มีโปร / ไม่มีโปร)" value={`${formatBaht(promo.withPromo.aov)} vs ${formatBaht(promo.withoutPromo.aov)}`} sub={promo.withPromo.aov > promo.withoutPromo.aov ? 'ออเดอร์ที่ใช้โปรซื้อเยอะกว่า' : promo.withPromo.orders === 0 ? 'ยังไม่มีออเดอร์ที่ใช้โปรในช่วงนี้' : 'ออเดอร์ที่ใช้โปรซื้อไม่ได้เยอะกว่า'} />
-          <Stat label="ส่วนลดที่ให้ไป" value={formatBaht(sales.current.discount)} sub={`${discountShare.toLocaleString('th-TH', { maximumFractionDigits: 1 })}% ของยอดก่อนหักส่วนลด`} />
-        </div>
         {promo.items.length === 0 ? (
-          <p className="border-t border-line px-5 py-4 text-sm text-muted">ไม่มีโปรโมชันที่เปิดในช่วงนี้</p>
+          <p className="px-5 py-4 text-sm text-muted">ไม่มีโปรโมชันที่เปิดในช่วงนี้</p>
         ) : (
-          <div className="border-t border-line px-5 pb-5">
-            <Table className="mt-4">
+          <div className="p-5">
+            <Table>
               <thead>
                 <tr>
                   <Th>โปรโมชัน</Th>
