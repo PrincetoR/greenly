@@ -59,15 +59,14 @@ export function ProductListing({
     ...categories.map((c) => ({ href: `/category/${c.slug}${query({})}`, label: c.name, active: current?.id === c.id })),
   ];
   const currentHref = links.find((l) => l.active)?.href ?? links[0].href;
+  const showHeading = Boolean(q || description);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4">
+    // ระยะจาก header ถึงเนื้อหา = 16px เท่าระยะระหว่างการ์ด
+    <div className="mx-auto max-w-6xl px-4 pt-4 pb-8 md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4">
       <aside className="hidden md:block">
-        {/*
-         * แถวแรก "หมวดหมู่สินค้า" สูง 40px ระดับเดียวกับหัวข้อหน้า (card ขยับขึ้น 8px เท่า padding)
-         * คั่นด้วยเส้น แล้วรายการเริ่มที่ระดับขอบบนช่องค้นหา (หัวข้อ 40 + gap 16)
-         */}
-        <nav aria-label="หมวดหมู่สินค้า" className="sticky top-[72px] -mt-2 rounded-card bg-surface p-2 ring-1 ring-line">
+        {/* ขอบบน card ตรงกับช่องค้นหา · แถวแรก "หมวดหมู่สินค้า" สูง 40 เท่าช่องค้นหา · คั่นด้วยเส้น */}
+        <nav aria-label="หมวดหมู่สินค้า" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
           {/* ขนาดใกล้เคียงหัวข้อหน้า (ย่อมกว่าหนึ่งขั้น) ให้ดูเป็นหัวข้อของคอลัมน์ ไม่ใช่รายการหนึ่ง */}
           <p className="flex h-10 items-center px-2 text-lg font-bold">หมวดหมู่สินค้า</p>
           <div className="mt-2 mb-[7px] border-t border-line" aria-hidden />
@@ -88,17 +87,23 @@ export function ProductListing({
       </aside>
 
       <div className="min-w-0">
-        {/* หัวข้อหน้าอยู่เหนือช่องค้นหา ในคอลัมน์ขวา */}
-        {/* สูง 40 เท่าแถวหัว card หมวดหมู่ และจัดกึ่งกลางแนวตั้งให้ตัวอักษรสองฝั่งอยู่ระดับเดียวกัน */}
-        <div className="flex min-h-10 flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-bold sm:text-2xl">{title}</h1>
-            {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+        {/*
+         * ไม่มีบรรทัดหัวข้อ (พี่ต่อเอาออก) — เหลือ h1 แบบ sr-only ให้ screen reader/SEO
+         * ยกเว้นหน้าที่ต้องบอกบริบท (ผลค้นหา / สินค้าในโปร) จึงแสดงหัวข้อเล็ก ๆ เหนือช่องค้นหา
+         */}
+        {showHeading ? (
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h1 className="text-xl font-bold">{title}</h1>
+              {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
+            </div>
+            <p className="text-sm text-muted">{products.length} รายการ</p>
           </div>
-          <p className="text-sm text-muted">{products.length} รายการ</p>
-        </div>
+        ) : (
+          <h1 className="sr-only">{title}</h1>
+        )}
 
-        <div className="mt-4">
+        <div>
           {/* มือถือ: dropdown หมวดหมู่ · ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
           <form action={basePath} className="flex flex-wrap items-center gap-2">
             <div className="w-full md:hidden">
