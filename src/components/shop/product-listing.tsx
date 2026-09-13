@@ -77,7 +77,7 @@ export function ProductListing({
                 <Link
                   href={l.href}
                   aria-current={l.active ? 'page' : undefined}
-                  className={cn('block rounded-lg px-3 py-2 text-[15px] font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
+                  className={cn('block rounded-lg px-3 py-1.5 text-[15px] font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
                 >
                   {l.label}
                 </Link>
