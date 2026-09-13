@@ -5,6 +5,14 @@ const { BASE, launch, ok, shot } = require('./lib');
   const { browser, page } = await launch();
   await page.goto(`${BASE}/products`);
   ok(await page.locator('main aside nav a:has-text("ธัญพืชและถั่ว")').isVisible(), 'desktop: aside แสดงหมวดหมู่');
+  // sticky: เลื่อนแล้ว card หมวดหมู่ + แถวค้นหา อยู่ที่เดิม การ์ดมุดใต้
+  const before = await page.evaluate(() => ({ aside: document.querySelector('main aside nav').getBoundingClientRect().top, tb: document.querySelector('main input[aria-label="ค้นหา"]').getBoundingClientRect().top }));
+  await page.mouse.wheel(0, 800);
+  await page.waitForTimeout(300);
+  const after = await page.evaluate(() => ({ aside: document.querySelector('main aside nav').getBoundingClientRect().top, tb: document.querySelector('main input[aria-label="ค้นหา"]').getBoundingClientRect().top, card: document.querySelector('main .group').getBoundingClientRect().top }));
+  ok(before.aside === after.aside && before.tb === after.tb && after.card < 0, `เลื่อนแล้ว aside/แถบค้นหาติดที่เดิม (${before.tb} = ${after.tb}) การ์ดเลื่อนไป`);
+  await page.mouse.wheel(0, -800);
+  await page.waitForTimeout(300);
   ok((await page.locator('main a.rounded-full').count()) === 0, 'desktop: ไม่มี chip/tag');
   ok(!(await page.locator('main select[aria-label="หมวดหมู่"]').isVisible()), 'desktop: ซ่อน dropdown หมวด');
   ok((await page.textContent('main aside nav p')).trim() === 'หมวดหมู่สินค้า', 'บรรทัดแรกของ card = หมวดหมู่สินค้า');
