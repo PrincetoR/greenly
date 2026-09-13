@@ -62,77 +62,75 @@ export function ProductListing({
     ...categories.map((c) => ({ href: `/category/${c.slug}${query({})}`, label: c.name, active: current?.id === c.id })),
   ];
 
-  const asideNav = aside && (
-    <aside className="hidden md:block">
-      <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
-        <p className="px-3 pt-2 pb-1 text-xs font-semibold tracking-wide text-muted uppercase">หมวดหมู่</p>
-        <ul className="flex flex-col">
-          {links.map((l) => (
-            <li key={l.href}>
-              <Link
-                href={l.href}
-                aria-current={l.active ? 'page' : undefined}
-                className={cn('block rounded-lg px-3 py-2 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
-              >
-                {l.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </aside>
-  );
-
   return (
-    // โหมด aside: card หมวดหมู่ซ้ายเริ่มระดับเดียวกับหัวข้อหน้า · ทุกอย่างที่เหลือ (หัวข้อ ค้นหา กริด) อยู่คอลัมน์ขวา
-    <div className={cn('mx-auto max-w-6xl px-4 py-8', aside && 'md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4')}>
-      {asideNav}
-
-      <div className="min-w-0">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
-            {description && <p className="mt-1 text-sm text-muted">{description}</p>}
-          </div>
-          <div className="flex items-center gap-3">
-            <p className="text-sm text-muted">{products.length} รายการ</p>
-            <CategoryLayoutToggle current={layout} />
-          </div>
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
+          {description && <p className="mt-1 text-sm text-muted">{description}</p>}
         </div>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-muted">{products.length} รายการ</p>
+          <CategoryLayoutToggle current={layout} />
+        </div>
+      </div>
 
-        {/* chips: เลื่อนแนวนอนบนมือถือ · py-1/px-1 เผื่อที่ให้ ring เพราะ overflow-x-auto จะ clip ขอบ */}
-        <ul className={cn('-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 py-1 scrollbar-none sm:-mx-1 sm:flex-wrap sm:px-1', aside && 'md:hidden')}>
-          {links.map((l) => (
-            <li key={l.href} className="shrink-0">
-              <Chip href={l.href} active={l.active}>
-                {l.label}
-              </Chip>
-            </li>
+      {/* chips: เลื่อนแนวนอนบนมือถือ · py-1/px-1 เผื่อที่ให้ ring เพราะ overflow-x-auto จะ clip ขอบ */}
+      <ul className={cn('-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 py-1 scrollbar-none sm:-mx-1 sm:flex-wrap sm:px-1', aside && 'md:hidden')}>
+        {links.map((l) => (
+          <li key={l.href} className="shrink-0">
+            <Chip href={l.href} active={l.active}>
+              {l.label}
+            </Chip>
+          </li>
+        ))}
+      </ul>
+
+      {/* ซ้าย: ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
+      <form action={basePath} className="mt-4 flex flex-wrap items-center gap-2">
+        <input type="search" name="q" defaultValue={q} placeholder="ค้นหาในรายการนี้" aria-label="ค้นหา" className="h-10 min-w-0 flex-1 sm:max-w-xs sm:flex-none sm:basis-72" />
+        <button type="submit" className={buttonStyles({ variant: 'secondary' })}>
+          ค้นหา
+        </button>
+        {q && (
+          <Link href={`${basePath}${query({ q: undefined })}`} className={buttonStyles({ variant: 'ghost' })}>
+            <X className="size-4" aria-hidden />
+            ล้างคำค้น
+          </Link>
+        )}
+        <select name="sort" defaultValue={sort} aria-label="เรียงลำดับ" className="ml-auto h-10 w-auto!">
+          {SORT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
           ))}
-        </ul>
+        </select>
+      </form>
 
-        {/* ซ้าย: ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
-        <form action={basePath} className="mt-4 flex flex-wrap items-center gap-2">
-          <input type="search" name="q" defaultValue={q} placeholder="ค้นหาในรายการนี้" aria-label="ค้นหา" className="h-10 min-w-0 flex-1 sm:max-w-xs sm:flex-none sm:basis-72" />
-          <button type="submit" className={buttonStyles({ variant: 'secondary' })}>
-            ค้นหา
-          </button>
-          {q && (
-            <Link href={`${basePath}${query({ q: undefined })}`} className={buttonStyles({ variant: 'ghost' })}>
-              <X className="size-4" aria-hidden />
-              ล้างคำค้น
-            </Link>
-          )}
-          <select name="sort" defaultValue={sort} aria-label="เรียงลำดับ" className="ml-auto h-10 w-auto!">
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </form>
+      {/* แถวเนื้อหา: โหมด aside = card หมวดหมู่ซ้าย (ขอบบนตรงกับการ์ดสินค้า) + กริดขวา */}
+      <div className={cn('mt-6', aside && 'md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4')}>
+        {aside && (
+          <aside className="hidden md:block">
+            <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
+              <p className="px-3 pt-2 pb-1 text-xs font-semibold tracking-wide text-muted uppercase">หมวดหมู่</p>
+              <ul className="flex flex-col">
+                {links.map((l) => (
+                  <li key={l.href}>
+                    <Link
+                      href={l.href}
+                      aria-current={l.active ? 'page' : undefined}
+                      className={cn('block rounded-lg px-3 py-2 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+        )}
 
-        <div className="mt-6">
+        <div className="min-w-0">
           {products.length === 0 ? (
             <EmptyState
               icon={<SearchX />}
