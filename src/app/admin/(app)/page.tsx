@@ -3,141 +3,194 @@ import { requireSession } from '@/lib/auth/session';
 import { roleCan } from '@/lib/auth/roles';
 import { listOrders } from '@/lib/db/orders';
 import { listProducts } from '@/lib/db/products';
+import { listCategories } from '@/lib/db/categories';
 import { loadPromotionContext } from '@/lib/promotions/service';
-import { promotionStatus } from '@/lib/pricing/status';
+import { promotionStatus, PROMOTION_STATUS_LABEL } from '@/lib/pricing/status';
 import { formatBaht } from '@/lib/money';
-import { humanCountdown } from '@/lib/datetime';
-import { ORDER_STATUS_LABEL, ORDER_STATUS_TONE } from '@/lib/orders/labels';
+import { formatRange } from '@/lib/datetime';
+import { parseRange, RANGES } from '@/lib/analytics/periods';
+import { salesReport } from '@/lib/analytics/sales';
+import { promotionReport } from '@/lib/analytics/promotions';
+import { categoryReport, topProducts } from '@/lib/analytics/categories';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { buttonStyles } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Table, Td, Th } from '@/components/ui/table';
+import { BarChart, Delta, RangeTabs, Stat } from '@/components/admin/analytics';
+import { PromoTypeIcon } from '@/components/shop/promo-type-icon';
+import { ProductImage } from '@/components/product-image';
 
 export const metadata = { title: 'แดชบอร์ด' };
 
-export default async function AdminDashboard() {
-  const session = await requireSession();
-  const [orders, products, ctx] = await Promise.all([listOrders(), listProducts(), loadPromotionContext()]);
+/**
+ * แดชบอร์ด = KPI 4 ใบ (กดไปดูรายละเอียด) + สถิติที่วิเคราะห์ได้จริง (พี่ต่อไม่เอารายการละเอียดซ้ำกับหน้าอื่น)
+ * ช่วงเวลาเลือกผ่าน ?range=day|month|year — ทุกการ์ดสถิติใช้ช่วงเดียวกัน
+ */
+export default async function AdminDashboard({ searchParams }: PageProps<'/admin'>) {
+  const [session, sp] = await Promise.all([requireSession(), searchParams]);
+  const [orders, products, categories, ctx] = await Promise.all([listOrders(), listProducts(), listCategories(), loadPromotionContext()]);
   const { settings, promotions, usage, now } = ctx;
+  const range = parseRange(sp.range);
 
   const startOfToday = new Date(now);
   startOfToday.setHours(0, 0, 0, 0);
   const active = orders.filter((o) => o.status !== 'cancelled');
   const today = active.filter((o) => new Date(o.createdAt) >= startOfToday);
   const revenueToday = today.reduce((s, o) => s + o.total, 0);
-  const revenueAll = active.reduce((s, o) => s + o.total, 0);
   const pending = orders.filter((o) => o.status === 'pending');
-  const lowStock = products.filter((p) => p.active && p.stock <= settings.lowStockThreshold).sort((a, b) => a.stock - b.stock);
+  const lowStock = products.filter((p) => p.active && p.stock <= settings.lowStockThreshold);
   const live = promotions.filter((p) => promotionStatus(p, now, usage[p.id]) === 'live');
   const canOrders = roleCan(session.role, 'order.manage');
   const canPromo = roleCan(session.role, 'promotion.manage');
 
+  const sales = salesReport(orders, range, now);
+  const promo = promotionReport(orders, promotions, now, sales.window);
+  const cats = categoryReport(orders, products, categories, sales.window, sales.previousWindow);
+  const top = topProducts(orders, sales.window, 5);
+  const hint = RANGES.find((r) => r.value === range)!.hint;
+  const discountShare = sales.current.revenue + sales.current.discount > 0 ? (sales.current.discount / (sales.current.revenue + sales.current.discount)) * 100 : 0;
+  const bestCat = cats[0]?.revenue > 0 ? cats[0].category.id : null;
+  const worstCat = cats.length > 1 && cats[cats.length - 1].revenue < (cats[0]?.revenue ?? 0) ? cats[cats.length - 1].category.id : null;
+
   return (
     // ระยะทุกช่องเท่ากัน 16px (= gap คอลัมน์ซ้าย/ขวา และ gap การ์ดสินค้าหน้าร้าน) — พี่ต่อไม่เอา 12/24 ปนกัน
-    <div className="grid gap-4">
+    // เป็น flex คอลัมน์ ไม่ใช่ grid: track ของ grid จะถ่างตาม min-content ของตารางข้างใน (overflow-x-auto ไม่ช่วย) จนหน้าเลื่อนข้างได้
+    <div className="flex flex-col gap-4">
       {/* ไม่มีหัวข้อ/บรรทัดทักทาย (พี่ต่อเอาออก) — แถว KPI เริ่มที่ขอบบนเดียวกับ card "จัดการสินค้า" · ชื่อหน้าอยู่ใน metadata.title */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi label="ยอดขายวันนี้" value={formatBaht(revenueToday)} sub={`${today.length} ออเดอร์`} />
+        <Kpi label="ยอดขายวันนี้" value={formatBaht(revenueToday)} sub={`${today.length} ออเดอร์`} href={canOrders ? '/admin/orders' : undefined} />
         <Kpi label="รอยืนยัน/ชำระ" value={String(pending.length)} sub="ออเดอร์" href={canOrders ? '/admin/orders?status=pending' : undefined} tone={pending.length > 0 ? 'warn' : undefined} />
         <Kpi label="สินค้าใกล้หมด" value={String(lowStock.length)} sub={`≤ ${settings.lowStockThreshold} ชิ้น`} href="/admin/products?status=low" tone={lowStock.length > 0 ? 'danger' : undefined} />
         <Kpi label="โปรที่กำลังใช้งาน" value={String(live.length)} sub="โปรโมชัน" href={canPromo ? '/admin/promotions?status=live' : '/promotions'} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        {canOrders && (
-          <Card>
-            <CardHeader
-              title="ออเดอร์ล่าสุด"
-              description={`ยอดขายสะสม ${formatBaht(revenueAll)}`}
-              action={
-                <Link href="/admin/orders" className="text-sm font-medium text-brand hover:underline">
-                  ดูทั้งหมด
-                </Link>
-              }
-            />
-            {orders.length === 0 ? (
-              <p className="p-5 text-sm text-muted">ยังไม่มีคำสั่งซื้อ</p>
-            ) : (
-              <ul className="divide-y divide-line">
-                {orders.slice(0, 6).map((o) => (
-                  <li key={o.id}>
-                    <Link href={`/admin/orders/${o.id}`} className="flex items-center gap-3 px-5 py-3 text-sm hover:bg-surface-alt/60">
-                      <span className="font-mono font-medium">{o.orderNo}</span>
-                      <span className="min-w-0 flex-1 truncate text-muted">{o.customer.name}</span>
-                      <span className="font-medium">{formatBaht(o.total)}</span>
-                      <Badge tone={ORDER_STATUS_TONE[o.status]}>{ORDER_STATUS_LABEL[o.status]}</Badge>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-        )}
+      {/* ยอดขายตามช่วงเวลา */}
+      <Card>
+        <CardHeader title="ยอดขาย" description={`${hint} · เทียบกับช่วงก่อนหน้าที่ยาวเท่ากัน · ไม่นับออเดอร์ที่ยกเลิก`} action={<RangeTabs range={range} />} />
+        <div className="grid gap-4 p-5 sm:grid-cols-3">
+          <Stat label="ยอดขาย" value={formatBaht(sales.current.revenue)} sub={`ช่วงก่อน ${formatBaht(sales.previous.revenue)}`} delta={sales.change.revenue} />
+          <Stat label="ออเดอร์" value={`${sales.current.orders.toLocaleString('th-TH')} ออเดอร์`} sub={`ช่วงก่อน ${sales.previous.orders.toLocaleString('th-TH')}`} delta={sales.change.orders} />
+          <Stat label="เฉลี่ยต่อออเดอร์" value={formatBaht(sales.current.aov)} sub={`ช่วงก่อน ${formatBaht(sales.previous.aov)}`} delta={sales.change.aov} />
+        </div>
+        <div className="px-5 pb-5">
+          <BarChart points={sales.points} labelEvery={range === 'day' ? 5 : 1} />
+        </div>
+      </Card>
 
-        <Card>
-          <CardHeader
-            title="โปรโมชันที่กำลังใช้งาน"
-            action={
-              canPromo ? (
-                <Link href="/admin/promotions/new" className={buttonStyles({ size: 'sm' })}>
-                  <Plus className="size-4" aria-hidden />
-                  สร้างโปร
-                </Link>
-              ) : undefined
-            }
-          />
-          {live.length === 0 ? (
-            <p className="p-5 text-sm text-muted">ตอนนี้ไม่มีโปรที่กำลังใช้งาน</p>
-          ) : (
-            <ul className="divide-y divide-line">
-              {live.map((p) => {
-                const u = usage[p.id];
-                return (
-                  <li key={p.id} className="flex items-center gap-3 px-5 py-3 text-sm">
-                    <span className="min-w-0 flex-1">
-                      {canPromo ? (
-                        <Link href={`/admin/promotions/${p.id}`} className="block truncate font-medium hover:text-brand">
-                          {p.name}
-                        </Link>
-                      ) : (
-                        <span className="block truncate font-medium">{p.name}</span>
-                      )}
-                      <span className="text-xs text-muted">
-                        เหลือ {humanCountdown(p.endsAt, now)} · ใช้ไป {u?.totalUses ?? 0}
-                        {p.limits.totalUses !== null && `/${p.limits.totalUses}`} สิทธิ์
-                      </span>
-                    </span>
-                    {p.coupon && <Badge tone="accent" className="font-mono">{p.coupon.code}</Badge>}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+      {/* โปรโมชันกระตุ้นยอดขายได้ไหม */}
+      <Card>
+        <CardHeader
+          title="โปรโมชันกระตุ้นยอดขายได้แค่ไหน"
+          description="ยอดขายเฉลี่ยต่อวันระหว่างที่โปรเปิด เทียบกับช่วงก่อนเริ่มโปรที่ยาวเท่ากัน — ยังไม่ตัดปัจจัยอื่น (ฤดูกาล โปรซ้อน) ใช้เป็นสัญญาณให้ดูต่อ"
+        />
+        <div className="grid gap-4 p-5 sm:grid-cols-3">
+          <Stat label="ออเดอร์ที่ใช้โปร" value={`${Math.round(promo.share)}%`} sub={`${promo.withPromo.orders.toLocaleString('th-TH')} จาก ${(promo.withPromo.orders + promo.withoutPromo.orders).toLocaleString('th-TH')} ออเดอร์ (${hint})`} />
+          <Stat label="เฉลี่ยต่อออเดอร์ (มีโปร / ไม่มีโปร)" value={`${formatBaht(promo.withPromo.aov)} vs ${formatBaht(promo.withoutPromo.aov)}`} sub={promo.withPromo.aov > promo.withoutPromo.aov ? 'ออเดอร์ที่ใช้โปรซื้อเยอะกว่า' : promo.withPromo.orders === 0 ? 'ยังไม่มีออเดอร์ที่ใช้โปรในช่วงนี้' : 'ออเดอร์ที่ใช้โปรซื้อไม่ได้เยอะกว่า'} />
+          <Stat label="ส่วนลดที่ให้ไป" value={formatBaht(sales.current.discount)} sub={`${discountShare.toLocaleString('th-TH', { maximumFractionDigits: 1 })}% ของยอดก่อนหักส่วนลด`} />
+        </div>
+        {promo.items.length === 0 ? (
+          <p className="border-t border-line px-5 py-4 text-sm text-muted">ไม่มีโปรโมชันที่เปิดในช่วงนี้</p>
+        ) : (
+          <div className="border-t border-line px-5 pb-5">
+            <Table className="mt-4">
+              <thead>
+                <tr>
+                  <Th>โปรโมชัน</Th>
+                  <Th className="text-right whitespace-nowrap">ออเดอร์ที่ใช้</Th>
+                  <Th className="text-right whitespace-nowrap">ยอดขายจากโปร</Th>
+                  <Th className="text-right whitespace-nowrap">ส่วนลดที่ให้</Th>
+                  <Th className="text-right whitespace-nowrap">ยอดขาย/วัน</Th>
+                  <Th className="whitespace-nowrap">เทียบก่อนโปร</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {promo.items.map((it) => {
+                  const st = promotionStatus(it.promotion, now, usage[it.promotion.id]);
+                  return (
+                    <tr key={it.promotion.id}>
+                      <Td>
+                        <div className="flex items-center gap-2">
+                          <PromoTypeIcon type={it.promotion.type} className="size-4 shrink-0 text-muted" />
+                          <div className="min-w-0">
+                            {canPromo ? (
+                              <Link href={`/admin/promotions/${it.promotion.id}`} className="block truncate font-medium hover:underline">
+                                {it.promotion.name}
+                              </Link>
+                            ) : (
+                              <p className="truncate font-medium">{it.promotion.name}</p>
+                            )}
+                            <p className="mt-0.5 flex items-center gap-2 text-xs text-muted whitespace-nowrap">
+                              <Badge tone={st === 'live' ? 'ok' : 'neutral'}>{PROMOTION_STATUS_LABEL[st]}</Badge>
+                              {formatRange(it.promotion.startsAt, it.promotion.endsAt)}
+                            </p>
+                          </div>
+                        </div>
+                      </Td>
+                      <Td className="text-right tabular-nums">{it.orders.toLocaleString('th-TH')}</Td>
+                      <Td className="text-right font-medium tabular-nums">{formatBaht(it.revenue)}</Td>
+                      <Td className="text-right text-accent tabular-nums whitespace-nowrap">{it.discount > 0 ? `−${formatBaht(it.discount)}` : '—'}</Td>
+                      <Td className="text-right tabular-nums whitespace-nowrap">
+                        {formatBaht(it.perDayDuring)}
+                        <span className="block text-xs text-muted">ก่อนโปร {formatBaht(it.perDayBefore)}</span>
+                      </Td>
+                      <Td>
+                        <Delta value={it.uplift} label="" />
+                      </Td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+          </div>
+        )}
+      </Card>
+
+      {/* min-w-0 ที่ card: ไม่งั้น track ของ grid ถ่างตามชื่อหมวด/สินค้าที่ยาว (truncate ไม่ทำงาน) จนหน้าเลื่อนข้างได้บนมือถือ */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* หมวดหมู่ขายดี / ขายไม่ดี */}
+        <Card className="min-w-0">
+          <CardHeader title="หมวดหมู่ไหนขายดี" description={`สัดส่วนรายได้ ${hint} · เทียบช่วงก่อนหน้า · ไม่นับของแถม`} />
+          <ol className="flex flex-col gap-4 p-5">
+            {cats.map((c) => (
+              <li key={c.category.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1">
+                <p className="flex min-w-0 items-center gap-2 text-sm font-medium">
+                  <span className="truncate">{c.category.name}</span>
+                  {c.category.id === bestCat && <Badge tone="ok">ขายดีสุด</Badge>}
+                  {c.category.id === worstCat && <Badge tone="warn">ขายน้อยสุด</Badge>}
+                </p>
+                <p className="text-sm font-semibold tabular-nums">{formatBaht(c.revenue)}</p>
+                <div className="col-span-2 h-2 overflow-hidden rounded-full bg-surface-alt" aria-hidden>
+                  <div className="h-full rounded-full bg-brand" style={{ width: `${c.share}%` }} />
+                </div>
+                <p className="text-xs text-muted">
+                  {c.share.toLocaleString('th-TH', { maximumFractionDigits: 1 })}% · {c.qty.toLocaleString('th-TH')} ชิ้น · {c.orders.toLocaleString('th-TH')} ออเดอร์
+                </p>
+                <Delta value={c.change} label="" />
+              </li>
+            ))}
+          </ol>
         </Card>
 
-        <Card className="lg:col-span-2">
-          <CardHeader
-            title="สินค้าใกล้หมด"
-            description={`stock ≤ ${settings.lowStockThreshold} ชิ้น`}
-            action={
-              <Link href="/admin/products?status=low" className="text-sm font-medium text-brand hover:underline">
-                ดูทั้งหมด
-              </Link>
-            }
-          />
-          {lowStock.length === 0 ? (
-            <p className="p-5 text-sm text-muted">สต็อกทุกรายการยังเพียงพอ</p>
+        {/* สินค้าขายดี */}
+        <Card className="min-w-0">
+          <CardHeader title="สินค้าขายดี 5 อันดับ" description={`ตามจำนวนชิ้นที่ขายได้ ${hint}`} />
+          {top.length === 0 ? (
+            <p className="p-5 text-sm text-muted">ยังไม่มีออเดอร์ในช่วงนี้</p>
           ) : (
-            <ul className="grid gap-x-6 divide-y divide-line sm:grid-cols-2 sm:divide-y-0">
-              {lowStock.slice(0, 8).map((p) => (
-                <li key={p.id} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
-                  <Link href={`/admin/products/${p.id}`} className="min-w-0 truncate hover:text-brand">
-                    {p.name}
-                  </Link>
-                  <span className={`shrink-0 font-semibold ${p.stock === 0 ? 'text-danger' : 'text-warn'}`}>{p.stock === 0 ? 'หมด' : `เหลือ ${p.stock}`}</span>
+            <ol className="flex flex-col gap-4 p-5">
+              {top.map((p, i) => (
+                <li key={p.productId} className="flex items-center gap-3">
+                  <span className="w-5 shrink-0 text-center text-sm font-bold text-muted tabular-nums">{i + 1}</span>
+                  <ProductImage src={p.image} alt="" className="size-12 rounded-md border border-line" />
+                  <div className="min-w-0 flex-1">
+                    <Link href={`/admin/products/${p.productId}`} className="block truncate text-sm font-medium hover:underline">
+                      {p.name}
+                    </Link>
+                    <p className="text-xs text-muted">{p.qty.toLocaleString('th-TH')} ชิ้น</p>
+                  </div>
+                  <p className="text-sm font-semibold tabular-nums">{formatBaht(p.revenue)}</p>
                 </li>
               ))}
-            </ul>
+            </ol>
           )}
         </Card>
       </div>

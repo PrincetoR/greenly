@@ -4,6 +4,8 @@
  * ระวัง: เขียนทับ orders/carts/products/promotions ที่มีอยู่ (ใช้เพื่อ reset demo)
  *
  * รันด้วย tsx จึง import โมดูลที่มี 'server-only' ไม่ได้ — เขียนไฟล์ตรง ๆ ที่นี่
+ *
+ * ค่าเริ่มต้นสร้างประวัติออเดอร์ย้อนหลัง 24 เดือนให้แดชบอร์ดมีสถิติดู · `--no-history` = orders ว่าง (e2e ใช้ เพราะเทสต์นับออเดอร์)
  */
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
@@ -15,6 +17,7 @@ const DATA = path.join(ROOT, 'data');
 const SEED_IMG = path.join(ROOT, 'public', 'uploads', 'seed');
 
 const now = new Date();
+const WITH_HISTORY = !process.argv.includes('--no-history');
 const iso = (d: Date) => d.toISOString();
 const daysFromNow = (n: number) => new Date(now.getTime() + n * 86_400_000);
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9ก-๙]+/g, '-').replace(/^-|-$/g, '');
@@ -83,8 +86,8 @@ let sku = 1;
 for (const [categoryId, seeds] of Object.entries(productSeed)) {
   for (const [name, baht, stock, description, featured] of seeds) {
     const id = `p-${String(sku).padStart(3, '0')}`;
-    // สินค้าที่สร้างก่อนมี createdAt เก่ากว่า เพื่อให้ "สินค้าใหม่" เรียงได้จริง
-    const createdAt = iso(daysFromNow(-(30 - sku)));
+    // สินค้าที่สร้างก่อนมี createdAt เก่ากว่า เพื่อให้ "สินค้าใหม่" เรียงได้จริง · ทุกตัวเก่ากว่าประวัติออเดอร์ (24 เดือน)
+    const createdAt = iso(daysFromNow(-(760 - sku * 4)));
     products.push({
       id,
       sku: `SKU-${String(sku).padStart(4, '0')}`,
@@ -184,7 +187,7 @@ const promotions: Promotion[] = [
   },
   {
     id: 'promo-expired',
-    name: 'ต้อนรับเปิดร้าน ลด 10% ทั้งร้าน',
+    name: 'ลด 10% ทั้งร้าน กลางเดือน',
     type: 'discount',
     active: true,
     startsAt: iso(daysFromNow(-30)),
@@ -196,7 +199,158 @@ const promotions: Promotion[] = [
     limits: { totalUses: null, perProductQty: null, perCustomer: null },
     ...basePromo,
   },
+  // โปรในอดีต 2 ตัว — ประวัติออเดอร์อ้างถึง ให้แดชบอร์ดเทียบ "ก่อน/ระหว่างโปร" ได้
+  {
+    id: 'promo-past-coupon',
+    name: 'คูปอง SUMMER50 ลด 50 บาท',
+    type: 'coupon',
+    active: true,
+    startsAt: iso(daysFromNow(-150)),
+    endsAt: iso(daysFromNow(-120)),
+    scope: { kind: 'all', ids: [] },
+    discount: { mode: 'fixed', value: 5000 },
+    coupon: { code: 'SUMMER50', minSubtotal: 30000, freeShipping: false },
+    bogo: null,
+    limits: { totalUses: null, perProductQty: null, perCustomer: null },
+    ...basePromo,
+  },
+  {
+    id: 'promo-past-anniv',
+    name: 'ครบรอบร้าน ลด 15% ธัญพืชและขนม',
+    type: 'discount',
+    active: true,
+    startsAt: iso(daysFromNow(-275)),
+    endsAt: iso(daysFromNow(-255)),
+    scope: { kind: 'categories', ids: ['c-grains', 'c-snacks'] },
+    discount: { mode: 'percent', value: 15 },
+    coupon: null,
+    bogo: null,
+    limits: { totalUses: null, perProductQty: null, perCustomer: null },
+    ...basePromo,
+  },
 ];
+
+/* ---------- ประวัติออเดอร์สาธิต 24 เดือน (deterministic — RNG seed คงที่ รันกี่ครั้งก็ได้ชุดเดิมเมื่อ now เท่ากัน) ---------- */
+function mulberry32(a: number) {
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const customers = [
+  ['สมชาย ใจดี', '0812345678', '12/3 ถ.สุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110'],
+  ['วราภรณ์ ศรีสุข', '0898765432', '99 หมู่ 4 ต.บางพลี อ.บางพลี สมุทรปราการ 10540'],
+  ['ณัฐพล พงษ์พานิช', '0861112222', '45 ซ.ลาดพร้าว 71 เขตวังทองหลาง กรุงเทพฯ 10310'],
+  ['พิมพ์ชนก ทองดี', '0923334444', '7/1 ถ.นิมมานเหมินท์ ต.สุเทพ อ.เมือง เชียงใหม่ 50200'],
+  ['อรุณ แสงทอง', '0845556666', '210 ถ.มิตรภาพ ต.ในเมือง อ.เมือง ขอนแก่น 40000'],
+  ['กมลวรรณ บุญมา', '0957778888', '88 ถ.ราชดำเนิน ต.ในเมือง อ.เมือง นครศรีธรรมราช 80000'],
+  ['ธีรภัทร วงศ์สวัสดิ์', '0639990000', '15 ซ.รามคำแหง 24 เขตหัวหมาก กรุงเทพฯ 10240'],
+  ['ศิริพร มั่นคง', '0871234567', '3/5 ถ.เพชรเกษม ต.หาดใหญ่ อ.หาดใหญ่ สงขลา 90110'],
+  ['ปิยะ รักษ์ดี', '0819876543', '120 ถ.ศรีนครินทร์ เขตประเวศ กรุงเทพฯ 10250'],
+  ['จิราพร แก้วใส', '0902468135', '56 หมู่ 2 ต.บ้านฉาง อ.บ้านฉาง ระยอง 21130'],
+  ['วีระ ชัยชนะ', '0881357924', '9 ถ.พหลโยธิน ต.ปากเพรียว อ.เมือง สระบุรี 18000'],
+  ['นภัสสร อินทร์แก้ว', '0651122334', '31 ซ.สุขุมวิท 101 เขตพระโขนง กรุงเทพฯ 10260'],
+] as const;
+
+/** น้ำหนักต่อหมวด — ให้หมวดเครื่องดื่ม/ขนมขายดี ของใช้ในครัวขายน้อย แดชบอร์ดจะได้เห็นความต่าง */
+const categoryWeight: Record<string, number> = { 'c-drinks': 0.3, 'c-snacks': 0.22, 'c-grains': 0.18, 'c-dried': 0.12, 'c-supplement': 0.1, 'c-kitchen': 0.08 };
+
+function demoOrders(): Order[] {
+  const rand = mulberry32(20260914);
+  const pick = <T,>(arr: readonly T[]) => arr[Math.floor(rand() * arr.length)];
+  const weightedProduct = () => {
+    let r = rand();
+    for (const [cid, w] of Object.entries(categoryWeight)) {
+      if (r < w) return pick(products.filter((p) => p.categoryId === cid));
+      r -= w;
+    }
+    return pick(products);
+  };
+  const past = promotions.filter((p) => new Date(p.startsAt) < now);
+  const inScope = (p: Promotion, prod: Product) => p.scope.kind === 'all' || (p.scope.kind === 'categories' ? p.scope.ids.includes(prod.categoryId) : p.scope.ids.includes(prod.id));
+
+  const orders: Order[] = [];
+  const perDay = new Map<string, number>();
+  const DAYS = 730;
+  for (let i = -DAYS; i <= 0; i++) {
+    const dayStart = daysFromNow(i);
+    const progress = (i + DAYS) / DAYS;
+    // ร้านโตขึ้นเรื่อย ๆ · เสาร์-อาทิตย์ขายดีกว่า · ช่วงมีโปรออเดอร์เพิ่ม (ให้ "ก่อน/ระหว่างโปร" ต่างกันจริง)
+    let rate = 0.2 + 0.85 * progress;
+    if ([0, 6].includes(dayStart.getDay())) rate *= 1.35;
+    const livePromos = past.filter((p) => new Date(p.startsAt) <= dayStart && new Date(p.endsAt) > dayStart && p.id !== 'promo-drinks20' && p.id !== 'promo-save100' && p.id !== 'promo-snack-b2g1');
+    if (livePromos.length) rate *= 1.6;
+    let count = Math.floor(rate) + (rand() < rate % 1 ? 1 : 0) + (rand() < 0.12 ? 1 : 0);
+    if (i === 0) count = Math.min(count, 2);
+
+    for (let n = 0; n < count; n++) {
+      const createdAt = new Date(dayStart.getTime());
+      createdAt.setHours(8 + Math.floor(rand() * 14), Math.floor(rand() * 60), Math.floor(rand() * 60), 0);
+      if (createdAt > now) createdAt.setTime(now.getTime() - 60_000 * (n + 1));
+      const [name, phone, address] = pick(customers);
+      const chosen = new Map<string, Product>();
+      const lineCount = rand() < 0.5 ? 1 : rand() < 0.7 ? 2 : 3;
+      while (chosen.size < lineCount) {
+        const p = weightedProduct();
+        chosen.set(p.id, p);
+      }
+      const promo = livePromos.length && rand() < 0.65 ? pick(livePromos) : null;
+      const lines: Order['lines'] = [];
+      const usages: Order['promotionUsages'] = [];
+      let subtotal = 0;
+      for (const p of chosen.values()) {
+        const qty = rand() < 0.65 ? 1 : rand() < 0.7 ? 2 : 3;
+        const full = p.price * qty;
+        subtotal += full;
+        let discount = 0;
+        let promotionId: string | null = null;
+        if (promo && promo.type === 'discount' && promo.discount && inScope(promo, p)) {
+          discount = promo.discount.mode === 'percent' ? Math.round((full * promo.discount.value) / 100) : Math.min(full, promo.discount.value * qty);
+          promotionId = promo.id;
+          usages.push({ promotionId: promo.id, productId: p.id, qty });
+        }
+        lines.push({ productId: p.id, name: p.name, image: p.images[0] ?? null, unitPrice: p.price, qty, discount, promotionId, isGift: false });
+      }
+      let couponCode: string | null = null;
+      let discountTotal = lines.reduce((s, l) => s + l.discount, 0);
+      if (promo && promo.type === 'coupon' && promo.coupon && promo.discount && subtotal >= (promo.coupon.minSubtotal ?? 0)) {
+        couponCode = promo.coupon.code;
+        discountTotal += Math.min(subtotal - discountTotal, promo.discount.value);
+        usages.push({ promotionId: promo.id, productId: null, qty: 1 });
+      }
+      const net = subtotal - discountTotal;
+      const shippingFee = net >= settings.freeShippingMin! ? 0 : settings.shippingFee;
+      const ageDays = -i;
+      const status: Order['status'] = ageDays > 1 && rand() < 0.05 ? 'cancelled' : ageDays > 7 ? 'done' : ageDays > 2 ? 'shipped' : ageDays > 0 ? 'paid' : 'pending';
+      const ymd = createdAt.toISOString().slice(0, 10).replace(/-/g, '');
+      const seq = (perDay.get(ymd) ?? 0) + 1;
+      perDay.set(ymd, seq);
+      orders.push({
+        id: `o-h${String(orders.length + 1).padStart(4, '0')}`,
+        orderNo: `OD-${ymd}-${String(seq).padStart(4, '0')}`,
+        status,
+        guestIds: [],
+        customer: { name, phone, email: '', address },
+        lines,
+        subtotal,
+        discountTotal,
+        shippingFee,
+        total: net + shippingFee,
+        couponCode,
+        promotionUsages: usages,
+        paymentMethod: rand() < 0.6 ? 'transfer' : 'cod',
+        note: '',
+        createdAt: iso(createdAt),
+        updatedAt: iso(createdAt),
+      });
+    }
+  }
+  return orders;
+}
 
 /* ---------- settings ---------- */
 const settings: Settings = {
@@ -229,7 +383,7 @@ async function main() {
       createdAt: iso(daysFromNow(-59)),
     },
   ];
-  const orders: Order[] = [];
+  const orders: Order[] = WITH_HISTORY ? demoOrders() : [];
 
   await mkdir(DATA, { recursive: true });
   await rm(SEED_IMG, { recursive: true, force: true });
@@ -254,7 +408,7 @@ async function main() {
   ]);
 
   console.log(
-    `seeded: ${categories.length} categories · ${products.length} products · ${promotions.length} promotions · ${users.length} users (admin/admin1234, staff/staff1234)`,
+    `seeded: ${categories.length} categories · ${products.length} products · ${promotions.length} promotions · ${orders.length} orders · ${users.length} users (admin/admin1234, staff/staff1234)`,
   );
 }
 

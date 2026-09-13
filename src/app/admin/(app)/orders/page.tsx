@@ -15,6 +15,7 @@ import { Receipt } from 'lucide-react';
 export const metadata = { title: 'คำสั่งซื้อ' };
 
 const STATUSES: OrderStatus[] = ['pending', 'paid', 'shipped', 'done', 'cancelled'];
+const PAGE_SIZE = 50;
 
 export default async function OrdersPage({ searchParams }: PageProps<'/admin/orders'>) {
   await requirePermission('order.manage');
@@ -22,10 +23,22 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
   const status = STATUSES.includes(sp.status as OrderStatus) ? (sp.status as OrderStatus) : undefined;
   const q = typeof sp.q === 'string' ? sp.q.trim().toLowerCase() : '';
   const all = await listOrders();
-  const orders = all.filter(
+  const matched = all.filter(
     (o) => (!status || o.status === status) && (!q || `${o.orderNo} ${o.customer.name} ${o.customer.phone}`.toLowerCase().includes(q)),
   );
   const count = (s: OrderStatus) => all.filter((o) => o.status === s).length;
+  // แบ่งหน้า 50 รายการ — ประวัติสาธิตมีหลายร้อยออเดอร์ ไม่งั้นหน้ายาวเกิน
+  const pages = Math.max(1, Math.ceil(matched.length / PAGE_SIZE));
+  const page = Math.min(pages, Math.max(1, Number.parseInt(String(sp.page ?? '1'), 10) || 1));
+  const orders = matched.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pageHref = (n: number) => {
+    const p = new URLSearchParams();
+    if (status) p.set('status', status);
+    if (q) p.set('q', q);
+    if (n > 1) p.set('page', String(n));
+    const qs = p.toString();
+    return `/admin/orders${qs ? `?${qs}` : ''}`;
+  };
 
   return (
     <div>
@@ -46,7 +59,7 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
         </form>
       </div>
 
-      {orders.length === 0 ? (
+      {matched.length === 0 ? (
         <EmptyState icon={<Receipt />} title="ไม่มีคำสั่งซื้อ" description={q || status ? 'ลองเปลี่ยนตัวกรอง' : 'เมื่อลูกค้าสั่งซื้อ รายการจะขึ้นที่นี่'} />
       ) : (
         <>
@@ -104,9 +117,40 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
               </li>
             ))}
           </ul>
+          {pages > 1 && (
+            <nav aria-label="แบ่งหน้า" className="mt-4 flex items-center justify-between gap-2 text-sm">
+              <p className="text-muted">
+                {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, matched.length)} จาก {matched.length.toLocaleString('th-TH')} รายการ
+              </p>
+              <div className="flex gap-2">
+                <PageLink href={pageHref(page - 1)} disabled={page <= 1}>
+                  ก่อนหน้า
+                </PageLink>
+                <span className="px-2 py-1.5 text-muted">
+                  หน้า {page} / {pages}
+                </span>
+                <PageLink href={pageHref(page + 1)} disabled={page >= pages}>
+                  ถัดไป
+                </PageLink>
+              </div>
+            </nav>
+          )}
         </>
       )}
     </div>
+  );
+}
+
+function PageLink({ href, disabled, children }: { href: string; disabled: boolean; children: React.ReactNode }) {
+  const cls = 'rounded-lg px-3 py-1.5 font-medium border border-line';
+  return disabled ? (
+    <span aria-disabled className={cn(cls, 'text-muted opacity-50')}>
+      {children}
+    </span>
+  ) : (
+    <Link href={href} className={cn(cls, 'bg-surface hover:bg-surface-alt')}>
+      {children}
+    </Link>
   );
 }
 

@@ -11,7 +11,7 @@ const readPromos = () => JSON.parse(fs.readFileSync(DATA + '/promotions.json', '
   const pills = await page.locator('li span:has-text("กำลังใช้งาน")').count();
   ok(pills === 3, `list: 3 live promos (found ${pills})`);
   ok((await page.locator('li span:has-text("ยังไม่เริ่ม")').count()) === 1, 'list: 1 scheduled');
-  ok((await page.locator('li span:has-text("หมดเวลา")').count()) === 1, 'list: 1 ended');
+  ok((await page.locator('li span:has-text("หมดเวลา")').count()) === 3, 'list: 3 ended (กลางเดือน + SUMMER50 + ครบรอบร้าน)');
   ok(await page.locator('text=โค้ด SAVE100').first().isVisible(), 'list: coupon summary sentence');
   await shot(page, 'p4-promotions-list');
 
@@ -129,6 +129,6 @@ const readPromos = () => JSON.parse(fs.readFileSync(DATA + '/promotions.json', '
     await page.click('button:has-text("ลบ")');
     await page.waitForURL(/\/admin\/promotions$/);
   }
-  ok(readPromos().length === 5, 'cleanup: back to 5 seed promos');
+  ok(readPromos().length === 7, 'cleanup: back to 7 seed promos');
   await browser.close();
 })().catch((e) => { console.error('💥', e); process.exit(1); });
