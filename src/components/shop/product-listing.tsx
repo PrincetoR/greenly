@@ -66,7 +66,7 @@ export function ProductListing({
     <div className="mx-auto max-w-6xl px-4 pt-4 pb-8 md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4">
       <aside className="hidden md:block">
         {/* ขอบบน card ตรงกับช่องค้นหา · แถวแรก "หมวดหมู่สินค้า" สูง 40 เท่าช่องค้นหา · คั่นด้วยเส้น */}
-        <nav aria-label="หมวดหมู่สินค้า" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
+        <nav aria-label="หมวดหมู่สินค้า" className="sticky top-20 rounded-card bg-surface p-2 pt-0 ring-1 ring-line">
           {/* ขนาดใกล้เคียงหัวข้อหน้า (ย่อมกว่าหนึ่งขั้น) ให้ดูเป็นหัวข้อของคอลัมน์ ไม่ใช่รายการหนึ่ง */}
           <p className="flex h-10 items-center px-2 text-lg font-bold">หมวดหมู่สินค้า</p>
           <div className="mt-2 mb-[7px] border-t border-line" aria-hidden />
