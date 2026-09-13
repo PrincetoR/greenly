@@ -66,7 +66,7 @@ export function ProductListing({
           {/* -mt-px ชดเชย border บน 1px ของ card: แถวสูง 40 เท่าช่องค้นหา กึ่งกลางตรงหัวข้อหน้า เส้นคั่นที่ 40 */}
           <p className="-mt-px flex h-10 items-center px-2 text-lg font-bold">หมวดหมู่สินค้า</p>
           {/* เส้นคั่นอยู่ที่ 40px = ขอบล่างช่องค้นหา · เว้น 15px ให้ "ทั้งหมด" เริ่มที่ 56 = ขอบบนการ์ดสินค้า */}
-          <div className="mb-[15px] border-t border-line" aria-hidden />
+          <div className="divider-caret mb-[15px] border-t border-line" aria-hidden />
           <ul className="flex flex-col">
             {links.map((l) => (
               <li key={l.href}>

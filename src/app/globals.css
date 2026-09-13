@@ -136,6 +136,25 @@
 
 @layer utilities {
   /*
+   * เส้นคั่นที่มีหัวลูกศรชี้ลง (ใช้ใต้หัว "หมวดหมู่สินค้า") — ตัวเส้นคือ border-top ที่ตำแหน่งเดิม
+   * ลูกศร = สี่เหลี่ยม 8px หมุน 45° วางคร่อมเส้น ครึ่งบนพื้นขาวบังเส้น ครึ่งล่างโชว์ขอบ 2 ด้านเป็นรูป V
+   */
+  .divider-caret {
+    position: relative;
+  }
+  .divider-caret::after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: -1px;
+    width: 8px;
+    height: 8px;
+    background: var(--surface);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    transform: translateY(-50%) rotate(45deg);
+  }
+  /*
    * หน้ารายการสินค้า (จอ md+): เลื่อนแล้ว snap ให้แถวการ์ดถัดไปชิดขอบล่างของแถบ sticky พอดี
    * ระยะ = header 65 + gap 16 + แถบ 40 + gap 16 = 137px · ประกาศที่ html ผ่าน :has เพราะ scroll container คือ html
    */
