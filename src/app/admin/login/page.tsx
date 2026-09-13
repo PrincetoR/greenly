@@ -21,7 +21,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/admin/logi
           <h1 className="mt-2 text-2xl font-bold">{storeName}</h1>
           <p className="text-sm text-muted">ระบบหลังบ้าน</p>
         </div>
-        <div className="mt-6 rounded-card bg-surface p-6 ring-1 ring-line">
+        <div className="mt-6 rounded-card bg-surface p-6 border border-line">
           <LoginForm next={typeof next === 'string' ? next : undefined} />
         </div>
         <p className="mt-4 text-center text-xs text-muted">

@@ -73,7 +73,7 @@ export default async function PromotionsPage({ searchParams }: PageProps<'/admin
       ) : (
         <ul className="flex flex-col gap-3">
           {shown.map(({ p, status, u }) => (
-            <li key={p.id} className={cn('rounded-card bg-surface p-4 ring-1 ring-line', status === 'ended' && 'opacity-70')}>
+            <li key={p.id} className={cn('rounded-card bg-surface p-4 border border-line', status === 'ended' && 'opacity-70')}>
               <div className="flex flex-wrap items-start gap-3">
                 <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-lg', p.type === 'bogo' ? 'bg-brand-soft text-brand' : 'bg-accent-soft text-accent')} aria-hidden>
                   <PromoTypeIcon type={p.type} className="size-5" />

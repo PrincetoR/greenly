@@ -33,7 +33,7 @@ export default async function UsersPage({ searchParams }: PageProps<'/admin/user
 
       <ul className="flex flex-col gap-2">
         {users.map((u) => (
-          <li key={u.id} className="flex flex-wrap items-center gap-3 rounded-card bg-surface p-4 ring-1 ring-line">
+          <li key={u.id} className="flex flex-wrap items-center gap-3 rounded-card bg-surface p-4 border border-line">
             <div className="min-w-0 flex-1">
               <p className="flex flex-wrap items-center gap-2 font-medium">
                 {u.name}

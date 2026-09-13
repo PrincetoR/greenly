@@ -40,7 +40,7 @@ export default async function MyOrdersPage() {
         <ul className="mt-6 flex flex-col gap-3">
           {orders.map((o) => (
             <li key={o.id}>
-              <Link href={`/order/${o.orderNo}`} className="block rounded-card bg-surface p-4 ring-1 ring-line transition-shadow hover:shadow-md">
+              <Link href={`/order/${o.orderNo}`} className="block rounded-card bg-surface p-4 border border-line transition-shadow hover:shadow-md">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-mono font-semibold">{o.orderNo}</span>
                   <Badge tone={ORDER_STATUS_TONE[o.status]}>{ORDER_STATUS_LABEL[o.status]}</Badge>
@@ -63,7 +63,7 @@ export default async function MyOrdersPage() {
         </ul>
       )}
 
-      <section className="mt-10 rounded-card bg-surface p-5 ring-1 ring-line">
+      <section className="mt-10 rounded-card bg-surface p-5 border border-line">
         <h2 className="font-semibold">ค้นหาคำสั่งซื้อจากเครื่องอื่น</h2>
         <p className="mt-1 mb-4 text-sm text-muted">กรอกเลขที่คำสั่งซื้อและเบอร์โทรที่ใช้สั่ง — ระบบจะจำไว้ในเครื่องนี้ให้ด้วย</p>
         <OrderLookupForm />

@@ -20,7 +20,7 @@ export function AddToCart({ productId, stock }: { productId: string; stock: numb
     <form action={action} className="flex flex-col gap-3">
       <input type="hidden" name="productId" value={productId} />
       <div className="flex items-center gap-3">
-        <div className="flex h-11 items-center rounded-lg ring-1 ring-line">
+        <div className="flex h-11 items-center rounded-lg border border-line">
           <button type="button" aria-label="ลดจำนวน" onClick={() => setQty((q) => Math.max(1, q - 1))} disabled={soldOut || qty <= 1} className="flex size-11 items-center justify-center disabled:opacity-40">
             <Minus className="size-4" aria-hidden />
           </button>

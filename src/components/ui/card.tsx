@@ -3,7 +3,7 @@ import { cn } from '@/lib/cn';
 
 /** กล่องพื้นขาวขอบบาง — หน่วยพื้นฐานของทั้งหน้าร้านและหลังบ้าน */
 export function Card({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('rounded-card bg-surface ring-1 ring-line', className)} {...rest} />;
+  return <div className={cn('rounded-card bg-surface border border-line', className)} {...rest} />;
 }
 
 export function CardHeader({

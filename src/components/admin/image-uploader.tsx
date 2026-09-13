@@ -53,7 +53,7 @@ export function ImageUploader({ initial, max = 6 }: { initial: string[]; max?: n
 
       <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         {images.map((src, i) => (
-          <li key={src} className="group relative overflow-hidden rounded-lg ring-1 ring-line">
+          <li key={src} className="group relative overflow-hidden rounded-lg border border-line">
             <ProductImage src={src} alt={`รูปที่ ${i + 1}`} />
             {i === 0 && (
               <span className="absolute top-1 left-1 rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">รูปปก</span>

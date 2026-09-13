@@ -52,7 +52,7 @@ export default async function HomePage() {
         <ul className="-mx-4 -my-1 flex gap-2 overflow-x-auto px-4 py-1 scrollbar-none sm:-mx-1 sm:flex-wrap sm:px-1">
           {categories.map((c) => (
             <li key={c.id} className="shrink-0">
-              <Link href={`/category/${c.slug}`} className="block rounded-full bg-surface px-4 py-2 text-sm font-medium ring-1 ring-line transition-colors hover:bg-brand-soft hover:text-brand hover:ring-brand">
+              <Link href={`/category/${c.slug}`} className="block rounded-full bg-surface px-4 py-2 text-sm font-medium border border-line transition-colors hover:bg-brand-soft hover:text-brand hover:ring-brand">
                 {c.name}
               </Link>
             </li>

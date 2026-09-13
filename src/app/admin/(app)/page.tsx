@@ -154,7 +154,7 @@ function Kpi({ label, value, sub, href, tone }: { label: string; value: string; 
       {sub && <p className="text-xs text-muted">{sub}</p>}
     </>
   );
-  const cls = 'block rounded-card bg-surface p-4 ring-1 ring-line';
+  const cls = 'block rounded-card bg-surface p-4 border border-line';
   return href ? (
     <Link href={href} className={`${cls} transition-shadow hover:shadow-md`}>
       {body}

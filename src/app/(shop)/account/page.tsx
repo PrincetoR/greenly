@@ -79,7 +79,7 @@ export default async function AccountPage() {
 
 function Stat({ href, Icon, label, value, sub }: { href: string; Icon: typeof Package; label: string; value: string; sub?: string }) {
   return (
-    <Link href={href} className="flex items-center gap-3 rounded-card bg-surface p-4 ring-1 ring-line transition-shadow hover:shadow-md">
+    <Link href={href} className="flex items-center gap-3 rounded-card bg-surface p-4 border border-line transition-shadow hover:shadow-md">
       <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-surface-alt text-muted" aria-hidden>
         <Icon className="size-5" />
       </span>

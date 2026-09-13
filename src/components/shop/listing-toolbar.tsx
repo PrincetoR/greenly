@@ -58,8 +58,8 @@ export function ListingToolbar({
   return (
     /*
      * จอ md+: ใช้ grid คอลัมน์เดียวกับกริดสินค้า (md 3 / lg 4 คอลัมน์ gap 16) ให้ทุกขอบตรงกับการ์ด
-     * lg: หัวข้อ = การ์ด 1–2 · [ค้นหา+เรียง] = การ์ด 3–4 โดย "ช่องว่าง 8px" ระหว่างค้นหากับเรียงลำดับ
-     *     อยู่กึ่งกลางการ์ด 4 พอดี (ค้นหา = 75% ของช่วง เพราะ 1.5w+g−4 = 0.75(2w+g) เมื่อ g=16)
+     * lg: หัวข้อ = การ์ด 1–2 · [ค้นหา+เรียง] = การ์ด 3–4: เรียงลำดับกว้างตามข้อความที่ยาวสุด (ไม่ตัดคำ)
+     *     ค้นหากินที่เหลือ เริ่มขอบซ้ายการ์ด 3 · ขอบขวาเรียงลำดับ = ขอบขวาการ์ด 4
      * md: หัวข้อ = การ์ด 1 · [ค้นหา+เรียง] = การ์ด 2–3 แบ่งแบบเดียวกัน
      */
     <div className="flex flex-wrap items-center gap-2 md:grid md:grid-cols-3 md:gap-4 lg:grid-cols-4">
@@ -79,7 +79,7 @@ export function ListingToolbar({
         {description && <span className="hidden truncate text-sm text-muted lg:inline">· {description}</span>}
       </div>
 
-      <div className="flex min-w-0 flex-1 basis-full items-center gap-2 md:col-span-2 md:grid md:grid-cols-[75%_1fr] md:gap-2">
+      <div className="flex min-w-0 flex-1 basis-full items-center gap-2 md:col-span-2 md:grid md:grid-cols-[1fr_auto] md:gap-2">
       <div className="relative min-w-0 flex-1 md:flex-none">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
         <input
@@ -143,16 +143,23 @@ function SortMenu({ value, onChange }: { value: SortValue; onChange: (v: SortVal
         aria-label={`เรียงลำดับ: ${current.label}`}
         className={cn(
           // ใช้ border จริง (อยู่ในกล่อง) ไม่ใช่ ring (วาดนอกกล่อง) ให้สูงเท่าช่องค้นหาเป๊ะ 40px
-          'flex h-10 w-full items-center gap-1 rounded-lg border border-line px-2.5 text-sm font-medium transition-colors hover:bg-surface-alt',
+          'flex h-10 w-full items-center gap-2 rounded-lg border border-line px-3 text-sm font-medium transition-colors hover:bg-surface-alt',
           open ? 'bg-surface-alt' : 'bg-surface',
         )}
       >
-        <span className="min-w-0 flex-1 truncate text-left">{current.short}</span>
+        {/* จองความกว้างเท่าข้อความยาวสุด (ซ่อนไว้) ให้ปุ่มไม่เปลี่ยนขนาดตอนสลับตัวเลือก */}
+        <span className="grid text-left">
+          {SORT_OPTIONS.map((o) => (
+            <span key={o.value} aria-hidden={o.value !== value} className={cn('col-start-1 row-start-1 whitespace-nowrap', o.value !== value && 'invisible')}>
+              {o.label}
+            </span>
+          ))}
+        </span>
         <ChevronDown className={cn('size-4 text-muted transition-transform', open && 'rotate-180')} aria-hidden />
       </button>
 
       {open && (
-        <ul role="listbox" aria-label="เรียงลำดับ" className="absolute top-full right-0 z-30 mt-1 w-44 overflow-hidden rounded-card bg-surface p-1.5 shadow-lg ring-1 ring-line">
+        <ul role="listbox" aria-label="เรียงลำดับ" className="absolute top-full right-0 z-30 mt-1 w-44 overflow-hidden rounded-card bg-surface p-1.5 shadow-lg border border-line">
           {SORT_OPTIONS.map((o) => {
             const on = o.value === value;
             return (

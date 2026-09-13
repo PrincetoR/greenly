@@ -129,7 +129,7 @@ export default async function ProductsPage({ searchParams }: PageProps<'/admin/p
 
           <ul className="flex flex-col gap-2 md:hidden">
             {products.map((p) => (
-              <li key={p.id} className="flex gap-3 rounded-card bg-surface p-3 ring-1 ring-line">
+              <li key={p.id} className="flex gap-3 rounded-card bg-surface p-3 border border-line">
                 <ProductImage src={p.images[0]} alt="" className="size-20 shrink-0 rounded-md" />
                 <div className="min-w-0 flex-1">
                   <Link href={`/admin/products/${p.id}`} className="line-clamp-2 font-medium hover:text-brand">

@@ -38,7 +38,7 @@ export function PromoCard({
   const live = status === 'live';
 
   return (
-    <article className={cn('flex flex-col gap-3 rounded-card bg-surface p-5 ring-1 ring-line', !live && 'opacity-80')}>
+    <article className={cn('flex flex-col gap-3 rounded-card bg-surface p-5 border border-line', !live && 'opacity-80')}>
       <div className="flex items-start gap-3">
         <span className={cn('flex size-12 shrink-0 items-center justify-center rounded-xl', promo.type === 'bogo' ? 'bg-brand-soft text-brand' : 'bg-accent-soft text-accent')} aria-hidden>
           <PromoTypeIcon type={promo.type} className="size-6" />

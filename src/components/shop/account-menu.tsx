@@ -51,7 +51,7 @@ export function AccountMenu({ wishlistCount, className }: { wishlistCount: numbe
       </button>
 
       {open && (
-        <div role="menu" aria-label="เมนูบัญชี" className="absolute top-full right-0 z-50 mt-1 w-56 overflow-hidden rounded-card bg-surface p-1.5 shadow-lg ring-1 ring-line">
+        <div role="menu" aria-label="เมนูบัญชี" className="absolute top-full right-0 z-50 mt-1 w-56 overflow-hidden rounded-card bg-surface p-1.5 shadow-lg border border-line">
           {ACCOUNT_ITEMS.map(({ href, label, Icon }) => (
             <Link
               key={href}

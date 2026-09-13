@@ -35,7 +35,7 @@ export function ProductPicker({
   const allShownSelected = shown.length > 0 && shown.every((p) => set.has(p.id));
 
   return (
-    <div className="rounded-lg ring-1 ring-line">
+    <div className="rounded-lg border border-line">
       <div className="flex flex-wrap items-center gap-2 border-b border-line p-2">
         <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาชื่อ / SKU" aria-label="ค้นหาสินค้า" className="min-w-0 flex-1" />
         <select value={cat} onChange={(e) => setCat(e.target.value)} aria-label="กรองหมวดหมู่" className="w-auto!">

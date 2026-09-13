@@ -40,7 +40,7 @@ export function CheckoutForm({ total, gifts }: { total: number; gifts: number })
         </Alert>
       )}
 
-      <section className="rounded-card bg-surface p-5 ring-1 ring-line">
+      <section className="rounded-card bg-surface p-5 border border-line">
         <h2 className="font-semibold">ข้อมูลผู้รับ</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <Field label="ชื่อ-นามสกุล" htmlFor="name" error={errors.name} required>
@@ -58,7 +58,7 @@ export function CheckoutForm({ total, gifts }: { total: number; gifts: number })
         </div>
       </section>
 
-      <section className="rounded-card bg-surface p-5 ring-1 ring-line">
+      <section className="rounded-card bg-surface p-5 border border-line">
         <h2 className="font-semibold">วิธีชำระเงิน</h2>
         <div role="radiogroup" className="mt-4 grid gap-3 sm:grid-cols-2">
           {PAYMENTS.map((p) => {

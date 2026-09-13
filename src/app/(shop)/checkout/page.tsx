@@ -20,7 +20,7 @@ export default async function CheckoutPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_380px] lg:items-start">
         <CheckoutForm total={quote.total} gifts={quote.lines.filter((l) => l.isGift).reduce((s, l) => s + l.qty, 0)} />
 
-        <aside className="rounded-card bg-surface p-5 ring-1 ring-line lg:sticky lg:top-20">
+        <aside className="rounded-card bg-surface p-5 border border-line lg:sticky lg:top-20">
           <h2 className="font-semibold">รายการสินค้า</h2>
           <ul className="mt-3 flex flex-col gap-2 text-sm">
             {quote.lines.map((l) => (

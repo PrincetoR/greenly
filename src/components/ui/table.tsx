@@ -7,7 +7,7 @@ import { cn } from '@/lib/cn';
  */
 export function Table({ className, ...rest }: HTMLAttributes<HTMLTableElement>) {
   return (
-    <div className="overflow-x-auto rounded-card bg-surface ring-1 ring-line">
+    <div className="overflow-x-auto rounded-card bg-surface border border-line">
       <table className={cn('w-full text-sm', className)} {...rest} />
     </div>
   );

@@ -125,7 +125,7 @@ export default async function CartPage() {
           )}
         </div>
 
-        <aside className="flex flex-col gap-4 rounded-card bg-surface p-5 ring-1 ring-line lg:sticky lg:top-20">
+        <aside className="flex flex-col gap-4 rounded-card bg-surface p-5 border border-line lg:sticky lg:top-20">
           <CouponBox coupon={quote.coupon} />
           <OrderSummary quote={quote} freeShippingMin={settings.freeShippingMin} />
           <Link href="/checkout" className={buttonStyles({ size: 'lg' })}>

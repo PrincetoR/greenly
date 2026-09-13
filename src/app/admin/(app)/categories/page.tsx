@@ -71,7 +71,7 @@ export default async function CategoriesPage({ searchParams }: PageProps<'/admin
       {/* card list บนมือถือ */}
       <ul className="flex flex-col gap-2 md:hidden">
         {categories.map((c) => (
-          <li key={c.id} className="rounded-card bg-surface p-4 ring-1 ring-line">
+          <li key={c.id} className="rounded-card bg-surface p-4 border border-line">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="font-medium">{c.name}</p>

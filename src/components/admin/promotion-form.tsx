@@ -402,7 +402,7 @@ export function PromotionForm({
 
 function Step({ n, title, description, children }: { n: number; title: string; description?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-card bg-surface ring-1 ring-line">
+    <section className="rounded-card bg-surface border border-line">
       <header className="flex items-center gap-3 border-b border-line px-5 py-3">
         <span className="flex size-7 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">{n}</span>
         <div>

@@ -31,8 +31,8 @@ export function WishlistButton({ productId, saved, variant = 'overlay' }: { prod
         className={cn(
           'inline-flex items-center justify-center gap-2 transition-colors',
           variant === 'overlay'
-            ? 'size-9 rounded-full ring-1 ring-line hover:bg-surface-alt'
-            : 'h-12 rounded-lg px-4 text-sm font-semibold ring-1 ring-line hover:bg-surface-alt',
+            ? 'size-9 rounded-full border border-line hover:bg-surface-alt'
+            : 'h-12 rounded-lg px-4 text-sm font-semibold border border-line hover:bg-surface-alt',
           optimistic ? 'text-accent' : 'text-muted hover:text-accent',
         )}
       >

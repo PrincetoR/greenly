@@ -25,7 +25,7 @@ export function ProductCard({
 }) {
   const soldOut = product.stock <= 0;
   return (
-    <div className="group flex flex-col overflow-hidden rounded-card bg-surface ring-1 ring-line transition-shadow hover:shadow-lg">
+    <div className="group flex flex-col overflow-hidden rounded-card bg-surface border border-line transition-shadow hover:shadow-lg">
       <Link href={`/product/${product.slug}`} className="flex flex-1 flex-col">
         <div className="relative overflow-hidden">
           <ProductImage src={product.images[0]} alt={product.name} priority={priority} ratio="landscape" className="w-full transition-transform duration-300 group-hover:scale-[1.03]" />

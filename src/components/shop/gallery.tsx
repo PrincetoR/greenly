@@ -10,7 +10,7 @@ export function Gallery({ images, alt }: { images: string[]; alt: string }) {
 
   return (
     <div>
-      <div className="overflow-hidden rounded-card ring-1 ring-line">
+      <div className="overflow-hidden rounded-card border border-line">
         <ProductImage src={current} alt={alt} priority />
       </div>
       {images.length > 1 && (

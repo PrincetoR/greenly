@@ -33,7 +33,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
           คำสั่งซื้อ <span className="font-mono font-semibold text-ink">{order.orderNo}</span> ไม่ได้สั่งจากเครื่องนี้ กรอกเบอร์โทรที่ใช้สั่งเพื่อดูรายละเอียด
           — ระบบจะจำเครื่องนี้ไว้ให้
         </p>
-        <div className="mt-6 rounded-card bg-surface p-5 ring-1 ring-line">
+        <div className="mt-6 rounded-card bg-surface p-5 border border-line">
           <OrderLookupForm orderNo={order.orderNo} compact />
         </div>
         <Link href="/orders" className="mt-4 block text-sm text-muted hover:text-ink">
@@ -83,7 +83,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
         </div>
       )}
 
-      <section className="mt-6 rounded-card bg-surface p-5 ring-1 ring-line">
+      <section className="mt-6 rounded-card bg-surface p-5 border border-line">
         <h2 className="font-semibold">รายการสินค้า</h2>
         <ul className="mt-3 divide-y divide-line">
           {order.lines.map((l, i) => (
@@ -118,7 +118,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
         </dl>
       </section>
 
-      <section className="mt-4 grid gap-4 rounded-card bg-surface p-5 text-sm ring-1 ring-line sm:grid-cols-2">
+      <section className="mt-4 grid gap-4 rounded-card bg-surface p-5 text-sm border border-line sm:grid-cols-2">
         <div>
           <h2 className="font-semibold">จัดส่งถึง</h2>
           <p className="mt-1">{order.customer.name}</p>
