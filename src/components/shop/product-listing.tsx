@@ -78,15 +78,9 @@ export function ProductListing({
         ))}
       </ul>
 
-      <form action={basePath} className="mt-4 flex flex-wrap gap-2">
-        <input type="search" name="q" defaultValue={q} placeholder="ค้นหาในรายการนี้…" aria-label="ค้นหา" className="min-w-0 flex-1 sm:max-w-xs" />
-        <select name="sort" defaultValue={sort} aria-label="เรียงลำดับ" className="w-auto!">
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+      {/* ซ้าย: ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
+      <form action={basePath} className="mt-4 flex flex-wrap items-center gap-2">
+        <input type="search" name="q" defaultValue={q} placeholder="ค้นหาในรายการนี้" aria-label="ค้นหา" className="h-10 min-w-0 flex-1 sm:max-w-xs sm:flex-none sm:basis-72" />
         <button type="submit" className={buttonStyles({ variant: 'secondary' })}>
           ค้นหา
         </button>
@@ -96,6 +90,13 @@ export function ProductListing({
             ล้างคำค้น
           </Link>
         )}
+        <select name="sort" defaultValue={sort} aria-label="เรียงลำดับ" className="ml-auto h-10 w-auto!">
+          {SORT_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
       </form>
 
       <div className="mt-6">
