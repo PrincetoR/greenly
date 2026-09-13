@@ -63,7 +63,7 @@ export function ProductListing({
 
   return (
     // ระยะจาก header ถึงเนื้อหา = 16px เท่าระยะระหว่างการ์ด
-    <div className="mx-auto max-w-6xl px-4 pt-4 pb-8 md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4">
+    <div className="mx-auto max-w-6xl px-4 pt-4 pb-8 md:grid md:grid-cols-[var(--aside-w)_1fr] md:items-start md:gap-4">
       <aside className="hidden md:block">
         {/* ขอบบน card ตรงกับช่องค้นหา · แถวแรก "หมวดหมู่สินค้า" สูง 40 เท่าช่องค้นหา · คั่นด้วยเส้น */}
         <nav aria-label="หมวดหมู่สินค้า" className="sticky top-20 rounded-card bg-surface p-2 pt-0 ring-1 ring-line">

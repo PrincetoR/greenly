@@ -41,9 +41,16 @@ export function ShopHeader({
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4">
-        <Link href="/" className="flex items-center gap-1.5 text-lg font-bold text-brand">
-          <Leaf className="size-5" aria-hidden />
-          {storeName}
+        {/*
+         * ช่องโลโก้กว้าง = aside − (gap 8 + ml-4 16) − เมนู 1 ช่อง และเมนูแต่ละช่องกว้างคงที่
+         * → ขอบขวาของเมนูแรก "สินค้าทั้งหมด" ตรงกับขอบขวาของ card หมวดหมู่ในหน้ารายการเป๊ะ
+         */}
+        <Link
+          href="/"
+          className="flex items-center gap-1 truncate text-lg font-bold text-brand md:w-[calc(var(--aside-w)-1.5rem-var(--nav-item-w))]"
+        >
+          <Leaf className="size-5 shrink-0" aria-hidden />
+          <span className="truncate">{storeName}</span>
         </Link>
 
         <nav aria-label="เมนูหลัก" className="ml-4 hidden items-center gap-1 md:flex">
@@ -52,7 +59,7 @@ export function ShopHeader({
               key={item.href}
               href={item.href}
               className={cn(
-                'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'w-[var(--nav-item-w)] rounded-lg py-2 text-center text-sm font-medium transition-colors',
                 pathname.startsWith(item.href) ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt',
               )}
             >
