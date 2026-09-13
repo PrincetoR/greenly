@@ -56,7 +56,8 @@ export function ShopHeader({
       {/* แถบสถานะ — ไม่ sticky (แถบหลักยังติดที่ top-0 ระยะ 65px ที่หน้ารายการใช้จึงไม่เปลี่ยน) */}
       {/* พื้นขาวต่อเนื่องกับแถบหลัก ไม่มีเส้นคั่น · ลิงก์สีเทา ชื่อผู้ใช้สีเข้ม */}
       <div className="status-bar hidden bg-surface text-xs text-muted md:block">
-        <div className="mx-auto flex h-8 max-w-6xl items-center px-4">
+        {/* เนื้อหาชิดขอบล่าง: เว้นบน 6px เท่าเดิม (ตอนสูง 32 ตัวอักษรเริ่มที่ 6) ไม่มีที่ว่างด้านล่าง */}
+        <div className="mx-auto flex max-w-6xl items-end px-4 pt-1.5 leading-5">
           {tagline && <p className="truncate">{tagline}</p>}
           <nav aria-label="แถบสถานะ" className="ml-auto flex items-center gap-4">
             <Link href="/wishlist" className="flex items-center gap-1 hover:text-ink">
