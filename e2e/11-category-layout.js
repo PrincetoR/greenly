@@ -33,7 +33,7 @@ const { BASE, launch, ok, shot } = require('./lib');
   const pill = await page.locator('header nav[aria-label="เมนูหลัก"] a[href="/products"]').boundingBox();
   const cardBox = await page.locator('main aside nav').boundingBox();
   ok(Math.abs(pill.x + pill.width - (cardBox.x + cardBox.width)) < 0.5, `ขอบขวาเมนู "สินค้าทั้งหมด" ตรงกับขอบขวา card หมวดหมู่ (${pill.x + pill.width} = ${cardBox.x + cardBox.width})`);
-  ok(await page.locator('header a[href="/"] span').evaluate((s) => s.scrollWidth <= s.clientWidth), 'ชื่อร้านใน header ไม่ถูกตัด');
+  ok(await page.locator('header a[href="/"] span.truncate').evaluate((s) => s.scrollWidth <= s.clientWidth), 'ชื่อร้านใน header ไม่ถูกตัด');
   const promoTextLeft = await page.locator('header nav[aria-label="เมนูหลัก"] a[href="/promotions"]').evaluate((a) => { const r = document.createRange(); r.selectNodeContents(a); return r.getBoundingClientRect().left; });
   const firstCard = await page.locator('main .group').first().boundingBox();
   ok(Math.abs(promoTextLeft - firstCard.x) < 0.5, `ข้อความ "โปรโมชัน" เริ่มตรงขอบซ้ายการ์ดสินค้า (${promoTextLeft} = ${firstCard.x})`);
