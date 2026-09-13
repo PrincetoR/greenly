@@ -64,15 +64,15 @@ export function ProductListing({
 
   const asideNav = aside && (
     <aside className="hidden md:block">
-      {/* ไม่มีหัวข้อ — รายการแรก "ทั้งหมด" สูง 40px เท่าช่องค้นหา · card ขยับขึ้น 8px (= padding) ให้รายการแรกอยู่ระดับช่องค้นหาพอดีโดยไฮไลต์ไม่ชนขอบ */}
-      <nav aria-label="หมวดหมู่" className="sticky top-[72px] -mt-2 rounded-card bg-surface p-2 ring-1 ring-line">
-        <ul className="flex flex-col">
+      {/* ขอบบน card ตรงกับช่องค้นหา · รายการแน่น (py-1.5) ให้สมดุลกับ padding 8px ของ card */}
+      <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
+        <ul className="flex flex-col gap-0.5">
           {links.map((l) => (
             <li key={l.href}>
               <Link
                 href={l.href}
                 aria-current={l.active ? 'page' : undefined}
-                className={cn('flex h-10 items-center rounded-lg px-3 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
+                className={cn('block rounded-lg px-3 py-1.5 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
               >
                 {l.label}
               </Link>
