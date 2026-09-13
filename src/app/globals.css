@@ -22,6 +22,8 @@
   /* สีของโปรโมชัน/ป้ายลด — ตั้งใจให้ตัดกับ brand */
   --accent: #e0562b;
   --accent-soft: #fdeae3;
+  /* สีเน้นของโลโก้ ("ly") — ชมพู แยกจาก accent ของป้ายโปร */
+  --logo-accent: #e0457b;
 
   --danger: #d13438;
   --danger-soft: #fde8e8;
@@ -55,6 +57,7 @@
   --color-brand-soft: var(--brand-soft);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-logo-accent: var(--logo-accent);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --color-ok: var(--ok);
