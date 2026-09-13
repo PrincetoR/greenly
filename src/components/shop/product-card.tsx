@@ -38,7 +38,10 @@ export function ProductCard({
             </div>
           )}
         </div>
-        <h3 className="line-clamp-2 px-3 pt-3 text-sm font-medium leading-snug">{product.name}</h3>
+        {/* ชื่อบรรทัดเดียว ตัดด้วย … (title เต็มโชว์ตอน hover) ให้การ์ดทุกใบสูงเท่ากัน */}
+        <h3 className="truncate px-3 pt-3 text-sm font-medium leading-snug" title={product.name}>
+          {product.name}
+        </h3>
       </Link>
       <div className="flex items-end justify-between gap-2 px-3 pt-2 pb-3">
         <div className="min-w-0">{priceSlot ?? <p className="font-bold">{formatBaht(product.price)}</p>}</div>
