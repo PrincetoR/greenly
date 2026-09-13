@@ -86,7 +86,7 @@ export function ShopHeader({
          */}
         <nav aria-label="เมนูหลัก" className="flex min-w-0 items-center">
           <div className="flex min-w-0 items-center md:w-[var(--aside-w)] md:shrink-0 md:justify-between md:gap-2">
-            {/* โลโก้ = ชื่อร้านตัวหนา สองโทน: 2 ตัวท้ายเป็นสีชมพู ("Green" เขียว + "ly" ชมพู) ให้ดูมีลูกเล่น */}
+            {/* โลโก้ = ชื่อร้านตัวหนา สองโทน: 2 ตัวท้ายเป็นสีทอง ("Green" เขียว + "ly" ทอง) ให้ดูมีลูกเล่น */}
             <Link href="/" className="flex min-w-0 items-center text-3xl font-bold tracking-tight text-brand">
               <span className="truncate">
                 {storeName.length > 3 ? (
