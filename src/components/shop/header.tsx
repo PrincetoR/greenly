@@ -87,7 +87,10 @@ export function ShopHeader({
         <nav aria-label="เมนูหลัก" className="flex min-w-0 items-center">
           <div className="flex min-w-0 items-center md:w-[var(--aside-w)] md:shrink-0 md:justify-between md:gap-2">
             <Link href="/" className="flex min-w-0 items-center gap-1.5 text-xl font-bold text-brand">
-              <Leaf className="size-6 shrink-0" aria-hidden />
+              {/* โลโก้: ใบไม้ขาวบนพื้นสีแบรนด์ (มุม 6px ตามระบบ) */}
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-brand text-white" aria-hidden>
+                <Leaf className="size-4" />
+              </span>
               <span className="truncate">{storeName}</span>
             </Link>
             <NavLink item={NAV[0]} pathname={pathname} className="hidden shrink-0 md:block" />
