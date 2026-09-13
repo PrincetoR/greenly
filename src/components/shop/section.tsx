@@ -22,7 +22,7 @@ export function Section({
         </div>
         {href && (
           <Link href={href} className="shrink-0 text-sm font-semibold text-brand hover:underline">
-            {hrefLabel} →
+            {hrefLabel}
           </Link>
         )}
       </div>

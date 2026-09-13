@@ -51,7 +51,7 @@ export default async function AdminDashboard() {
               description={`ยอดขายสะสม ${formatBaht(revenueAll)}`}
               action={
                 <Link href="/admin/orders" className="text-sm font-medium text-brand hover:underline">
-                  ดูทั้งหมด →
+                  ดูทั้งหมด
                 </Link>
               }
             />
@@ -120,7 +120,7 @@ export default async function AdminDashboard() {
             description={`stock ≤ ${settings.lowStockThreshold} ชิ้น`}
             action={
               <Link href="/admin/products?status=low" className="text-sm font-medium text-brand hover:underline">
-                ดูทั้งหมด →
+                ดูทั้งหมด
               </Link>
             }
           />
