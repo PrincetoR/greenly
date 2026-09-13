@@ -1,7 +1,6 @@
 import { listCategories } from '@/lib/db/categories';
 import { listProducts } from '@/lib/db/products';
 import { loadPromotionContext } from '@/lib/promotions/service';
-import { readCategoryLayout } from '@/lib/prefs';
 import { matchesScope } from '@/lib/pricing/quote';
 import { ProductListing, parseSort } from '@/components/shop/product-listing';
 import { PromoProductCard } from '@/components/shop/promo-product-card';
@@ -13,7 +12,7 @@ export default async function ProductsPage({ searchParams }: PageProps<'/product
   const q = typeof sp.q === 'string' ? sp.q.trim() : '';
   const sort = parseSort(sp.sort);
   const promoId = typeof sp.promo === 'string' ? sp.promo : '';
-  const [all, categories, ctx, layout] = await Promise.all([listProducts({ q, activeOnly: true, sort }), listCategories({ activeOnly: true }), loadPromotionContext(), readCategoryLayout()]);
+  const [all, categories, ctx] = await Promise.all([listProducts({ q, activeOnly: true, sort }), listCategories({ activeOnly: true }), loadPromotionContext()]);
 
   // ?promo=<id> = ดูเฉพาะสินค้าที่อยู่ใน scope ของโปรนั้น (ลิงก์จากการ์ดโปร)
   const promo = promoId ? ctx.promotions.find((p) => p.id === promoId) : undefined;
@@ -28,7 +27,6 @@ export default async function ProductsPage({ searchParams }: PageProps<'/product
       q={q}
       sort={sort}
       basePath="/products"
-      layout={layout}
       renderCard={(p, i) => <PromoProductCard key={p.id} product={p} ctx={ctx} priority={i < 4} />}
     />
   );

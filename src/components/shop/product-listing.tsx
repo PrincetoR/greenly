@@ -5,7 +5,7 @@ import type { Category, Product } from '@/lib/types';
 import { ProductCard, ProductGrid } from './product-card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { buttonStyles } from '@/components/ui/button';
-import { CategoryLayoutToggle, type CategoryLayout } from './category-layout-toggle';
+import { CategorySelect } from './category-select';
 
 export const SORT_OPTIONS = [
   { value: 'newest', label: 'ใหม่ล่าสุด' },
@@ -22,7 +22,7 @@ export function parseSort(value: unknown): SortValue {
 /**
  * หน้ารายการสินค้า ใช้ร่วมกันระหว่าง /products และ /category/[slug]
  * ตัวกรองทั้งหมดเป็น GET query → แชร์ลิงก์ได้ กด back ได้ ไม่ต้องมี client state
- * หมวดหมู่แสดงได้ 2 แบบ: chips (แถบบน) หรือ aside (แถบข้างซ้าย จอ md+ · มือถือยังเป็น chips)
+ * หมวดหมู่: จอ md+ เป็น card แถบข้างซ้าย · มือถือเป็น dropdown ในแถวเดียวกับช่องค้นหา
  */
 export function ProductListing({
   title,
@@ -34,7 +34,6 @@ export function ProductListing({
   sort,
   basePath,
   renderCard,
-  layout = 'chips',
 }: {
   title: string;
   description?: string;
@@ -46,7 +45,6 @@ export function ProductListing({
   basePath: string;
   /** ให้ phase โปรโมชันเสียบการ์ดที่มีราคาโปรได้โดยไม่แก้ไฟล์นี้ */
   renderCard?: (product: Product, index: number) => React.ReactNode;
-  layout?: CategoryLayout;
 }) {
   const query = (over: Record<string, string | undefined>) => {
     const p = new URLSearchParams();
@@ -56,65 +54,48 @@ export function ProductListing({
     return s ? `?${s}` : '';
   };
 
-  const aside = layout === 'aside';
   const links = [
     { href: `/products${query({})}`, label: 'ทั้งหมด', active: !current },
     ...categories.map((c) => ({ href: `/category/${c.slug}${query({})}`, label: c.name, active: current?.id === c.id })),
   ];
-
-  const asideNav = aside && (
-    <aside className="hidden md:block">
-      {/* ขอบบน card ตรงกับช่องค้นหา · รายการแน่น (py-1.5) ให้สมดุลกับ padding 8px ของ card */}
-      <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
-        <ul className="flex flex-col gap-0.5">
-          {links.map((l) => (
-            <li key={l.href}>
-              <Link
-                href={l.href}
-                aria-current={l.active ? 'page' : undefined}
-                className={cn('block rounded-lg px-3 py-1.5 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
-              >
-                {l.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </aside>
-  );
+  const currentHref = links.find((l) => l.active)?.href ?? links[0].href;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      {/* หัวข้อกว้างเต็ม */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
           {description && <p className="mt-1 text-sm text-muted">{description}</p>}
         </div>
-        <div className="flex items-center gap-3">
-          <p className="text-sm text-muted">{products.length} รายการ</p>
-          <CategoryLayoutToggle current={layout} />
-        </div>
+        <p className="text-sm text-muted">{products.length} รายการ</p>
       </div>
 
-      {/* chips: เลื่อนแนวนอนบนมือถือ · py-1/px-1 เผื่อที่ให้ ring เพราะ overflow-x-auto จะ clip ขอบ */}
-      <ul className={cn('-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 py-1 scrollbar-none sm:-mx-1 sm:flex-wrap sm:px-1', aside && 'md:hidden')}>
-        {links.map((l) => (
-          <li key={l.href} className="shrink-0">
-            <Chip href={l.href} active={l.active}>
-              {l.label}
-            </Chip>
-          </li>
-        ))}
-      </ul>
-
-      {/* โหมด aside: card หมวดหมู่อยู่ใต้หัวข้อทางซ้าย · ช่องค้นหา + กริดอยู่คอลัมน์ขวา ขอบซ้ายตรงกัน */}
-      <div className={cn('mt-4', aside && 'md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4')}>
-        {asideNav}
+      {/* card หมวดหมู่ซ้าย (ขอบบนตรงกับช่องค้นหา) · ช่องค้นหา + กริดคอลัมน์ขวา */}
+      <div className="mt-4 md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4">
+        <aside className="hidden md:block">
+          <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
+            <ul className="flex flex-col gap-0.5">
+              {links.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    aria-current={l.active ? 'page' : undefined}
+                    className={cn('block rounded-lg px-3 py-1.5 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
 
         <div className="min-w-0">
-          {/* ซ้าย: ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
+          {/* มือถือ: dropdown หมวดหมู่ · ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
           <form action={basePath} className="flex flex-wrap items-center gap-2">
+            <div className="w-full md:hidden">
+              <CategorySelect options={links} value={currentHref} />
+            </div>
             <input type="search" name="q" defaultValue={q} placeholder="ค้นหาในรายการนี้" aria-label="ค้นหา" className="h-10 min-w-0 flex-1 sm:max-w-xs sm:flex-none sm:basis-72" />
             <button type="submit" className={buttonStyles({ variant: 'secondary' })}>
               ค้นหา
@@ -154,20 +135,5 @@ export function ProductListing({
         </div>
       </div>
     </div>
-  );
-}
-
-function Chip({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      aria-current={active ? 'page' : undefined}
-      className={cn(
-        'block rounded-full px-4 py-1.5 text-sm font-medium ring-1 transition-colors',
-        active ? 'bg-brand text-white ring-brand' : 'bg-surface text-ink ring-line hover:bg-brand-soft hover:text-brand',
-      )}
-    >
-      {children}
-    </Link>
   );
 }
