@@ -10,7 +10,7 @@ const { BASE, launch, ok, shot } = require('./lib');
   ok((await page.textContent('main aside nav p')).trim() === 'หมวดหมู่สินค้า', 'บรรทัดแรกของ card = หมวดหมู่สินค้า');
   const head = await page.locator('main aside nav p').boundingBox();
   const h1 = await page.locator('main h1').boundingBox();
-  ok(head.y <= h1.y && head.y + head.height === h1.y + h1.height, `หัว card ระดับเดียวกับหัวข้อหน้า (ฐาน ${head.y + head.height} = ${h1.y + h1.height})`);
+  ok(Math.abs(head.y + head.height / 2 - (h1.y + h1.height / 2)) <= 1, `หัว card กึ่งกลางเดียวกับหัวข้อหน้า (${head.y + head.height / 2} ≈ ${h1.y + h1.height / 2})`);
   const first = await page.locator('main aside nav ul a').first().boundingBox();
   const input = await page.locator('main input[name=q]').boundingBox();
   ok(first.y === input.y, `"ทั้งหมด" ขอบบนตรงกับช่องค้นหา (${first.y} = ${input.y})`);
