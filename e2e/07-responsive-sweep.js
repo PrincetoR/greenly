@@ -25,8 +25,10 @@ const ADMIN = ['/admin', '/admin/products', '/admin/products/new', '/admin/produ
     for (const path of ADMIN) {
       await page.goto(BASE + path);
       const sw = await page.evaluate(() => document.documentElement.scrollWidth);
-      const h1 = await page.locator('h1').count();
-      ok(sw <= vp && h1 >= 1, `${vp}px ${path} (sw=${sw}, h1=${h1})`);
+      // แดชบอร์ดไม่มี h1 (พี่ต่อเอาออก) — ใช้ card KPI เป็นสัญญาณว่าหน้าโหลด · /admin/login ตอน login แล้วจะเด้งมาแดชบอร์ด
+      const isDash = page.url().replace(/\/$/, '').endsWith('/admin');
+      const h1 = isDash ? await page.locator('main .grid a, main .grid div[class*="rounded-card"]').count() : await page.locator('h1').count();
+      ok(sw <= vp && h1 >= 1, `${vp}px ${path} (sw=${sw}, ${isDash ? 'kpi' : 'h1'}=${h1})`);
       if (vp === 375) await page.screenshot({ path: `${SHOT}/p8-${vp}${path.replace(/[^a-z0-9]+/gi, '_')}.png`, fullPage: true, caret: 'initial' });
     }
   }
