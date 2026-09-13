@@ -10,8 +10,8 @@
     "line": "@greenly"
   },
   "dashboard": {
-    "topPromotions": 10,
-    "topCategories": 10,
-    "topProducts": 10
+    "topPromotions": 5,
+    "topCategories": 5,
+    "topProducts": 5
   }
 }

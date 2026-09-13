@@ -11,7 +11,7 @@ export const DEFAULT_SETTINGS: Settings = {
   freeShippingMin: null,
   lowStockThreshold: 5,
   contact: { phone: '', email: '', line: '' },
-  dashboard: { topPromotions: 10, topCategories: 10, topProducts: 10 },
+  dashboard: { topPromotions: 5, topCategories: 5, topProducts: 5 },
 };
 
 export async function getSettings(): Promise<Settings> {

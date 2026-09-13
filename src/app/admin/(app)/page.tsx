@@ -49,8 +49,10 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
   const cats = categoryReport(orders, products, categories, sales.window, sales.previousWindow);
   const top = topProducts(orders, sales.window, ranks.topProducts);
   const hint = RANGES.find((r) => r.value === range)!.hint;
+  const shownCats = cats.slice(0, ranks.topCategories);
   const bestCat = cats[0]?.revenue > 0 ? cats[0].category.id : null;
-  const worstCat = cats.length > 1 && cats[cats.length - 1].revenue < (cats[0]?.revenue ?? 0) ? cats[cats.length - 1].category.id : null;
+  // ป้าย "ขายน้อยสุด" ติดเฉพาะเมื่อแสดงครบทุกหมวด — ถ้าตัดที่ N อันดับ ตัวท้ายที่เห็นไม่ใช่ตัวที่ขายน้อยสุดจริง
+  const worstCat = shownCats.length === cats.length && cats.length > 1 && cats[cats.length - 1].revenue < (cats[0]?.revenue ?? 0) ? cats[cats.length - 1].category.id : null;
 
   return (
     // ระยะทุกช่องเท่ากัน 16px (= gap คอลัมน์ซ้าย/ขวา และ gap การ์ดสินค้าหน้าร้าน) — พี่ต่อไม่เอา 12/24 ปนกัน
@@ -152,7 +154,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
             action={<RankSetting field="topCategories" value={ranks.topCategories} label="หมวดหมู่" />}
           />
           <ol className="flex flex-col gap-4 p-5">
-            {cats.slice(0, ranks.topCategories).map((c) => (
+            {shownCats.map((c) => (
               <li key={c.category.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1">
                 <p className="flex min-w-0 items-center gap-2 text-sm font-medium">
                   <span className="truncate">{c.category.name}</span>

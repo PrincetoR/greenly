@@ -14,7 +14,7 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   // รายวัน (ค่าเริ่มต้น)
   await page.goto(`${BASE}/admin`);
   ok((await page.locator('main h1').count()) === 0 && (await page.locator('main > div > div.min-w-0 > div > div.grid:first-child > *').count()) === 4, 'KPI 4 ใบ ไม่มีหัวข้อ');
-  ok((await page.locator('main h2').allTextContents()).map((t) => t.trim()).join('|') === 'ยอดขาย|โปรโมชันกระตุ้นยอดขาย 10 อันดับ|หมวดหมู่ขายดี 10 อันดับ|สินค้าขายดี 10 อันดับ', 'การ์ดสถิติ 4 ใบ (ไม่มีรายการออเดอร์/โปร/สต็อกแบบเดิม)');
+  ok((await page.locator('main h2').allTextContents()).map((t) => t.trim()).join('|') === 'ยอดขาย|โปรโมชันกระตุ้นยอดขาย 5 อันดับ|หมวดหมู่ขายดี 5 อันดับ|สินค้าขายดี 5 อันดับ', 'การ์ดสถิติ 4 ใบ (ไม่มีรายการออเดอร์/โปร/สต็อกแบบเดิม)');
   ok((await page.locator('ul[aria-label="ยอดขายต่อช่วง"] > li').count()) === 30, 'รายวัน: กราฟ 30 แท่ง');
   ok((await page.locator('nav[aria-label="ช่วงเวลา"] a[aria-current=page]').textContent()).trim() === 'รายวัน', 'แท็บรายวัน active');
   const revenueText = await page.locator('main h2:has-text("ยอดขาย")').locator('xpath=ancestor::div[contains(@class,"rounded-card")]').locator('p.text-2xl').first().textContent();
@@ -23,17 +23,21 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   ok((await page.locator('main table tbody tr').count()) >= 4, 'ตารางโปรโมชัน: มีโปรที่คาบเกี่ยว 30 วัน (กลางเดือน + 3 ตัวที่กำลังใช้)');
   const midMonth = page.locator('main table tbody tr', { hasText: 'ลด 10% ทั้งร้าน กลางเดือน' });
   ok((await midMonth.count()) === 1 && !/\b0\b/.test((await midMonth.locator('td').nth(1).textContent()).trim()), 'โปรกลางเดือนมีออเดอร์ที่ใช้ > 0');
-  ok((await page.locator('main ol').first().locator('> li').count()) === 6, 'หมวดหมู่ขายดี: seed มี 6 หมวด (เพดาน 10)');
-  ok(await page.locator('main span:has-text("ขายดีสุด")').isVisible() && (await page.locator('main span:has-text("ขายน้อยสุด")').isVisible()), 'ป้ายขายดีสุด/ขายน้อยสุด');
-  ok((await page.locator('main ol').nth(1).locator('> li').count()) === 10, 'สินค้าขายดี 10 อันดับ');
+  ok((await page.locator('main ol').first().locator('> li').count()) === 5, 'หมวดหมู่ขายดี: ค่าเริ่มต้น 5 อันดับ (seed มี 6 หมวด)');
+  ok((await page.locator('main span:has-text("ขายดีสุด")').isVisible()) && (await page.locator('main span:has-text("ขายน้อยสุด")').count()) === 0, 'ป้ายขายดีสุดขึ้น · ขายน้อยสุดไม่ขึ้นเพราะตัดที่ 5 จาก 6 หมวด');
+  ok((await page.locator('main ol').nth(1).locator('> li').count()) === 5, 'สินค้าขายดี: ค่าเริ่มต้น 5 อันดับ');
   await shot(page, 'p14-dashboard-day');
 
   // รูปเฟือง → เปลี่ยนจำนวนอันดับ (ปุ่มลัด + พิมพ์เอง) → หน้าโหลดข้อมูลตามค่าใหม่ + เก็บลง settings
   await page.click('button[aria-label="ตั้งค่าจำนวนอันดับสินค้า"]');
-  await page.click('form[role=dialog] button:has-text("5")');
-  await page.waitForFunction(() => document.querySelector('main h2:nth-of-type(1)') && [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'สินค้าขายดี 5 อันดับ'));
-  ok((await page.locator('main ol').nth(1).locator('> li').count()) === 5 && (await page.locator('form[role=dialog]').count()) === 0, 'เฟืองสินค้า: กด 5 → หัวข้อ+รายการเป็น 5 อันดับ ป๊อปอัปปิด');
-  ok(JSON.parse(require('node:fs').readFileSync(`${DATA}/settings.json`, 'utf8')).dashboard.topProducts === 5, 'settings.json เก็บ topProducts = 5');
+  await page.click('form[role=dialog] button:has-text("10")');
+  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'สินค้าขายดี 10 อันดับ'));
+  ok((await page.locator('main ol').nth(1).locator('> li').count()) === 10 && (await page.locator('form[role=dialog]').count()) === 0, 'เฟืองสินค้า: กด 10 → หัวข้อ+รายการเป็น 10 อันดับ ป๊อปอัปปิด');
+  ok(JSON.parse(require('node:fs').readFileSync(`${DATA}/settings.json`, 'utf8')).dashboard.topProducts === 10, 'settings.json เก็บ topProducts = 10');
+  await page.click('button[aria-label="ตั้งค่าจำนวนอันดับหมวดหมู่"]');
+  await page.click('form[role=dialog] button:has-text("10")');
+  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'หมวดหมู่ขายดี 10 อันดับ'));
+  ok((await page.locator('main ol').first().locator('> li').count()) === 6 && (await page.locator('main span:has-text("ขายน้อยสุด")').isVisible()), 'เฟืองหมวดหมู่: 10 → แสดงครบ 6 หมวด ป้ายขายน้อยสุดขึ้น');
   await page.click('button[aria-label="ตั้งค่าจำนวนอันดับหมวดหมู่"]');
   await page.fill('form[role=dialog] input[name=value]', '3');
   await page.press('form[role=dialog] input[name=value]', 'Enter');
@@ -50,22 +54,22 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   await page.press('form[role=dialog] input[name=value]', 'Enter');
   await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'โปรโมชันกระตุ้นยอดขาย 2 อันดับ'));
   ok((await page.locator('main table tbody tr').count()) === 2, 'เฟืองโปรโมชัน: พิมพ์ 2 → ตาราง 2 แถว');
+  // คืนค่าเริ่มต้น 5 ให้เทสต์ถัดไป
   await page.click('button[aria-label="ตั้งค่าจำนวนอันดับโปรโมชัน"]');
-  await page.click('form[role=dialog] button:has-text("10")');
-  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'โปรโมชันกระตุ้นยอดขาย 10 อันดับ'));
-  // คืนค่า 10 ให้เทสต์ถัดไป
+  await page.click('form[role=dialog] button:has-text("5")');
+  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'โปรโมชันกระตุ้นยอดขาย 5 อันดับ'));
   await page.click('button[aria-label="ตั้งค่าจำนวนอันดับหมวดหมู่"]');
-  await page.click('form[role=dialog] button:has-text("10")');
-  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'หมวดหมู่ขายดี 10 อันดับ'));
+  await page.click('form[role=dialog] button:has-text("5")');
+  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'หมวดหมู่ขายดี 5 อันดับ'));
   await page.click('button[aria-label="ตั้งค่าจำนวนอันดับสินค้า"]');
-  await page.click('form[role=dialog] button:has-text("10")');
-  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'สินค้าขายดี 10 อันดับ'));
+  await page.click('form[role=dialog] button:has-text("5")');
+  await page.waitForFunction(() => [...document.querySelectorAll('main h2')].some((h) => h.textContent.trim() === 'สินค้าขายดี 5 อันดับ'));
 
   // รายเดือน / รายปี
   await page.click('nav[aria-label="ช่วงเวลา"] a:has-text("รายเดือน")');
   await page.waitForURL(/range=month/);
   ok((await page.locator('ul[aria-label="ยอดขายต่อช่วง"] > li').count()) === 12, 'รายเดือน: กราฟ 12 แท่ง');
-  ok((await page.locator('main table tbody tr').count()) >= 6, 'รายเดือน: โปรในอดีต (SUMMER50, ครบรอบร้าน) โผล่ในตาราง');
+  ok((await page.locator('main table tbody tr').count()) === 5 && (await page.locator('main table tbody tr', { hasText: 'SUMMER50' }).count()) === 1, 'รายเดือน: โปรในอดีต (SUMMER50) โผล่ในตาราง · ตัดที่ 5 อันดับ');
   await shot(page, 'p14-dashboard-month');
   await page.click('nav[aria-label="ช่วงเวลา"] a:has-text("รายปี")');
   await page.waitForURL(/range=year/);
