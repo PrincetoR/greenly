@@ -66,9 +66,9 @@ export function ProductListing({
     <div className="mx-auto max-w-6xl px-4 pt-4 pb-8 md:grid md:grid-cols-[var(--aside-w)_1fr] md:items-start md:gap-4">
       <aside className="hidden md:block">
         {/* ขอบบน card ตรงกับช่องค้นหา · แถวแรก "หมวดหมู่สินค้า" สูง 40 เท่าช่องค้นหา · คั่นด้วยเส้น */}
-        <nav aria-label="หมวดหมู่สินค้า" className="sticky top-20 rounded-card bg-surface p-1.5 pt-0 ring-1 ring-line">
+        <nav aria-label="หมวดหมู่สินค้า" className="sticky top-20 rounded-card bg-surface p-1 pt-0 ring-1 ring-line">
           {/* ขนาดใกล้เคียงหัวข้อหน้า (ย่อมกว่าหนึ่งขั้น) ให้ดูเป็นหัวข้อของคอลัมน์ ไม่ใช่รายการหนึ่ง */}
-          <p className="flex h-10 items-center px-2 text-lg font-bold">หมวดหมู่สินค้า</p>
+          <p className="flex h-10 items-center px-2.5 text-lg font-bold">หมวดหมู่สินค้า</p>
           {/* เส้นคั่นอยู่ที่ 40px = ขอบล่างช่องค้นหา · เว้น 15px ให้ "ทั้งหมด" เริ่มที่ 56 = ขอบบนการ์ดสินค้า */}
           <div className="mb-[15px] border-t border-line" aria-hidden />
           <ul className="flex flex-col gap-1">
@@ -77,7 +77,7 @@ export function ProductListing({
                 <Link
                   href={l.href}
                   aria-current={l.active ? 'page' : undefined}
-                  className={cn('block rounded-lg px-2.5 py-2 text-[15px] font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
+                  className={cn('block rounded-lg px-2 py-2 text-[15px] font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
                 >
                   {l.label}
                 </Link>
