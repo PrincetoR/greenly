@@ -85,7 +85,7 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
               </tbody>
             </Table>
           </div>
-          <ul className="flex flex-col gap-2 md:hidden">
+          <ul className="flex flex-col gap-3 sm:gap-4 md:hidden">
             {orders.map((o) => (
               <li key={o.id}>
                 <Link href={`/admin/orders/${o.id}`} className="block rounded-card bg-surface p-4 border border-line">

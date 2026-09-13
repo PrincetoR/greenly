@@ -33,16 +33,17 @@ export default async function AdminDashboard() {
   const canPromo = roleCan(session.role, 'promotion.manage');
 
   return (
-    <div>
+    // ระยะทุกช่องเท่ากัน 16px (= gap คอลัมน์ซ้าย/ขวา และ gap การ์ดสินค้าหน้าร้าน) — พี่ต่อไม่เอา 12/24 ปนกัน
+    <div className="grid gap-4">
       {/* ไม่มีหัวข้อ/บรรทัดทักทาย (พี่ต่อเอาออก) — แถว KPI เริ่มที่ขอบบนเดียวกับ card "จัดการสินค้า" · ชื่อหน้าอยู่ใน metadata.title */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="ยอดขายวันนี้" value={formatBaht(revenueToday)} sub={`${today.length} ออเดอร์`} />
         <Kpi label="รอยืนยัน/ชำระ" value={String(pending.length)} sub="ออเดอร์" href={canOrders ? '/admin/orders?status=pending' : undefined} tone={pending.length > 0 ? 'warn' : undefined} />
         <Kpi label="สินค้าใกล้หมด" value={String(lowStock.length)} sub={`≤ ${settings.lowStockThreshold} ชิ้น`} href="/admin/products?status=low" tone={lowStock.length > 0 ? 'danger' : undefined} />
         <Kpi label="โปรที่กำลังใช้งาน" value={String(live.length)} sub="โปรโมชัน" href={canPromo ? '/admin/promotions?status=live' : '/promotions'} />
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         {canOrders && (
           <Card>
             <CardHeader

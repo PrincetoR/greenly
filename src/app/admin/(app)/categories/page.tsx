@@ -31,7 +31,7 @@ export default async function CategoriesPage({ searchParams }: PageProps<'/admin
         </Alert>
       )}
 
-      <Card className="mb-6">
+      <Card className="mb-4">
         <CardHeader title={editing ? `แก้ไข "${editing.name}"` : 'เพิ่มหมวดหมู่ใหม่'} />
         <div className="p-5">
           <CategoryForm key={editing?.id ?? 'new'} category={editing} />
@@ -69,7 +69,7 @@ export default async function CategoriesPage({ searchParams }: PageProps<'/admin
       </div>
 
       {/* card list บนมือถือ */}
-      <ul className="flex flex-col gap-2 md:hidden">
+      <ul className="flex flex-col gap-3 sm:gap-4 md:hidden">
         {categories.map((c) => (
           <li key={c.id} className="rounded-card bg-surface p-4 border border-line">
             <div className="flex items-start justify-between gap-2">
