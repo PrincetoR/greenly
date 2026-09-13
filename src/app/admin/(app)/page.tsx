@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth/session';
-import { ROLE_LABEL, roleCan } from '@/lib/auth/roles';
+import { roleCan } from '@/lib/auth/roles';
 import { listOrders } from '@/lib/db/orders';
 import { listProducts } from '@/lib/db/products';
 import { loadPromotionContext } from '@/lib/promotions/service';
 import { promotionStatus } from '@/lib/pricing/status';
 import { formatBaht } from '@/lib/money';
-import { formatDateTime, humanCountdown } from '@/lib/datetime';
+import { humanCountdown } from '@/lib/datetime';
 import { ORDER_STATUS_LABEL, ORDER_STATUS_TONE } from '@/lib/orders/labels';
 import { PageHeader } from '@/components/admin/page-header';
 import { Card, CardHeader } from '@/components/ui/card';
@@ -35,7 +35,8 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <PageHeader title="แดชบอร์ด" description={`สวัสดี ${session.user.name} · ${ROLE_LABEL[session.role]} · ${formatDateTime(now)}`} />
+      {/* ไม่มีบรรทัดทักทาย/เวลา (พี่ต่อเอาออก) — ชื่อกับ role อยู่ใน card ผู้ใช้ทางซ้ายแล้ว */}
+      <PageHeader title="แดชบอร์ด" />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="ยอดขายวันนี้" value={formatBaht(revenueToday)} sub={`${today.length} ออเดอร์`} />

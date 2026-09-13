@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { Heart, Menu, Package, ShoppingCart, User, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import type { Category } from '@/lib/types';
+import { isAdminMenuActive, type AdminMenuItem } from '@/lib/auth/roles';
+import { logout } from '@/lib/actions/auth';
 import { ACCOUNT_ITEMS } from './account-items';
 
 const NAV = [
@@ -19,7 +21,8 @@ type NavItem = (typeof NAV)[number] | typeof STAFF_NAV;
 /**
  * หัวเว็บฝั่งลูกค้า
  * แถบสถานะบนสุด (แบบ Shopee, จอ md+): ขวา = รายการโปรด · ประวัติการสั่งซื้อ · ชื่อผู้ใช้ (หรือ guest) — เลื่อนไปกับหน้า
- * แถบหลัก (sticky): โลโก้ · เมนู · ตะกร้า (ขวาสุด) · มือถือมีปุ่มเมนู → drawer รวมเมนูหลัก · บัญชี · หมวดหมู่
+ * แถบหลัก (sticky): โลโก้ · เมนู · ตะกร้า (ขวาสุด) · มือถือมีปุ่มเมนู → drawer รวมเมนูหลัก · (เมนูหลังบ้านถ้าอยู่หน้า admin) · บัญชี · หมวดหมู่
+ * หลังบ้านใช้ header ตัวนี้ด้วย — เมนู "การจัดการ" active และเส้นแนวตั้งตรงกับ card เมนูหลังบ้าน
  */
 export function ShopHeader({
   storeName,
@@ -29,6 +32,7 @@ export function ShopHeader({
   wishlistCount,
   isStaff = false,
   userName,
+  adminItems,
 }: {
   storeName: string;
   tagline?: string;
@@ -39,6 +43,8 @@ export function ShopHeader({
   isStaff?: boolean;
   /** ชื่อ login หลังบ้าน (เช่น admin) · ไม่มี = guest */
   userName?: string | null;
+  /** หน้าหลังบ้านส่งเมนู (กรองสิทธิ์แล้ว) มาใส่ drawer มือถือ — จอใหญ่เมนูอยู่ใน card ซ้ายของ AdminShell */
+  adminItems?: AdminMenuItem[];
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -146,6 +152,28 @@ export function ShopHeader({
             </Link>
           ))}
         </nav>
+        {adminItems && (
+          <>
+            <p className="mt-3 px-3 text-xs font-semibold tracking-wide text-muted uppercase">จัดการสินค้า</p>
+            <nav aria-label="เมนูหลังบ้าน (มือถือ)" className="mt-1 flex flex-col">
+              {adminItems.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={isAdminMenuActive(href, pathname) ? 'page' : undefined}
+                  className={cn('rounded-lg px-3 py-2.5 font-medium', isAdminMenuActive(href, pathname) ? 'bg-brand-soft text-brand' : 'hover:bg-surface-alt')}
+                >
+                  {label}
+                </Link>
+              ))}
+              <form action={logout}>
+                <button type="submit" className="w-full rounded-lg px-3 py-2.5 text-left font-medium text-danger hover:bg-danger-soft">
+                  ออกจากระบบ
+                </button>
+              </form>
+            </nav>
+          </>
+        )}
         <p className="mt-3 px-3 text-xs font-semibold tracking-wide text-muted uppercase">บัญชี</p>
         <nav aria-label="เมนูบัญชี (มือถือ)" className="mt-1 flex flex-col">
           {ACCOUNT_ITEMS.map(({ href, label, Icon }) => (

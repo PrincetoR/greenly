@@ -71,7 +71,7 @@ export default async function PromotionsPage({ searchParams }: PageProps<'/admin
           }
         />
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul aria-label="รายการโปรโมชัน" className="flex flex-col gap-3">
           {shown.map(({ p, status, u }) => (
             <li key={p.id} className={cn('rounded-card bg-surface p-4 border border-line', status === 'ended' && 'opacity-70')}>
               <div className="flex flex-wrap items-start gap-3">

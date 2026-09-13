@@ -59,6 +59,11 @@ export const ADMIN_MENU: AdminMenuItem[] = [
   { href: '/admin/settings', label: 'ตั้งค่าร้าน', icon: 'settings', permission: 'settings.manage' },
 ];
 
+/** แดชบอร์ดคือ /admin ตรง ๆ ไม่งั้นทุกหน้าใต้ /admin จะ active พร้อมกัน */
+export function isAdminMenuActive(href: string, pathname: string): boolean {
+  return href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
+}
+
 export function visibleMenu(role: Role): AdminMenuItem[] {
   return ADMIN_MENU.filter((m) => m.permission === null || roleCan(role, m.permission));
 }

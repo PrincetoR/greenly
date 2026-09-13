@@ -19,7 +19,7 @@ const { BASE, launch, login, ok } = require('./lib');
   }
 
   // logout แล้วเมนูหาย
-  await page.click('button:has-text("ออกจากระบบ")');
+  await page.click('main button:has-text("ออกจากระบบ")');
   await page.waitForURL(/\/admin\/login/);
   await page.goto(`${BASE}/`);
   ok((await page.locator('header a[href="/admin"]').count()) === 0, 'logout แล้วเมนูการจัดการหาย');

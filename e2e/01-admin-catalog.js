@@ -102,7 +102,7 @@ fs.writeFileSync(UPLOAD_TMP, png);
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto(`${BASE}/admin/products`);
   await page.click('button[aria-label="เปิดเมนู"]');
-  ok(await page.locator('[role=dialog] nav a[href="/admin/orders"]').isVisible(), 'mobile drawer opens with menu');
+  ok(await page.locator('#mobile-menu a[href="/admin/orders"]').isVisible(), 'mobile drawer opens with menu');
   await shot(page, 'p2-mobile-products');
   const sw = await page.evaluate(() => document.documentElement.scrollWidth);
   ok(sw <= 375, `no horizontal scroll on mobile (scrollWidth=${sw})`);

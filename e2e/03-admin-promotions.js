@@ -111,7 +111,7 @@ const readPromos = () => JSON.parse(fs.readFileSync(DATA + '/promotions.json', '
 
   // status filter
   await page.goto(`${BASE}/admin/promotions?status=scheduled`);
-  ok((await page.locator('ul > li').count()) === 1, 'filter scheduled → 1');
+  ok((await page.locator('ul[aria-label="รายการโปรโมชัน"] > li').count()) === 1, 'filter scheduled → 1');
 
   // mobile form
   await page.setViewportSize({ width: 375, height: 800 });
