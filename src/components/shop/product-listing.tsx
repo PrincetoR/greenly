@@ -62,14 +62,12 @@ export function ProductListing({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4">
-      {/*
-       * sticky ต้องอยู่ที่ตัว grid item (aside) ไม่ใช่ลูกข้างใน — ลูกจะขยับได้แค่ในช่องของตัวเองซึ่งสูงเท่าเนื้อหาพอดี
-       * แถวแรก "หมวดหมู่สินค้า" สูง 40px ระดับเดียวกับหัวข้อหน้า (card ขยับขึ้น 8px เท่า padding)
-       * คั่นด้วยเส้น แล้วรายการเริ่มที่ระดับขอบบนช่องค้นหา (หัวข้อ 40 + gap 16)
-       * ตอนเลื่อน: ติดที่ top-20 (80px) เท่ากับตำแหน่งช่องค้นหาที่ติดอยู่ (header 64 + padding 16)
-       */}
-      <aside className="sticky top-20 -mt-2 hidden md:block">
-        <nav aria-label="หมวดหมู่สินค้า" className="rounded-card bg-surface p-2 ring-1 ring-line">
+      <aside className="hidden md:block">
+        {/*
+         * แถวแรก "หมวดหมู่สินค้า" สูง 40px ระดับเดียวกับหัวข้อหน้า (card ขยับขึ้น 8px เท่า padding)
+         * คั่นด้วยเส้น แล้วรายการเริ่มที่ระดับขอบบนช่องค้นหา (หัวข้อ 40 + gap 16)
+         */}
+        <nav aria-label="หมวดหมู่สินค้า" className="sticky top-[72px] -mt-2 rounded-card bg-surface p-2 ring-1 ring-line">
           {/* ขนาดใกล้เคียงหัวข้อหน้า (ย่อมกว่าหนึ่งขั้น) ให้ดูเป็นหัวข้อของคอลัมน์ ไม่ใช่รายการหนึ่ง */}
           <p className="flex h-10 items-center px-2 text-lg font-bold">หมวดหมู่สินค้า</p>
           <div className="mt-2 mb-[7px] border-t border-line" aria-hidden />
@@ -100,11 +98,7 @@ export function ProductListing({
           <p className="text-sm text-muted">{products.length} รายการ</p>
         </div>
 
-        {/*
-         * แถบค้นหาติดใต้ header ตอนเลื่อน (top-16 = สูง header) การ์ดมุดลงใต้ · padding บน/ล่าง = ระยะระหว่างการ์ด
-         * พื้นสี page ทึบเพื่อบังการ์ดที่เลื่อนผ่าน
-         */}
-        <div className="sticky top-16 z-20 bg-page py-3 sm:py-4">
+        <div className="mt-4">
           {/* มือถือ: dropdown หมวดหมู่ · ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
           <form action={basePath} className="flex flex-wrap items-center gap-2">
             <div className="w-full md:hidden">
@@ -128,23 +122,24 @@ export function ProductListing({
               ))}
             </select>
           </form>
-        </div>
 
-        <div>
-          {products.length === 0 ? (
-            <EmptyState
-              icon={<SearchX />}
-              title={q ? `ไม่พบสินค้าที่ตรงกับ "${q}"` : 'ยังไม่มีสินค้าในหมวดนี้'}
-              description="ลองใช้คำค้นอื่น หรือดูสินค้าทั้งหมด"
-              action={
-                <Link href="/products" className={buttonStyles()}>
-                  ดูสินค้าทั้งหมด
-                </Link>
-              }
-            />
-          ) : (
-            <ProductGrid>{products.map((p, i) => (renderCard ? renderCard(p, i) : <ProductCard key={p.id} product={p} priority={i < 4} />))}</ProductGrid>
-          )}
+          {/* ระยะจากแถบค้นหาถึงกริด = ระยะระหว่างการ์ด (gap-3 / sm:gap-4) */}
+          <div className="mt-3 sm:mt-4">
+            {products.length === 0 ? (
+              <EmptyState
+                icon={<SearchX />}
+                title={q ? `ไม่พบสินค้าที่ตรงกับ "${q}"` : 'ยังไม่มีสินค้าในหมวดนี้'}
+                description="ลองใช้คำค้นอื่น หรือดูสินค้าทั้งหมด"
+                action={
+                  <Link href="/products" className={buttonStyles()}>
+                    ดูสินค้าทั้งหมด
+                  </Link>
+                }
+              />
+            ) : (
+              <ProductGrid>{products.map((p, i) => (renderCard ? renderCard(p, i) : <ProductCard key={p.id} product={p} priority={i < 4} />))}</ProductGrid>
+            )}
+          </div>
         </div>
       </div>
     </div>
