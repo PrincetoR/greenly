@@ -45,7 +45,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
   const sales = salesReport(orders, range, now);
   const promo = promotionReport(orders, promotions, now, sales.window);
   const cats = categoryReport(orders, products, categories, sales.window, sales.previousWindow);
-  const top = topProducts(orders, sales.window, 5);
+  const top = topProducts(orders, sales.window, 10);
   const hint = RANGES.find((r) => r.value === range)!.hint;
   const bestCat = cats[0]?.revenue > 0 ? cats[0].category.id : null;
   const worstCat = cats.length > 1 && cats[cats.length - 1].revenue < (cats[0]?.revenue ?? 0) ? cats[cats.length - 1].category.id : null;
@@ -143,9 +143,9 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
       <div className="grid gap-4 lg:grid-cols-2">
         {/* หมวดหมู่ขายดี / ขายไม่ดี */}
         <Card className="min-w-0">
-          <CardHeader title="หมวดหมู่ไหนขายดี" description={`สัดส่วนรายได้ ${hint} · เทียบช่วงก่อนหน้า · ไม่นับของแถม`} />
+          <CardHeader title="หมวดหมู่ขายดี" description={`10 อันดับตามรายได้ ${hint} · เทียบช่วงก่อนหน้า · ไม่นับของแถม`} />
           <ol className="flex flex-col gap-4 p-5">
-            {cats.map((c) => (
+            {cats.slice(0, 10).map((c) => (
               <li key={c.category.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1">
                 <p className="flex min-w-0 items-center gap-2 text-sm font-medium">
                   <span className="truncate">{c.category.name}</span>
@@ -167,7 +167,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
 
         {/* สินค้าขายดี */}
         <Card className="min-w-0">
-          <CardHeader title="สินค้าขายดี 5 อันดับ" description={`ตามจำนวนชิ้นที่ขายได้ ${hint}`} />
+          <CardHeader title="สินค้าขายดี 10 อันดับ" description={`ตามจำนวนชิ้นที่ขายได้ ${hint}`} />
           {top.length === 0 ? (
             <p className="p-5 text-sm text-muted">ยังไม่มีออเดอร์ในช่วงนี้</p>
           ) : (
