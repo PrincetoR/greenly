@@ -143,7 +143,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
       <div className="grid gap-4 lg:grid-cols-2">
         {/* หมวดหมู่ขายดี / ขายไม่ดี */}
         <Card className="min-w-0">
-          <CardHeader title="หมวดหมู่ขายดี" description={`10 อันดับตามรายได้ ${hint} · เทียบช่วงก่อนหน้า · ไม่นับของแถม`} />
+          <CardHeader title="หมวดหมู่ขายดี 10 อันดับ" description={`ตามรายได้ ${hint} · เทียบช่วงก่อนหน้า · ไม่นับของแถม`} />
           <ol className="flex flex-col gap-4 p-5">
             {cats.slice(0, 10).map((c) => (
               <li key={c.category.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1">
