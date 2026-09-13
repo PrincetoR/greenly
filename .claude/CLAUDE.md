@@ -68,6 +68,7 @@ src/app/(shop)/       หน้าร้าน · src/app/admin/(app)/ หลั
 - ถ้า HMR เพี้ยน: หยุด dev ทุกตัว → `rm -rf .next` → `npm run dev`
 
 ## บทเรียนจากการทดสอบ
+- container ที่ `overflow-x-auto` จะ clip แนวตั้งด้วย → `ring` (box-shadow) ของลูกโดนตัดขอบบน/ล่าง ต้องใส่ `py-1` ให้เสมอ
 - id ที่ต้องผ่าน regex ความยาว ห้ามสร้างจาก base64url แล้วตัดอักขระทิ้ง (ความยาวไม่แน่นอน → พังแบบสุ่ม 39%) ใช้ hex
 - Playwright screenshot ค่าเริ่มต้นแอบใส่ `style="caret-color: transparent"` ให้ input → เจอ hydration mismatch ปลอม ใช้ `caret: 'initial'` เสมอ
 - slug ภาษาไทยมาถึง `params` แบบ percent-encoded → `decodeSlug()` ก่อนค้น
