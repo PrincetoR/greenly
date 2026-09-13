@@ -3,7 +3,7 @@ import { cn } from '@/lib/cn';
 
 /**
  * ราคาเดิมขีดฆ่า + ราคาโปร — ถ้าไม่มีส่วนลดแสดงราคาเดียว
- * md (การ์ด): 2 บรรทัด ราคาเดิมขีดฆ่าบรรทัดบน ราคาโปรบรรทัดล่าง
+ * md (การ์ด): 2 บรรทัด ราคาโปรบรรทัดบน ราคาเดิมขีดฆ่าบรรทัดล่าง
  * lg (หน้าสินค้า): บรรทัดเดียว ราคาโปร · ราคาเดิม · ป้าย -%
  */
 export function PriceTag({ price, original, size = 'md' }: { price: number; original: number; size?: 'md' | 'lg' }) {
@@ -26,8 +26,8 @@ export function PriceTag({ price, original, size = 'md' }: { price: number; orig
 
   return (
     <p className="flex flex-col leading-tight">
-      {discounted && <span className="text-xs text-muted line-through">{formatBaht(original)}</span>}
       <span className={cn('text-base font-bold', discounted && 'text-accent')}>{formatBaht(price)}</span>
+      {discounted && <span className="text-xs text-muted line-through">{formatBaht(original)}</span>}
     </p>
   );
 }
