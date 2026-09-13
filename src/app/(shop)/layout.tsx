@@ -20,10 +20,12 @@ export default async function ShopLayout({ children }: LayoutProps<'/'>) {
     <div className="flex min-h-dvh flex-col">
       <ShopHeader
         storeName={settings.storeName}
+        tagline={settings.tagline}
         categories={categories}
         cartCount={cartCount(cart)}
         wishlistCount={wishlist.length}
         isStaff={Boolean(session)}
+        userName={session?.user.username ?? null}
       />
       <main className="flex-1">{children}</main>
       <ShopFooter settings={settings} />

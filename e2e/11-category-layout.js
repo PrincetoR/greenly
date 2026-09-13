@@ -10,7 +10,8 @@ const { BASE, launch, ok, shot } = require('./lib');
   await page.mouse.wheel(0, 800);
   await page.waitForTimeout(300);
   const after = await page.evaluate(() => ({ aside: document.querySelector('main aside nav').getBoundingClientRect().top, tb: document.querySelector('main input[aria-label="ค้นหา"]').getBoundingClientRect().top, card: document.querySelector('main .group').getBoundingClientRect().top }));
-  ok(before.aside === after.aside && before.tb === after.tb && after.card < 0, `เลื่อนแล้ว aside/แถบค้นหาติดที่เดิม (${before.tb} = ${after.tb}) การ์ดเลื่อนไป`);
+  // ตอนอยู่นิ่งมีแถบสถานะ 32px อยู่บน (เลื่อนไปกับหน้า) → ตอนติดจะอยู่ใต้ header พอดี (65 + 16 = 81)
+  ok(after.aside === 81 && after.tb === 81 && after.card < 0, `เลื่อนแล้ว aside/แถบค้นหาติดใต้ header (${before.tb} → ${after.tb}) การ์ดเลื่อนไป`);
   await page.mouse.wheel(0, -800);
   await page.waitForTimeout(300);
   ok((await page.locator('main a.rounded-full').count()) === 0, 'desktop: ไม่มี chip/tag');

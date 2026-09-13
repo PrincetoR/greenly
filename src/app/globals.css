@@ -148,6 +148,10 @@
     html:has(.snap-rows) footer {
       scroll-snap-align: end;
     }
+    /* หัวสุดของหน้า (แถบสถานะ) ต้องเป็นจุด snap ด้วย ไม่งั้นโหลดมาแล้ว snap ไปแถวการ์ดแรก แถบสถานะโดนเลื่อนพ้นจอ */
+    html:has(.snap-rows) .status-bar {
+      scroll-snap-align: start;
+    }
   }
   /* ซ่อน scrollbar แต่ยังเลื่อนได้ — ใช้กับแถบหมวดหมู่บนมือถือ */
   .scrollbar-none {

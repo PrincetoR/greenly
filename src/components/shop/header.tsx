@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Leaf, Menu, ShoppingCart, X } from 'lucide-react';
+import { Heart, Leaf, Menu, Package, ShoppingCart, User, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import type { Category } from '@/lib/types';
-import { AccountMenu, ACCOUNT_ITEMS } from './account-menu';
+import { ACCOUNT_ITEMS } from './account-items';
 
 const NAV = [
   { href: '/products', label: 'สินค้าทั้งหมด' },
@@ -17,22 +17,28 @@ const STAFF_NAV = { href: '/admin', label: 'การจัดการ' } as co
 type NavItem = (typeof NAV)[number] | typeof STAFF_NAV;
 
 /**
- * หัวเว็บฝั่งลูกค้า — มุมขวา: [บัญชี ▾] [ตะกร้า] · ตะกร้าอยู่ขวาสุดเสมอ ไม่มีอะไรมากั้น
- * mobile: ตะกร้า + ปุ่มเมนู → drawer รวมค้นหา · เมนูหลัก · บัญชี · หมวดหมู่ (ปุ่มบัญชีซ่อนไว้)
+ * หัวเว็บฝั่งลูกค้า
+ * แถบสถานะบนสุด (แบบ Shopee, จอ md+): ขวา = รายการโปรด · ประวัติการสั่งซื้อ · ชื่อผู้ใช้ (หรือ guest) — เลื่อนไปกับหน้า
+ * แถบหลัก (sticky): โลโก้ · เมนู · ตะกร้า (ขวาสุด) · มือถือมีปุ่มเมนู → drawer รวมเมนูหลัก · บัญชี · หมวดหมู่
  */
 export function ShopHeader({
   storeName,
+  tagline,
   categories,
   cartCount,
   wishlistCount,
   isStaff = false,
+  userName,
 }: {
   storeName: string;
+  tagline?: string;
   categories: Category[];
   cartCount: number;
   wishlistCount: number;
   /** login หลังบ้านอยู่ → แสดงเมนู "การจัดการ" */
   isStaff?: boolean;
+  /** ชื่อ login หลังบ้าน (เช่น admin) · ไม่มี = guest */
+  userName?: string | null;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -46,6 +52,29 @@ export function ShopHeader({
   }
 
   return (
+    <>
+      {/* แถบสถานะ — ไม่ sticky (แถบหลักยังติดที่ top-0 ระยะ 65px ที่หน้ารายการใช้จึงไม่เปลี่ยน) */}
+      {/* พื้นขาวเหมือนแถบหลัก คั่นด้วยเส้นบาง · ลิงก์สีเทา ชื่อผู้ใช้สีเข้ม */}
+      <div className="status-bar hidden border-b border-line bg-surface text-xs text-muted md:block">
+        <div className="mx-auto flex h-8 max-w-6xl items-center px-4">
+          {tagline && <p className="truncate">{tagline}</p>}
+          <nav aria-label="แถบสถานะ" className="ml-auto flex items-center gap-4">
+            <Link href="/wishlist" className="flex items-center gap-1 hover:text-ink">
+              <Heart className="size-3.5" aria-hidden />
+              รายการโปรด{wishlistCount > 0 && ` (${wishlistCount})`}
+            </Link>
+            <Link href="/orders" className="flex items-center gap-1 hover:text-ink">
+              <Package className="size-3.5" aria-hidden />
+              ประวัติการสั่งซื้อ
+            </Link>
+            <Link href="/account" className="flex items-center gap-1 font-medium text-ink hover:text-brand">
+              <User className="size-3.5" aria-hidden />
+              {userName ?? 'guest'}
+            </Link>
+          </nav>
+        </div>
+      </div>
+
     <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4">
         {/*
@@ -69,9 +98,8 @@ export function ShopHeader({
           </div>
         </nav>
 
-        {/* ไม่มีช่องค้นหาใน header (พี่ต่อไม่ชอบ) — ค้นหาได้ในหน้ารายการสินค้า · ไอคอนชิดกัน ไม่มี hover effect */}
+        {/* ไม่มีช่องค้นหาใน header (พี่ต่อไม่ชอบ) — ค้นหาได้ในหน้ารายการสินค้า · ไม่มี hover effect */}
         <div className="ml-auto flex items-center">
-          <AccountMenu wishlistCount={wishlistCount} className="hidden md:block" />
           <Link
             href="/cart"
             aria-label={cartCount > 0 ? `ตะกร้า ${cartCount} ชิ้น` : 'ตะกร้า'}
@@ -134,6 +162,7 @@ export function ShopHeader({
         )}
       </div>
     </header>
+    </>
   );
 }
 
