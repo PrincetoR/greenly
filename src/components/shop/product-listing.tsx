@@ -64,7 +64,7 @@ export function ProductListing({
 
   const asideNav = aside && (
     <aside className="hidden md:block">
-      <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface p-2 ring-1 ring-line">
+      <nav aria-label="หมวดหมู่" className="sticky top-20 rounded-card bg-surface px-2 pb-2 ring-1 ring-line">
         {/* ขนาดตัวอักษรเท่ากับช่องค้นหา (16px) ให้หัว card กับแถบค้นหาอยู่ระดับเดียวกัน */}
         <p className="flex h-10 items-center px-3 text-base font-semibold">หมวดหมู่</p>
         <ul className="flex flex-col">
