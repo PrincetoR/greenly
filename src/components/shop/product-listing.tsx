@@ -61,48 +61,42 @@ export function ProductListing({
   const currentHref = links.find((l) => l.active)?.href ?? links[0].href;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
-          {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+    <div className="mx-auto max-w-6xl px-4 py-8 md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4">
+      <aside className="hidden md:block">
+        {/*
+         * แถวแรก "หมวดหมู่สินค้า" สูง 40px ระดับเดียวกับหัวข้อหน้า (card ขยับขึ้น 8px เท่า padding)
+         * คั่นด้วยเส้น แล้วรายการเริ่มที่ระดับขอบบนช่องค้นหา (หัวข้อ 40 + gap 16)
+         */}
+        <nav aria-label="หมวดหมู่สินค้า" className="sticky top-[72px] -mt-2 rounded-card bg-surface p-2 ring-1 ring-line">
+          <p className="flex h-10 items-center px-3 text-sm font-semibold">หมวดหมู่สินค้า</p>
+          <div className="mt-2 mb-[7px] border-t border-line" aria-hidden />
+          <ul className="flex flex-col gap-0.5">
+            {links.map((l) => (
+              <li key={l.href}>
+                <Link
+                  href={l.href}
+                  aria-current={l.active ? 'page' : undefined}
+                  className={cn('block rounded-lg px-3 py-1.5 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+
+      <div className="min-w-0">
+        {/* หัวข้อหน้าอยู่เหนือช่องค้นหา ในคอลัมน์ขวา */}
+        <div className="flex min-h-10 flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
+            {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+          </div>
+          <p className="text-sm text-muted">{products.length} รายการ</p>
         </div>
-        <p className="text-sm text-muted">{products.length} รายการ</p>
-      </div>
 
-      {/* card หมวดหมู่ซ้าย (ขอบบนตรงกับช่องค้นหา) · ช่องค้นหา + กริดคอลัมน์ขวา */}
-      <div className="mt-4 md:grid md:grid-cols-[220px_1fr] md:items-start md:gap-4">
-        <aside className="hidden md:block">
-          {/*
-           * "ทั้งหมด" สูง 40px อยู่ระดับช่องค้นหา (card ขยับขึ้น 8px เท่า padding) · คั่นด้วยเส้น
-           * แล้วหมวดหมู่เริ่มที่ระดับขอบบนของการ์ดสินค้า (ช่องค้นหา 40 + gap 16)
-           */}
-          <nav aria-label="หมวดหมู่" className="sticky top-[72px] -mt-2 rounded-card bg-surface p-2 ring-1 ring-line">
-            <Link
-              href={links[0].href}
-              aria-current={links[0].active ? 'page' : undefined}
-              className={cn('flex h-10 items-center rounded-lg px-3 text-sm font-medium transition-colors', links[0].active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
-            >
-              {links[0].label}
-            </Link>
-            <div className="mt-2 mb-[7px] border-t border-line" aria-hidden />
-            <ul className="flex flex-col gap-0.5">
-              {links.slice(1).map((l) => (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    aria-current={l.active ? 'page' : undefined}
-                    className={cn('block rounded-lg px-3 py-1.5 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </aside>
-
-        <div className="min-w-0">
+        <div className="mt-4">
           {/* มือถือ: dropdown หมวดหมู่ · ค้นหา + ปุ่ม (สูงเท่ากัน h-10) · ขวาสุด: เรียงลำดับ */}
           <form action={basePath} className="flex flex-wrap items-center gap-2">
             <div className="w-full md:hidden">
