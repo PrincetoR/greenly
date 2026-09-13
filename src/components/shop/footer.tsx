@@ -20,8 +20,9 @@ export function ShopFooter({ settings }: { settings: Settings }) {
             <li><Link href="/products" className="hover:text-ink">สินค้าทั้งหมด</Link></li>
             <li><Link href="/promotions" className="hover:text-ink">โปรโมชัน</Link></li>
             <li><Link href="/cart" className="hover:text-ink">ตะกร้าสินค้า</Link></li>
+            <li><Link href="/account" className="hover:text-ink">โปรไฟล์</Link></li>
             <li><Link href="/wishlist" className="hover:text-ink">รายการโปรด</Link></li>
-            <li><Link href="/orders" className="hover:text-ink">คำสั่งซื้อของฉัน</Link></li>
+            <li><Link href="/orders" className="hover:text-ink">ประวัติการสั่งซื้อ</Link></li>
           </ul>
         </div>
         <div className="text-sm">

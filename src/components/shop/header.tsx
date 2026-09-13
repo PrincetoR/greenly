@@ -3,25 +3,19 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
-import { Heart, Leaf, Menu, Search, ShoppingCart, User, X } from 'lucide-react';
+import { Leaf, Menu, Search, ShoppingCart, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import type { Category } from '@/lib/types';
+import { AccountMenu, ACCOUNT_ITEMS } from './account-menu';
 
 const NAV = [
   { href: '/products', label: 'สินค้าทั้งหมด' },
   { href: '/promotions', label: 'โปรโมชัน' },
 ] as const;
 
-/** ไอคอนมุมขวา เรียง wishlist · cart · profile — ทุกจอ */
-const ACTIONS = [
-  { href: '/wishlist', label: 'รายการโปรด', Icon: Heart, countKey: 'wishlist' },
-  { href: '/cart', label: 'ตะกร้า', Icon: ShoppingCart, countKey: 'cart' },
-  { href: '/orders', label: 'บัญชีของฉัน', Icon: User, countKey: null },
-] as const;
-
 /**
- * หัวเว็บฝั่งลูกค้า — desktop: โลโก้ · เมนู · ช่องค้นหา · ไอคอน 3 ตัว
- * mobile: โลโก้ · ไอคอน 3 ตัว · ปุ่มเมนู → drawer ที่มีช่องค้นหา + เมนู + หมวดหมู่
+ * หัวเว็บฝั่งลูกค้า — มุมขวามีแค่ ตะกร้า + จุดสามจุด (เมนูบัญชี) ให้โล่ง
+ * mobile: ตะกร้า + ปุ่มเมนู → drawer รวมค้นหา · เมนูหลัก · บัญชี · หมวดหมู่ (จุดสามจุดซ่อนไว้)
  */
 export function ShopHeader({
   storeName,
@@ -43,7 +37,6 @@ export function ShopHeader({
     setSeenPath(pathname);
     setOpen(false);
   }
-  const counts = { wishlist: wishlistCount, cart: cartCount };
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur">
@@ -73,26 +66,21 @@ export function ShopHeader({
         </div>
 
         <div className="ml-auto flex items-center md:ml-0">
-          {ACTIONS.map(({ href, label, Icon, countKey }) => {
-            const count = countKey ? counts[countKey] : 0;
-            const active = href === '/orders' ? pathname.startsWith('/order') : pathname.startsWith(href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                aria-label={count > 0 ? `${label} ${count} รายการ` : label}
-                title={label}
-                className={cn('relative flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-surface-alt', active ? 'text-brand' : 'text-ink')}
-              >
-                <Icon className="size-5" aria-hidden />
-                {count > 0 && (
-                  <span className="absolute top-0.5 right-0.5 min-w-4 rounded-full bg-accent px-1 text-center text-[10px] font-bold leading-4 text-white">
-                    {count > 99 ? '99+' : count}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+          <Link
+            href="/cart"
+            aria-label={cartCount > 0 ? `ตะกร้า ${cartCount} ชิ้น` : 'ตะกร้า'}
+            title="ตะกร้า"
+            className={cn('relative flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-surface-alt', pathname.startsWith('/cart') ? 'text-brand' : 'text-ink')}
+          >
+            <ShoppingCart className="size-5" aria-hidden />
+            {cartCount > 0 && (
+              <span className="absolute top-0.5 right-0.5 min-w-4 rounded-full bg-accent px-1 text-center text-[10px] font-bold leading-4 text-white">
+                {cartCount > 99 ? '99+' : cartCount}
+              </span>
+            )}
+          </Link>
+
+          <AccountMenu wishlistCount={wishlistCount} className="hidden md:block" />
 
           <button
             type="button"
@@ -116,10 +104,14 @@ export function ShopHeader({
               {item.label}
             </Link>
           ))}
-          {ACTIONS.map(({ href, label, Icon }) => (
+        </nav>
+        <p className="mt-3 px-3 text-xs font-semibold tracking-wide text-muted uppercase">บัญชี</p>
+        <nav aria-label="เมนูบัญชี (มือถือ)" className="mt-1 flex flex-col">
+          {ACCOUNT_ITEMS.map(({ href, label, Icon }) => (
             <Link key={href} href={href} className="flex items-center gap-2 rounded-lg px-3 py-2.5 font-medium hover:bg-surface-alt">
               <Icon className="size-4 text-muted" aria-hidden />
               {label}
+              {href === '/wishlist' && wishlistCount > 0 && <span className="ml-auto rounded-full bg-accent-soft px-2 text-xs font-semibold text-accent">{wishlistCount}</span>}
             </Link>
           ))}
         </nav>

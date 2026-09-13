@@ -55,7 +55,7 @@ src/app/(shop)/       หน้าร้าน · src/app/admin/(app)/ หลั
 - client component ที่ใช้เวลาปัจจุบัน ให้รับ `serverNow`/`initial` จาก server เพื่อกัน hydration mismatch
 - **ห้ามใช้ emoji เป็นไอคอน** (พี่ต่อไม่เอา) ใช้ `lucide-react` · ไอคอนเมนูหลังบ้านเป็นชื่อใน roles.ts map ที่ `components/admin/icons.tsx` · ไอคอนประเภทโปรที่ `components/shop/promo-type-icon.tsx`
 - **ไม่ใส่ลูกศร →/← ท้ายหรือหน้าเมนู/ลิงก์/ปุ่ม** (พี่ต่อสั่งเอาออกทั้งหมด)
-- header ลูกค้า: ไอคอนมุมขวาเรียง wishlist · cart · profile(→ /orders) ทุกจอ
+- header ลูกค้ามุมขวา: **ตะกร้า + จุดสามจุดแนวตั้ง** (AccountMenu: โปรไฟล์ `/account` · รายการโปรด · ประวัติการสั่งซื้อ `/orders`) — พี่ต่อบอก 3 ไอคอนเรียงกันรกไป · มือถือซ่อนจุดสามจุด ย้ายรายการเข้า drawer
 - การ์ดสินค้า: แถวล่าง = ราคา · หัวใจ · ใส่ตะกร้า (QuickAddButton ใส่ 1 ชิ้นจากหน้ารายการได้เลย) — ปุ่มอยู่นอก `<Link>`
 - สไตล์ input/select/textarea อยู่ใน `globals.css` — ไม่ใส่ class ซ้ำที่ element
 - comment ในโค้ดเป็นภาษาไทย อธิบาย "ทำไม" ไม่ใช่ "ทำอะไร"

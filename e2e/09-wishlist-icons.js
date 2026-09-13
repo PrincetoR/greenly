@@ -9,22 +9,35 @@ const GRANOLA = '/product/กราโนล่าน้ำผึ้งอัล
   fs.writeFileSync(`${DATA}/wishlists.json`, '{}\n');
   let { browser, ctx, page } = await launch();
 
-  // header: 3 ไอคอนเรียงถูกลำดับ มุมขวา เป็น svg
+  // header มุมขวา: ตะกร้า + จุดสามจุด (เมนูบัญชี) เท่านั้น · เมนูภาษาไทย 3 รายการ
   await page.goto(`${BASE}/`);
-  const order = await page.locator('header a[title]').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
-  ok(JSON.stringify(order) === JSON.stringify(['/wishlist', '/cart', '/orders']), `header icons order: ${order.join(' · ')}`);
-  ok((await page.locator('header svg').count()) >= 5, 'header uses svg icons');
+  ok((await page.locator('header a[title]').count()) === 1 && (await page.locator('header a[title="ตะกร้า"]').isVisible()), 'header icon: มีแค่ตะกร้า');
+  ok(await page.locator('header button[aria-label="เมนูบัญชี"]').isVisible(), 'header: ปุ่มจุดสามจุด');
+  ok((await page.locator('[role=menu]').count()) === 0, 'เมนูปิดอยู่ตอนแรก');
+  await page.click('header button[aria-label="เมนูบัญชี"]');
+  const items = await page.locator('[role=menu] [role=menuitem]').allTextContents();
+  ok(JSON.stringify(items.map((t) => t.trim())) === JSON.stringify(['โปรไฟล์', 'รายการโปรด', 'ประวัติการสั่งซื้อ']), `เมนู: ${items.join(' · ')}`);
+  await page.keyboard.press('Escape');
+  ok((await page.locator('[role=menu]').count()) === 0, 'Esc ปิดเมนู');
+  await page.click('header button[aria-label="เมนูบัญชี"]');
+  await page.click('[role=menuitem]:has-text("โปรไฟล์")');
+  await page.waitForURL(/\/account$/);
+  ok(await page.locator('h1').isVisible(), 'โปรไฟล์ → /account');
+  await page.goto(`${BASE}/`);
+  ok((await page.locator('header svg').count()) >= 4, 'header uses svg icons');
   const headerText = await page.textContent('header');
   ok(!EMOJI.test(headerText), 'header has no emoji');
-  const rightX = await page.locator('header a[title="บัญชีของฉัน"]').evaluate((a) => a.getBoundingClientRect().right);
+  const rightX = await page.locator('header button[aria-label="เมนูบัญชี"]').evaluate((a) => a.getBoundingClientRect().right);
   ok(rightX > 1100, `icons at right edge (x=${Math.round(rightX)})`);
 
   // heart on card → wishlist page
   const card = page.locator('a[href^="/product/"]', { hasText: 'กราโนล่า' }).first();
   const heart = card.locator('xpath=..').locator('button[aria-label="เพิ่มในรายการโปรด"]');
   await heart.click();
-  await page.waitForFunction(() => document.querySelector('header a[title="รายการโปรด"] span')?.textContent === '1');
-  ok(true, 'heart on card → wishlist badge = 1');
+  await page.click('header button[aria-label="เมนูบัญชี"]');
+  await page.waitForFunction(() => document.querySelector('[role=menu] a[href="/wishlist"] span:last-child')?.textContent === '1');
+  ok(true, 'heart on card → เมนูรายการโปรดนับ 1');
+  await page.keyboard.press('Escape');
   ok(new URL(page.url()).pathname === '/', 'clicking heart did not navigate to product');
   await page.goto(`${BASE}/wishlist`);
   ok((await page.locator('a[href^="/product/"]').count()) === 1 && (await page.locator('text=กราโนล่า').count()) >= 1, 'wishlist page shows granola');
@@ -36,10 +49,10 @@ const GRANOLA = '/product/กราโนล่าน้ำผึ้งอัล
   const bigBtn = page.locator('button[aria-pressed="true"]:visible').first();
   ok((await bigBtn.textContent()).includes('อยู่ในรายการโปรด'), 'product page shows "อยู่ในรายการโปรด"');
   await bigBtn.click();
-  await page.waitForFunction(() => !document.querySelector('header a[title="รายการโปรด"] span'));
-  ok(true, 'toggle off → badge gone');
+  await page.waitForSelector('button[aria-pressed="false"]:visible');
+  ok(true, 'toggle off');
   await page.locator('button[aria-pressed="false"]:visible').first().click();
-  await page.waitForFunction(() => document.querySelector('header a[title="รายการโปรด"] span')?.textContent === '1');
+  await page.waitForSelector('button[aria-pressed="true"]:visible');
 
   // persists after browser restart
   const state = await ctx.storageState();
@@ -53,7 +66,7 @@ const GRANOLA = '/product/กราโนล่าน้ำผึ้งอัล
   // no emoji / arrows anywhere in visible UI (shop + admin)
   const { login } = require('./lib');
   const bad = [];
-  for (const path of ['/', '/products', '/promotions', '/cart', '/orders', '/wishlist', GRANOLA]) {
+  for (const path of ['/', '/products', '/promotions', '/cart', '/orders', '/wishlist', '/account', GRANOLA]) {
     await page.goto(BASE + path);
     const t = await page.evaluate(() => document.body.innerText);
     if (EMOJI.test(t)) bad.push(`${path}: emoji`);
@@ -72,7 +85,9 @@ const GRANOLA = '/product/กราโนล่าน้ำผึ้งอัล
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto(`${BASE}/`);
   ok((await page.evaluate(() => document.documentElement.scrollWidth)) <= 375, 'mobile no h-scroll');
-  ok((await page.locator('header a[title]').count()) === 3 && (await page.locator('button[aria-label="เปิดเมนู"]').isVisible()), 'mobile: 3 icons + menu button');
+  ok((await page.locator('header a[title]').count()) === 1 && !(await page.locator('header button[aria-label="เมนูบัญชี"]').isVisible()) && (await page.locator('button[aria-label="เปิดเมนู"]').isVisible()), 'mobile: ตะกร้า + ปุ่มเมนู (ซ่อนจุดสามจุด)');
+  await page.click('button[aria-label="เปิดเมนู"]');
+  ok((await page.locator('#mobile-menu a[href="/account"]').count()) === 1 && (await page.locator('#mobile-menu a[href="/wishlist"]').count()) === 1, 'drawer มือถือมีเมนูบัญชีครบ');
   await page.screenshot({ path: `${require('./lib').SHOT}/p10-mobile-header.png`, caret: 'initial' });
   await browser.close();
   fs.writeFileSync(`${DATA}/wishlists.json`, '{}\n');

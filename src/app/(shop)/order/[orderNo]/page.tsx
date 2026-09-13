@@ -37,7 +37,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
           <OrderLookupForm orderNo={order.orderNo} compact />
         </div>
         <Link href="/orders" className="mt-4 block text-sm text-muted hover:text-ink">
-          คำสั่งซื้อของฉัน
+          ประวัติการสั่งซื้อ
         </Link>
       </div>
     );
@@ -137,7 +137,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
           เลือกซื้อสินค้าต่อ
         </Link>
         <Link href="/orders" className={buttonStyles({ variant: 'secondary' })}>
-          คำสั่งซื้อของฉัน
+          ประวัติการสั่งซื้อ
         </Link>
       </div>
     </div>

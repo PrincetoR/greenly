@@ -57,10 +57,11 @@ const cartBadge = async (page) => (await page.locator('header a[href="/cart"] sp
   ok((await cartBadge(page)) === '0', 'ตะกร้าว่างหลังสั่งซื้อ');
   await page.screenshot({ path: `${require('./lib').SHOT}/p9-my-orders.png`, fullPage: true, caret: 'initial' });
   // header icon + mobile nav
-  ok(await page.locator('header a[title="บัญชีของฉัน"]').isVisible(), 'header มีไอคอนบัญชี/คำสั่งซื้อ');
+  await page.click('button[aria-label="เมนูบัญชี"]');
+  ok(await page.locator('[role=menu] a[href="/orders"]:has-text("ประวัติการสั่งซื้อ")').isVisible(), 'เมนูจุดสามจุดมี "ประวัติการสั่งซื้อ"');
   await page.setViewportSize({ width: 375, height: 800 });
   await page.click('button[aria-label="เปิดเมนู"]');
-  ok(await page.locator('#mobile-menu a[href="/orders"]').isVisible(), 'drawer มือถือมีเมนูคำสั่งซื้อของฉัน');
+  ok(await page.locator('#mobile-menu a[href="/orders"]').isVisible(), 'drawer มือถือมีเมนูประวัติการสั่งซื้อ');
   const stateA2 = await ctx.storageState();
   await browser.close();
 

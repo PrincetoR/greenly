@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { buttonStyles } from '@/components/ui/button';
 import { Package } from 'lucide-react';
 
-export const metadata = { title: 'คำสั่งซื้อของฉัน' };
+export const metadata = { title: 'ประวัติการสั่งซื้อ' };
 
 /**
  * ประวัติสั่งซื้อของเบราว์เซอร์นี้ (guest id) — ไม่ต้อง login
@@ -22,7 +22,7 @@ export default async function MyOrdersPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-2xl font-bold sm:text-3xl">คำสั่งซื้อของฉัน</h1>
+      <h1 className="text-2xl font-bold sm:text-3xl">ประวัติการสั่งซื้อ</h1>
       <p className="mt-1 text-sm text-muted">ระบบจำเครื่องนี้ไว้ให้โดยไม่ต้องสมัครสมาชิก — คำสั่งซื้อที่ทำจากเครื่องนี้จะแสดงที่นี่</p>
 
       {orders.length === 0 ? (
