@@ -71,13 +71,13 @@ export function ProductListing({
           <p className="flex h-10 items-center px-2 text-lg font-bold">หมวดหมู่สินค้า</p>
           {/* เส้นคั่นอยู่ที่ 40px = ขอบล่างช่องค้นหา · เว้น 15px ให้ "ทั้งหมด" เริ่มที่ 56 = ขอบบนการ์ดสินค้า */}
           <div className="mb-[15px] border-t border-line" aria-hidden />
-          <ul className="flex flex-col gap-0.5">
+          <ul className="flex flex-col gap-1">
             {links.map((l) => (
               <li key={l.href}>
                 <Link
                   href={l.href}
                   aria-current={l.active ? 'page' : undefined}
-                  className={cn('block rounded-lg px-3 py-1.5 text-sm font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
+                  className={cn('block rounded-lg px-3 py-2 text-[15px] font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
                 >
                   {l.label}
                 </Link>
