@@ -22,6 +22,11 @@ const { BASE, launch, ok, shot } = require('./lib');
   ok(Math.abs(h1Box.y + h1Box.height / 2 - (sortBox.y + sortBox.height / 2)) <= 1, 'หัวข้อกับปุ่มเรียงลำดับอยู่แถวเดียวกัน');
   const searchBox = await page.locator('main input[aria-label="ค้นหา"]').boundingBox();
   ok(searchBox.x + searchBox.width < sortBox.x && sortBox.x - (searchBox.x + searchBox.width) <= 12, 'ช่องค้นหาติดกับเรียงลำดับ');
+  // ค้นหา = ขอบซ้ายการ์ด 3 → กึ่งกลางการ์ด 4 · เรียงลำดับ = ครึ่งหลังการ์ด 4
+  const row = (await page.locator('main .group').evaluateAll((cs) => cs.map((c) => c.getBoundingClientRect()))).slice(0, 4);
+  ok(Math.abs(searchBox.x - row[2].x) < 0.5, `ขอบซ้ายช่องค้นหา = ขอบซ้ายการ์ด 3 (${searchBox.x} = ${row[2].x})`);
+  ok(Math.abs(searchBox.x + searchBox.width - (row[3].x + row[3].width / 2)) < 0.5, 'ขอบขวาช่องค้นหา = กึ่งกลางการ์ด 4');
+  ok(Math.abs(sortBox.x + sortBox.width - (row[3].x + row[3].width)) < 0.5, 'ขอบขวาเรียงลำดับ = ขอบขวาการ์ด 4');
   const headerBottom = await page.locator('header').evaluate((h) => h.getBoundingClientRect().bottom);
   ok((await page.locator('main aside nav').boundingBox()).y - headerBottom === 16, 'ระยะ header → เนื้อหา 16px');
   const pill = await page.locator('header nav[aria-label="เมนูหลัก"] a[href="/products"]').boundingBox();

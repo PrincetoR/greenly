@@ -1,9 +1,10 @@
 /** ตัวเลือกเรียงลำดับ — pure module ใช้ทั้ง server (page) และ client (toolbar) */
+/** label = ในรายการเลือก · short = บนปุ่ม (ช่องแคบ = ครึ่งการ์ด) */
 export const SORT_OPTIONS = [
-  { value: 'newest', label: 'ใหม่ล่าสุด' },
-  { value: 'price-asc', label: 'ราคาต่ำไปสูง' },
-  { value: 'price-desc', label: 'ราคาสูงไปต่ำ' },
-  { value: 'name', label: 'ชื่อ ก–ฮ' },
+  { value: 'newest', label: 'ใหม่ล่าสุด', short: 'ล่าสุด' },
+  { value: 'price-asc', label: 'ราคาต่ำไปสูง', short: 'ราคาต่ำ' },
+  { value: 'price-desc', label: 'ราคาสูงไปต่ำ', short: 'ราคาสูง' },
+  { value: 'name', label: 'ชื่อ ก–ฮ', short: 'ชื่อ' },
 ] as const;
 export type SortValue = (typeof SORT_OPTIONS)[number]['value'];
 

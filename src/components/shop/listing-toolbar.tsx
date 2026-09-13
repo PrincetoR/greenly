@@ -56,14 +56,20 @@ export function ListingToolbar({
   }, []);
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    /*
+     * จอ md+: ใช้ grid คอลัมน์เดียวกับกริดสินค้า (md 3 / lg 4 คอลัมน์ gap 16) ให้ทุกขอบตรงกับการ์ด
+     * lg: หัวข้อ = การ์ด 1–2 · [ค้นหา+เรียง] = การ์ด 3–4 โดยค้นหาจบที่กึ่งกลางการ์ด 4 (75% ของช่วง + 4px = ครึ่ง gap)
+     *     และเรียงลำดับกินครึ่งหลังของการ์ด 4 (เว้น 8px จากค้นหา)
+     * md: หัวข้อ = การ์ด 1 · [ค้นหา+เรียง] = การ์ด 2–3 แบ่งแบบเดียวกัน
+     */
+    <div className="flex flex-wrap items-center gap-2 md:grid md:grid-cols-3 md:gap-4 lg:grid-cols-4">
       <div className="w-full md:hidden">
         <CategorySelect options={categoryOptions} value={currentCategoryHref} />
       </div>
 
       {/* หัวข้อ: กำลังเปิดอะไรอยู่ (ทั้งหมด / ชื่อหมวด / ผลค้นหา) + จำนวน */}
       {/* items-baseline: "24 รายการ" นั่งบนเส้นฐานเดียวกับหัวข้อ (ไม่ใช่กึ่งกลาง) */}
-      <div className="flex h-10 min-w-0 basis-full items-baseline gap-2 sm:flex-1 sm:basis-auto">
+      <div className="flex h-10 min-w-0 basis-full items-baseline gap-2 md:col-span-1 md:basis-auto lg:col-span-2">
         {/*
          * line-height เต็มแถว 40px — truncate ใช้ overflow:hidden ถ้าบรรทัดเตี้ยกว่านั้น
          * วรรณยุกต์/สระบนของไทย (เช่น ไม้โทใน "ทั้ง") จะถูกตัดหัว
@@ -73,7 +79,8 @@ export function ListingToolbar({
         {description && <span className="hidden truncate text-sm text-muted lg:inline">· {description}</span>}
       </div>
 
-      <div className="relative min-w-0 flex-1 sm:flex-none sm:basis-64">
+      <div className="flex min-w-0 flex-1 basis-full items-center gap-2 md:col-span-2 md:grid md:grid-cols-[calc(75%+4px)_1fr] md:gap-2">
+      <div className="relative min-w-0 flex-1 md:flex-none">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
         <input
           type="search"
@@ -100,6 +107,7 @@ export function ListingToolbar({
       </div>
 
       <SortMenu value={sort} onChange={(v) => navigate(term, v)} />
+      </div>
     </div>
   );
 }
@@ -126,7 +134,7 @@ function SortMenu({ value, onChange }: { value: SortValue; onChange: (v: SortVal
   }, [open]);
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative min-w-0">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -135,11 +143,11 @@ function SortMenu({ value, onChange }: { value: SortValue; onChange: (v: SortVal
         aria-label={`เรียงลำดับ: ${current.label}`}
         className={cn(
           // ใช้ border จริง (อยู่ในกล่อง) ไม่ใช่ ring (วาดนอกกล่อง) ให้สูงเท่าช่องค้นหาเป๊ะ 40px
-          'flex h-10 items-center gap-2 rounded-lg border border-line px-3 text-sm font-medium transition-colors hover:bg-surface-alt',
+          'flex h-10 w-full items-center gap-1 rounded-lg border border-line px-2.5 text-sm font-medium transition-colors hover:bg-surface-alt',
           open ? 'bg-surface-alt' : 'bg-surface',
         )}
       >
-        <span>{current.label}</span>
+        <span className="min-w-0 flex-1 truncate text-left">{current.short}</span>
         <ChevronDown className={cn('size-4 text-muted transition-transform', open && 'rotate-180')} aria-hidden />
       </button>
 
