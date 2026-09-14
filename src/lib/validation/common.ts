@@ -37,6 +37,10 @@ export const intInput = (opts: { min?: number; max?: number; label: string }) =>
     });
 
 /** checkbox ใน FormData มาเป็น "on" หรือไม่มีเลย */
+/** รูปที่อัปโหลด: path ในเว็บ /uploads/… (เครื่อง) หรือ URL Vercel Blob (deploy) */
+export const UPLOADED_IMAGE = /^(\/uploads\/|https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/)/;
+export const isUploadedImage = (v: string) => UPLOADED_IMAGE.test(v);
+
 export const checkbox = z.preprocess((v) => v === 'on' || v === 'true' || v === true, z.boolean());
 
 export const slugInput = z

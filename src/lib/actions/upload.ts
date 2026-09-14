@@ -3,6 +3,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
+import { put } from '@vercel/blob';
 import { requirePermission } from '@/lib/auth/session';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
@@ -17,8 +18,8 @@ const ALLOWED: Record<string, string> = {
 export type UploadResult = { ok: true; path: string } | { ok: false; error: string };
 
 /**
- * รับไฟล์รูปจาก ImageUploader แล้วเขียนลง public/uploads/
- * ชื่อไฟล์สุ่มใหม่เสมอ ไม่ใช้ชื่อเดิมจากเครื่องผู้ใช้ กัน path traversal และชื่อชนกัน
+ * รับไฟล์รูปจาก ImageUploader — ในเครื่องเขียนลง public/uploads/ · บน Vercel (มี BLOB_READ_WRITE_TOKEN) อัปขึ้น Vercel Blob แล้วคืน URL เต็ม
+ * (filesystem ของ Vercel เขียนไม่ได้) · ชื่อไฟล์สุ่มใหม่เสมอ ไม่ใช้ชื่อเดิมจากเครื่องผู้ใช้ กัน path traversal และชื่อชนกัน
  */
 export async function uploadImage(formData: FormData): Promise<UploadResult> {
   await requirePermission('catalog.manage');
@@ -29,6 +30,10 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
   if (file.size > MAX_BYTES) return { ok: false, error: 'ไฟล์ใหญ่เกิน 5 MB' };
 
   const name = `${Date.now().toString(36)}-${randomBytes(4).toString('hex')}.${ext}`;
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const blob = await put(`uploads/${name}`, file, { access: 'public', contentType: file.type });
+    return { ok: true, path: blob.url };
+  }
   await mkdir(UPLOAD_DIR, { recursive: true });
   await writeFile(path.join(UPLOAD_DIR, name), Buffer.from(await file.arrayBuffer()));
   return { ok: true, path: `/uploads/${name}` };

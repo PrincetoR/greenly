@@ -66,3 +66,15 @@ npm run e2e          # e2e ทุกไฟล์ (ต้องมี dev server 
 - **ตัด stock แบบ all-or-nothing** รวมของแถม
 - **ลูกค้าไม่ต้อง login** — cookie `ec_guest` (1 ปี) ผูกตะกร้า (`data/carts.json`) รายการโปรด (`data/wishlists.json`) และคำสั่งซื้อ (`order.guestIds`) · เปลี่ยนเครื่องแล้วยืนยันด้วยเลขที่ + เบอร์โทร ระบบจะผูกเครื่องใหม่ให้
 - `SESSION_SECRET` ใน `.env` สำหรับใช้จริง (ดู `.env.example`)
+
+## Deploy บน Vercel
+
+filesystem ของ Vercel เขียนไม่ได้ (ใส่ตะกร้า/สั่งซื้อ/บันทึกหลังบ้านจะ error) ต้องต่อที่เก็บข้อมูลภายนอก 2 อย่างจาก Vercel Marketplace — โค้ดสลับ driver ให้เองตาม env:
+
+| ตั้งค่า | ที่ Vercel | env ที่ได้ | ใช้ทำอะไร |
+|---|---|---|---|
+| **Neon** (Postgres) | Project → Storage → Create Database → Neon | `DATABASE_URL` | เก็บ collection JSON ทั้งหมด (ตาราง `collections` สร้างเอง) · ยังไม่มีข้อมูล = ใช้ไฟล์ seed ใน `data/` ให้ก่อน |
+| **Blob** | Project → Storage → Create → Blob | `BLOB_READ_WRITE_TOKEN` | รูปที่อัปโหลดจากหลังบ้าน (แทน `public/uploads/`) |
+| `SESSION_SECRET` | Settings → Environment Variables | — | ลายเซ็น cookie login |
+
+ตั้งแล้ว **Redeploy** หนึ่งครั้ง · รีเซ็ตข้อมูลสาธิตบน Vercel = ลบแถวในตาราง `collections` (จะกลับไปใช้ไฟล์ seed) · ในเครื่องยังใช้ไฟล์ `data/*.json` เหมือนเดิม ไม่ต้องตั้งอะไร

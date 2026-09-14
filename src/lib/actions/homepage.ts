@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { requirePermission } from '@/lib/auth/session';
 import { deleteSlide as dbDeleteSlide, saveAutoplay, savePopup as dbSavePopup, upsertSlide } from '@/lib/db/homepage';
-import { checkbox, fieldErrors, formValues, intInput, type FormState } from '@/lib/validation/common';
+import { UPLOADED_IMAGE, checkbox, fieldErrors, formValues, intInput, type FormState } from '@/lib/validation/common';
 
 /** path ในเว็บ (/…) หรือ URL http(s) · ว่าง = ไม่ลิงก์ */
 const hrefInput = z
@@ -13,7 +13,7 @@ const hrefInput = z
   .trim()
   .max(500)
   .refine((v) => v === '' || v.startsWith('/') || /^https?:\/\//.test(v), 'ต้องขึ้นต้นด้วย / หรือ https://');
-const imageInput = z.string().trim().regex(/^\/uploads\//, 'กรุณาอัปโหลดรูป');
+const imageInput = z.string().trim().regex(UPLOADED_IMAGE, 'กรุณาอัปโหลดรูป');
 
 const slideSchema = z.object({
   image: imageInput,
