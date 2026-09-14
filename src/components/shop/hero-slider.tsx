@@ -29,12 +29,13 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
 
   /*
    * โครงแบบ Shopee: แถบพื้นขาวสุดจอ (ต่อจากเส้นขอบล่างของ header — ไม่มีเส้นบนของตัวเอง) มีเส้นขอบล่าง · รูปชิดเส้น header เลยไม่เว้นบน (พี่ต่อสั่ง) เว้นล่าง 16
-   * ข้างในจัดตามคอนเทนเนอร์ [สไลด์ใหญ่ 2 ส่วน | ภาพเล็ก 2 ช่องซ้อนแนวตั้ง 1 ส่วน] · สูงคงที่บนจอ md+ ให้ 2 ช่องขวารวมกันเท่าสไลด์พอดี
+   * ข้างในจัดตามคอนเทนเนอร์ [สไลด์ใหญ่ 2 ส่วน | ภาพเล็ก 2 ช่องซ้อนแนวตั้ง 1 ส่วน]
+   * ความสูงแถวมาจากภาพเล็ก (aspect 2:1 พอดีรูป ไม่โดนครอปหัว/ท้าย — พี่ต่อเห็นหัวรูปจม 2px) · สไลด์ยืดเท่าแถวแล้วครอปข้างแทน
    * มือถือ: สไลด์เต็มแถว ภาพเล็กเรียง 2 คอลัมน์ข้างล่าง
    */
   // will-change: opacity ให้ compositor แยกเลเยอร์ — จางตามการเลื่อนได้ลื่นโดยไม่วาดรูปใหม่ทุกเฟรม
   return (
-    <div data-hero-content className={cn('mx-auto grid max-w-6xl gap-3 px-4 pb-4 will-change-[opacity]', sides.length > 0 && 'md:h-[372px] md:grid-cols-[2fr_1fr]')}>
+    <div data-hero-content className={cn('mx-auto grid max-w-6xl gap-3 px-4 pb-4 will-change-[opacity]', sides.length > 0 && 'md:grid-cols-[2fr_1fr]')}>
       <section
         // มุมบนไม่มน — ชิดเส้น header พอดี
         className={cn('group relative aspect-[16/9] overflow-hidden rounded-lg rounded-t-none bg-ink md:aspect-auto', sides.length === 0 ? 'md:aspect-[8/3]' : 'md:h-full')}
@@ -112,7 +113,7 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
       </section>
 
       {sides.length > 0 && (
-        <div className={cn('grid gap-3', sides.length === 2 ? 'grid-cols-2 md:grid-cols-1 md:grid-rows-2' : 'grid-cols-1')} aria-label="แบนเนอร์เล็ก">
+        <div className={cn('grid gap-3', sides.length === 2 ? 'grid-cols-2 md:grid-cols-1' : 'grid-cols-1')} aria-label="แบนเนอร์เล็ก">
           {sides.map((b, i) => (
             <SideBanner key={b.id} banner={b} flushTop={i === 0} />
           ))}
@@ -136,7 +137,7 @@ function SideBanner({ banner: b, flushTop }: { banner: HeroSlide; flushTop: bool
     </>
   );
   // ใบบนสุดชิดเส้น header → มุมบนไม่มน (เฉพาะจอ md+ ที่อยู่แถวเดียวกับสไลด์)
-  const cls = cn('group/side relative block aspect-[2/1] overflow-hidden rounded-lg bg-ink md:aspect-auto md:h-full', flushTop && 'md:rounded-t-none');
+  const cls = cn('group/side relative block aspect-[2/1] overflow-hidden rounded-lg bg-ink', flushTop && 'md:rounded-t-none');
   if (!b.href) return <div className={cls}>{body}</div>;
   return b.href.startsWith('/') ? (
     <Link href={b.href} className={cls}>

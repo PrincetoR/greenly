@@ -3,66 +3,76 @@
 import { useEffect } from 'react';
 
 /**
- * หน้าแรก (จอ md+): หมุนล้อเมาส์นิดเดียวก็เลื่อนไปกลุ่มถัดไป/ก่อนหน้าทันที (แบบ fullpage)
- * เบราว์เซอร์เอง snap ไป "จุดที่ใกล้ที่สุด" หลังหยุดหมุน → หมุนน้อยจะเด้งกลับที่เดิม พี่ต่อบอกว่าต้องหมุนเยอะไป จึงจัดการเอง:
- *  จุดหยุด = บนสุด · หัวข้อแต่ละกลุ่ม (ตรงกับ scroll-margin-top ของ .snap-section) · ล่างสุด
- *  ล็อกระหว่างแอนิเมชัน ~700ms กันทัชแพดที่ยิง wheel ถี่ ๆ เลื่อนข้ามหลายกลุ่ม · กลุ่มที่สูงเกินจอปล่อยให้เลื่อนปกติ
+ * หน้าแรก (จอ md+ ที่มีเมาส์/ทัชแพด): เลื่อนตามมือได้อิสระ พอหยุดค่อย "เกลี่ย" ไปหัวกลุ่มที่เลื่อนไปถึง
+ *  · ทิศลง → กลุ่มถัดไปข้างหน้า (เลื่อนแค่นิดเดียวก็ไปต่อ ไม่เด้งกลับ) · ทิศขึ้น → กลุ่มก่อนหน้า
+ *  · ถ้าเพิ่งผ่านหัวกลุ่มมาไม่เกิน 24px ถือว่าถึงกลุ่มนั้นแล้ว · ห่างเกินหนึ่งจอ (กลุ่มสูงมาก) ไม่บังคับ
+ * ปิด scroll-snap ของเบราว์เซอร์ (class wheel-snap) เพราะแบบ mandatory เด้งกลับจุดใกล้สุด พี่ต่อไม่ชอบ · จอสัมผัสยังใช้ CSS snap
  */
 export function SnapWheel() {
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 48rem)');
-    // มีเมาส์/ทัชแพด (pointer: fine) → ปิด snap ของเบราว์เซอร์ ให้ JS คุมคนเดียว ไม่งั้นสองระบบแย่งกันตอนจบแอนิเมชันแล้วกระตุก · จอสัมผัสยังใช้ snap ของเบราว์เซอร์
     const fine = window.matchMedia('(pointer: fine)');
     const root = document.documentElement;
-    const applyMode = () => root.classList.toggle('wheel-snap', mq.matches && fine.matches);
+    const active = () => mq.matches && fine.matches;
+    const applyMode = () => root.classList.toggle('wheel-snap', active());
     applyMode();
     mq.addEventListener('change', applyMode);
     fine.addEventListener('change', applyMode);
-    let locked = false;
-    let unlock = 0;
+
+    let lastY = window.scrollY;
+    let settling = false;
+    let timer = 0;
+    const SLACK = 24;
 
     const targets = () => {
       const tops = [...document.querySelectorAll<HTMLElement>('.snap-section')].map((el) => Math.round(el.getBoundingClientRect().top + window.scrollY - parseFloat(getComputedStyle(el).scrollMarginTop || '0')));
-      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
       return [...new Set([0, ...tops, max])].filter((t) => t >= 0 && t <= max).sort((a, b) => a - b);
     };
 
-    const onWheel = (e: WheelEvent) => {
-      if (!mq.matches || e.ctrlKey) return;
-      if (locked) {
-        e.preventDefault();
-        return;
-      }
-      if (Math.abs(e.deltaY) < 4) return;
+    const settle = () => {
+      if (!active() || settling) return;
       const y = window.scrollY;
+      const dir = Math.sign(y - lastY);
+      lastY = y;
+      if (dir === 0) return;
       const list = targets();
-      const down = e.deltaY > 0;
-      // กลุ่มปัจจุบันสูงเกินจอและยังมีส่วนที่ซ่อนอยู่ในทิศที่จะเลื่อน → ปล่อยให้เลื่อนปกติ
-      const idx = list.reduce((best, t, i) => (t <= y + 1 ? i : best), 0);
-      const next = list[idx + 1];
-      if (down && next !== undefined && next - y > window.innerHeight - 40) return;
-      const target = down ? next : [...list].reverse().find((t) => t < y - 1);
-      if (target === undefined) return;
-      e.preventDefault();
-      locked = true;
+      // ลง: จุดแรกที่ ≥ y − SLACK (ผ่านมานิดเดียวถือว่าถึงแล้ว) · ขึ้น: จุดสุดท้ายที่ ≤ y + SLACK
+      const target = dir > 0 ? list.find((t) => t >= y - SLACK) : [...list].reverse().find((t) => t <= y + SLACK);
+      if (target === undefined || Math.abs(target - y) < 1 || Math.abs(target - y) > window.innerHeight) return;
+      settling = true;
       window.scrollTo({ top: target, behavior: 'smooth' });
-      clearTimeout(unlock);
-      unlock = window.setTimeout(() => (locked = false), 700);
-      // ถึงจุดหมายแล้วปักตำแหน่งให้ตรงพิกเซล (กันค้าง .5px จาก smooth scroll)
-      const settle = () => {
-        window.removeEventListener('scrollend', settle);
+      const done = () => {
+        window.removeEventListener('scrollend', done);
+        clearTimeout(guard);
         if (Math.abs(window.scrollY - target) < 2 && window.scrollY !== target) window.scrollTo({ top: target });
+        lastY = window.scrollY;
+        // ปล่อยหลังเฟรมถัดไป กัน scroll event ท้าย ๆ ของแอนิเมชันเราเองไปเรียก settle ซ้ำ
+        requestAnimationFrame(() => (settling = false));
       };
-      window.addEventListener('scrollend', settle, { once: true });
+      window.addEventListener('scrollend', done, { once: true });
+      const guard = window.setTimeout(done, 900);
     };
 
-    window.addEventListener('wheel', onWheel, { passive: false });
+    // ใช้ scrollend ถ้ามี (Chrome/Firefox) · fallback หน่วง 150ms หลัง scroll สุดท้าย
+    const hasScrollEnd = 'onscrollend' in window;
+    const onScroll = () => {
+      if (settling || hasScrollEnd) return;
+      clearTimeout(timer);
+      timer = window.setTimeout(settle, 150);
+    };
+    const onScrollEnd = () => {
+      if (!settling) settle();
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    if (hasScrollEnd) window.addEventListener('scrollend', onScrollEnd);
     return () => {
-      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scrollend', onScrollEnd);
       mq.removeEventListener('change', applyMode);
       fine.removeEventListener('change', applyMode);
       root.classList.remove('wheel-snap');
-      clearTimeout(unlock);
+      clearTimeout(timer);
     };
   }, []);
   return null;
