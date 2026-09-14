@@ -118,6 +118,7 @@ const read = (n) => JSON.parse(fs.readFileSync(`${DATA}/${n}.json`, 'utf8'));
   await page.goto(`${BASE}/admin/products`);
   // มือถือหลังบ้าน: hamburger อย่างเดียว ไม่มีตะกร้า (พี่ต่อสั่ง 2026-09-15)
   ok(!(await page.locator('header a[href="/cart"]').isVisible()) && (await page.locator('button[aria-label="เปิดเมนู"]').isVisible()), 'mobile admin: hamburger อย่างเดียว ไม่มีตะกร้า');
+  ok((await page.locator('nav[aria-label="เมนูมือถือ"] a[href="/admin"][aria-current=page]').isVisible()) && (await page.locator('nav[aria-label="เมนูมือถือ"] a').count()) === 4, 'mobile admin: มีแถบเมนูล่าง · การจัดการ active');
   await page.click('button[aria-label="เปิดเมนู"]');
   ok(await page.locator('#mobile-menu a[href="/admin/orders"]').isVisible(), 'mobile drawer opens with menu');
   // staff login → แถบเมนูล่างหน้าร้านช่องขวาสุดเป็น การจัดการ

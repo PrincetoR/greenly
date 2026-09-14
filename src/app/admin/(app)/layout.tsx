@@ -3,6 +3,7 @@ import { visibleMenu } from '@/lib/auth/roles';
 import { ShopHeader } from '@/components/shop/header';
 import { loadShopHeaderProps } from '@/components/shop/header-data';
 import { AdminShell } from '@/components/admin/shell';
+import { MobileTabBar } from '@/components/shop/mobile-tabbar';
 
 /**
  * ชั้นที่สอง — proxy กันมาแล้วชั้นหนึ่ง แต่ layout ต้องตรวจกับ users.json จริงอีกที
@@ -20,6 +21,8 @@ export default async function AdminLayout({ children }: LayoutProps<'/admin'>) {
           {children}
         </AdminShell>
       </main>
+      {/* แถบเมนูล่างมือถือตัวเดียวกับหน้าร้าน — อยู่หลังบ้านช่องขวาสุด "การจัดการ" active (พี่ต่อถามว่าทำไมไม่แสดง 2026-09-15) */}
+      <MobileTabBar staff />
     </div>
   );
 }
