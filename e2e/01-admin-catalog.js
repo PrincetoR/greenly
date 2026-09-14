@@ -116,8 +116,15 @@ const read = (n) => JSON.parse(fs.readFileSync(`${DATA}/${n}.json`, 'utf8'));
   // mobile shell
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto(`${BASE}/admin/products`);
+  // มือถือหลังบ้าน: hamburger อย่างเดียว ไม่มีตะกร้า (พี่ต่อสั่ง 2026-09-15)
+  ok(!(await page.locator('header a[href="/cart"]').isVisible()) && (await page.locator('button[aria-label="เปิดเมนู"]').isVisible()), 'mobile admin: hamburger อย่างเดียว ไม่มีตะกร้า');
   await page.click('button[aria-label="เปิดเมนู"]');
   ok(await page.locator('#mobile-menu a[href="/admin/orders"]').isVisible(), 'mobile drawer opens with menu');
+  // staff login → แถบเมนูล่างหน้าร้านช่องขวาสุดเป็น การจัดการ
+  await page.goto(`${BASE}/`);
+  await page.waitForLoadState('networkidle');
+  ok((await page.locator('nav[aria-label="เมนูมือถือ"] a[href="/admin"][aria-label="การจัดการ"]').count()) === 1 && (await page.locator('nav[aria-label="เมนูมือถือ"] a[href="/account"]').count()) === 0, 'mobile: staff เห็นแท็บ การจัดการ แทนโปรไฟล์');
+  await page.goto(`${BASE}/admin/products`);
   await shot(page, 'p2-mobile-products');
   const sw = await page.evaluate(() => document.documentElement.scrollWidth);
   ok(sw <= 375, `no horizontal scroll on mobile (scrollWidth=${sw})`);

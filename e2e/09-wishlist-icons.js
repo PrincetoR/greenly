@@ -77,9 +77,9 @@ const GRANOLA = '/product/กราโนล่าน้ำผึ้งอัล
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto(`${BASE}/`);
   ok((await page.evaluate(() => document.documentElement.scrollWidth)) <= 375, 'mobile no h-scroll');
-  ok((await page.locator('header a[title]').count()) === 1 && !(await page.locator('nav[aria-label="แถบสถานะ"]').isVisible()) && (await page.locator('button[aria-label="เปิดเมนู"]').isVisible()), 'mobile: ตะกร้า + ปุ่มเมนู (ซ่อนแถบสถานะ)');
-  await page.click('button[aria-label="เปิดเมนู"]');
-  ok((await page.locator('#mobile-menu a[href="/account"]').count()) === 1 && (await page.locator('#mobile-menu a[href="/wishlist"]').count()) === 1, 'drawer มือถือมีเมนูบัญชีครบ');
+  ok((await page.locator('header a[title]').count()) === 1 && !(await page.locator('nav[aria-label="แถบสถานะ"]').isVisible()) && !(await page.locator('button[aria-label="เปิดเมนู"]').isVisible()), 'mobile: ตะกร้าอย่างเดียว ไม่มีปุ่มเมนู (ซ่อนแถบสถานะ)');
+  // ยัง login admin อยู่จากรอบก่อน → ช่องขวาสุดเป็น การจัดการ (guest จะเป็นโปรไฟล์ — ตรวจใน e2e/02)
+  ok((await page.locator('nav[aria-label="เมนูมือถือ"] a[href="/admin"]').count()) === 1, 'แถบเมนูล่าง: admin login เห็น การจัดการ');
   await page.screenshot({ path: `${require('./lib').SHOT}/p10-mobile-header.png`, caret: 'initial' });
   await browser.close();
   fs.writeFileSync(`${DATA}/wishlists.json`, '{}\n');

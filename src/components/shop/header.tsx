@@ -22,7 +22,9 @@ type NavItem = (typeof NAV)[number] | typeof STAFF_NAV;
 /**
  * หัวเว็บฝั่งลูกค้า
  * แถบสถานะบนสุด (แบบ Shopee, จอ md+): ขวา = รายการโปรด · ประวัติการสั่งซื้อ · ชื่อผู้ใช้ (หรือ guest) — เลื่อนไปกับหน้า
- * แถบหลัก (sticky): โลโก้ · เมนู · ตะกร้า (ขวาสุด) · มือถือมีปุ่มเมนู → drawer รวมเมนูหลัก · (เมนูหลังบ้านถ้าอยู่หน้า admin) · บัญชี · หมวดหมู่
+ * แถบหลัก (sticky): โลโก้ · เมนู · ตะกร้า (ขวาสุด)
+ * มือถือ (พี่ต่อสั่ง 2026-09-15): หน้าร้าน = ตะกร้าอย่างเดียว (นำทางด้วยแถบเมนูล่าง MobileTabBar) · หน้าหลังบ้าน = ปุ่มเมนู (hamburger) อย่างเดียว ไม่มีตะกร้า
+ * → drawer มือถือจึงเปิดได้เฉพาะหลังบ้าน: เมนูหลัก · เมนูหลังบ้าน · บัญชี · หมวดหมู่
  * หลังบ้านใช้ header ตัวนี้ด้วย — เมนู "การจัดการ" active และเส้นแนวตั้งตรงกับ card เมนูหลังบ้าน
  */
 export function ShopHeader({
@@ -50,6 +52,8 @@ export function ShopHeader({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const nav: readonly NavItem[] = isStaff ? [...NAV, STAFF_NAV] : NAV;
+  // อยู่หน้าหลังบ้าน (layout admin ส่งเมนูมา) → มือถือโชว์ hamburger แทนตะกร้า
+  const onAdmin = Boolean(adminItems);
 
   // ปิด drawer ทุกครั้งที่เปลี่ยนหน้า — ปรับ state ระหว่าง render ตามแนวทาง React แทน useEffect
   const [seenPath, setSeenPath] = useState(pathname);
@@ -124,7 +128,7 @@ export function ShopHeader({
             href="/cart"
             aria-label={cartCount > 0 ? `ตะกร้า ${cartCount} ชิ้น` : 'ตะกร้า'}
             title="ตะกร้า"
-            className={cn('relative flex size-9 items-center justify-center', pathname.startsWith('/cart') ? 'text-brand' : 'text-ink')}
+            className={cn('relative size-9 items-center justify-center', onAdmin ? 'hidden md:flex' : 'flex', pathname.startsWith('/cart') ? 'text-brand' : 'text-ink')}
           >
             <ShoppingCart className="size-5" aria-hidden />
             {cartCount > 0 && (
@@ -140,7 +144,7 @@ export function ShopHeader({
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? 'ปิดเมนู' : 'เปิดเมนู'}
-            className="flex size-9 items-center justify-center md:hidden"
+            className={cn('size-9 items-center justify-center md:hidden', onAdmin ? 'flex' : 'hidden')}
           >
             {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
           </button>

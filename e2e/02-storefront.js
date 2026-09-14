@@ -126,9 +126,9 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   await page.waitForLoadState('networkidle');
   ok((await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))) === 'ค้นหา' && (await page.locator('nav[aria-label="เมนูมือถือ"] a[aria-current=page]').getAttribute('aria-label')) === 'สินค้าทั้งหมด', 'mobile: ปุ่มค้นหา → /products โฟกัสช่องค้นหา · แท็บสินค้า active');
   await page.goto(`${BASE}/`);
-  await page.click('button[aria-label="เปิดเมนู"]');
-  ok(await page.locator('#mobile-menu a[href="/promotions"]').isVisible(), 'mobile drawer nav');
-  await page.screenshot({ path: SHOT + '/p3-mobile-home-menu.png', caret: 'initial' });
+  // มือถือหน้าร้าน: header มีแค่ตะกร้า ไม่มี hamburger (นำทางด้วยแถบเมนูล่าง) — พี่ต่อสั่ง 2026-09-15
+  ok((await page.locator('header a[href="/cart"]').isVisible()) && !(await page.locator('button[aria-label="เปิดเมนู"]').isVisible()), 'mobile: header หน้าร้าน = ตะกร้าอย่างเดียว ไม่มี hamburger');
+  await page.screenshot({ path: SHOT + '/p3-mobile-home.png', caret: 'initial' });
 
   await browser.close();
 })().catch((e) => { console.error('💥', e); process.exit(1); });

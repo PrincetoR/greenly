@@ -24,11 +24,14 @@ const { BASE, launch, login, ok } = require('./lib');
   await page.goto(`${BASE}/`);
   ok((await page.locator('header a[href="/admin"]').count()) === 0, 'logout แล้วเมนูการจัดการหาย');
 
-  // มือถือ: อยู่ใน drawer
+  // มือถือ: staff login → แถบเมนูล่างช่องขวาสุดเป็น การจัดการ (แทนโปรไฟล์) · header หน้าร้านไม่มี hamburger (พี่ต่อสั่ง 2026-09-15)
   await login(page, 'staff', 'staff1234');
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto(`${BASE}/`);
-  await page.click('button[aria-label="เปิดเมนู"]');
-  ok(await page.locator('#mobile-menu a[href="/admin"]:has-text("การจัดการ")').isVisible(), 'มือถือ: การจัดการอยู่ใน drawer');
+  await page.waitForLoadState('networkidle');
+  ok(!(await page.locator('button[aria-label="เปิดเมนู"]').isVisible()) && (await page.locator('nav[aria-label="เมนูมือถือ"] a[href="/admin"][aria-label="การจัดการ"]').isVisible()), 'มือถือ: staff เห็นแท็บ การจัดการ ที่แถบล่าง · ไม่มี hamburger หน้าร้าน');
+  await page.click('nav[aria-label="เมนูมือถือ"] a[href="/admin"]');
+  await page.waitForURL(/\/admin$/);
+  ok((await page.locator('button[aria-label="เปิดเมนู"]').isVisible()) && !(await page.locator('header a[href="/cart"]').isVisible()), 'มือถือหลังบ้าน: hamburger อย่างเดียว ไม่มีตะกร้า');
   await browser.close();
 })().catch((e) => { console.error('💥', e); process.exit(1); });

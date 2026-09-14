@@ -65,8 +65,8 @@ const cartBadge = async (page) => (await page.locator('header a[href="/cart"] sp
   // header icon + mobile nav
   ok(await page.locator('nav[aria-label="แถบสถานะ"] a[href="/orders"]:has-text("ประวัติการสั่งซื้อ")').isVisible(), 'แถบสถานะมี "ประวัติการสั่งซื้อ"');
   await page.setViewportSize({ width: 375, height: 800 });
-  await page.click('button[aria-label="เปิดเมนู"]');
-  ok(await page.locator('#mobile-menu a[href="/orders"]').isVisible(), 'drawer มือถือมีเมนูประวัติการสั่งซื้อ');
+  await page.goto(`${BASE}/account`);
+  ok((await page.locator('main a[href="/orders"]').count()) >= 1 && (await page.locator('nav[aria-label="เมนูมือถือ"] a[href="/account"][aria-current=page]').count()) === 1, 'มือถือ: โปรไฟล์ (แท็บล่าง) มีทางไปประวัติการสั่งซื้อ');
   const stateA2 = await ctx.storageState();
   await browser.close();
 

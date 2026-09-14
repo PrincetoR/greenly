@@ -12,8 +12,8 @@ export default async function ShopLayout({ children }: LayoutProps<'/'>) {
       <ShopHeader {...headerProps} />
       <main className="flex-1">{children}</main>
       <ShopFooter settings={settings} />
-      {/* แถบเมนูล่างมือถือ + spacer (ซ่อนบนหน้าสินค้า) */}
-      <MobileTabBar />
+      {/* แถบเมนูล่างมือถือ + spacer (ซ่อนบนหน้าสินค้า) · login หลังบ้าน → ช่องขวาสุดเป็น การจัดการ */}
+      <MobileTabBar staff={headerProps.isStaff} />
     </div>
   );
 }
