@@ -9700,10 +9700,10 @@
     "provider": "beam",
     "channel": "card",
     "amount": 44000,
-    "fee": 0,
-    "net": 0,
-    "status": "pending",
-    "reference": null,
+    "fee": 1166,
+    "net": 42834,
+    "status": "succeeded",
+    "reference": "bm_426df4537",
     "installmentTerm": null,
     "customer": {
       "name": "พิมพ์ชนก ทองดี",
@@ -9712,7 +9712,7 @@
     "refunds": [],
     "createdAt": "2026-09-14T02:59:44.000Z",
     "updatedAt": "2026-09-14T03:05:44.000Z",
-    "paidAt": null,
+    "paidAt": "2026-09-14T03:05:44.000Z",
     "expiresAt": "2026-09-14T03:14:44.000Z"
   }
 ]

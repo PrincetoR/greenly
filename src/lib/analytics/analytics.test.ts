@@ -56,8 +56,8 @@ const products: Product[] = [
   { id: 'p2', sku: 'B', slug: 'b', name: 'B', description: '', categoryId: 'c2', price: 50_00, stock: 9, images: [], active: true, featured: false, createdAt: day(-30), updatedAt: day(-30) },
 ];
 const categories: Category[] = [
-  { id: 'c1', slug: 'c1', name: 'หมวด 1', sortOrder: 10, active: true },
-  { id: 'c2', slug: 'c2', name: 'หมวด 2', sortOrder: 20, active: true },
+  { id: 'c1', slug: 'c1', name: 'หมวด 1', sortOrder: 10, active: true, image: null, icon: null },
+  { id: 'c2', slug: 'c2', name: 'หมวด 2', sortOrder: 20, active: true, image: null, icon: null },
 ];
 
 /* ---------- periods ---------- */

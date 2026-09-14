@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isCategoryIcon } from '@/lib/catalog/category-icons';
 import { bahtInput, checkbox, intInput, slugInput } from './common';
 
 export const categorySchema = z.object({
@@ -6,6 +7,9 @@ export const categorySchema = z.object({
   slug: slugInput,
   sortOrder: intInput({ min: 0, max: 9999, label: 'ลำดับ' }),
   active: checkbox,
+  // รูป = path จาก uploadImage (เว้นว่าง = ไม่มี) · icon = ชื่อจากรายการ (เว้นว่าง = ไม่มี)
+  image: z.preprocess((v) => (typeof v === 'string' && v.trim() ? v.trim() : null), z.string().regex(/^\/uploads\//, 'รูปไม่ถูกต้อง').max(300).nullable()),
+  icon: z.preprocess((v) => (typeof v === 'string' && v.trim() ? v.trim() : null), z.string().refine((v) => isCategoryIcon(v), 'ไอคอนไม่ถูกต้อง').nullable()),
 });
 
 export const productSchema = z.object({

@@ -10,7 +10,7 @@ import { ChevronLeft, ChevronRight, ImagePlus, Loader2, Trash2 } from 'lucide-re
  * อัปโหลดรูปหลายรูป — รูปแรกในลิสต์คือรูปปก
  * ส่งค่ากลับให้ฟอร์มผ่าน <input type="hidden" name="images"> หลายตัว
  */
-export function ImageUploader({ initial, max = 6 }: { initial: string[]; max?: number }) {
+export function ImageUploader({ initial, max = 6, name = 'images' }: { initial: string[]; max?: number; /** ชื่อ field ใน FormData */ name?: string }) {
   const [images, setImages] = useState(initial);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -48,14 +48,14 @@ export function ImageUploader({ initial, max = 6 }: { initial: string[]; max?: n
   return (
     <div>
       {images.map((src) => (
-        <input key={src} type="hidden" name="images" value={src} />
+        <input key={src} type="hidden" name={name} value={src} />
       ))}
 
       <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         {images.map((src, i) => (
           <li key={src} className="group relative overflow-hidden rounded-lg border border-line">
             <ProductImage src={src} alt={`รูปที่ ${i + 1}`} />
-            {i === 0 && (
+            {i === 0 && max > 1 && (
               <span className="absolute top-1 left-1 rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">รูปปก</span>
             )}
             <div className="absolute inset-x-0 bottom-0 flex justify-center gap-1 bg-ink/60 p-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
@@ -92,7 +92,7 @@ export function ImageUploader({ initial, max = 6 }: { initial: string[]; max?: n
       </ul>
 
       <p className="mt-2 text-xs text-muted">
-        JPG / PNG / WebP / GIF ไม่เกิน 5 MB · สูงสุด {max} รูป · รูปแรกจะเป็นรูปปก (ชี้ที่รูปเพื่อจัดลำดับ)
+        JPG / PNG / WebP / GIF ไม่เกิน 5 MB{max > 1 ? ` · สูงสุด ${max} รูป · รูปแรกจะเป็นรูปปก (ชี้ที่รูปเพื่อจัดลำดับ)` : ' · 1 รูป (สี่เหลี่ยมจัตุรัสจะพอดีที่สุด)'}
       </p>
       {error && (
         <p className="mt-1 text-xs text-danger" role="alert">

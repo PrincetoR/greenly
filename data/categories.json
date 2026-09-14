@@ -4,41 +4,53 @@
     "slug": "เครื่องดื่มสุขภาพ",
     "name": "เครื่องดื่มสุขภาพ",
     "sortOrder": 10,
-    "active": true
+    "active": true,
+    "image": "/uploads/seed/c-drinks.svg",
+    "icon": "cup-soda"
   },
   {
     "id": "c-grains",
     "slug": "ธัญพืชและถั่ว",
     "name": "ธัญพืชและถั่ว",
     "sortOrder": 20,
-    "active": true
+    "active": true,
+    "image": null,
+    "icon": "wheat"
   },
   {
     "id": "c-snacks",
     "slug": "ขนมเพื่อสุขภาพ",
     "name": "ขนมเพื่อสุขภาพ",
     "sortOrder": 30,
-    "active": true
+    "active": true,
+    "image": "/uploads/seed/c-snacks.svg",
+    "icon": "cookie"
   },
   {
     "id": "c-supplement",
     "slug": "อาหารเสริม",
     "name": "อาหารเสริม",
     "sortOrder": 40,
-    "active": true
+    "active": true,
+    "image": null,
+    "icon": "pill"
   },
   {
     "id": "c-kitchen",
     "slug": "ของใช้ในครัว",
     "name": "ของใช้ในครัว",
     "sortOrder": 50,
-    "active": true
+    "active": true,
+    "image": null,
+    "icon": "cooking-pot"
   },
   {
     "id": "c-dried",
     "slug": "ผลไม้อบแห้ง",
     "name": "ผลไม้อบแห้ง",
     "sortOrder": 60,
-    "active": true
+    "active": true,
+    "image": null,
+    "icon": "cherry"
   }
 ]

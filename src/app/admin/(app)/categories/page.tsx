@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
 import { buttonStyles } from '@/components/ui/button';
 import { ConfirmButton } from '@/components/ui/confirm-button';
+import { CategoryIcon } from '@/components/category-icon';
+import { ProductImage } from '@/components/product-image';
 
 export const metadata = { title: 'หมวดหมู่' };
 
@@ -55,7 +57,18 @@ export default async function CategoriesPage({ searchParams }: PageProps<'/admin
             {categories.map((c) => (
               <tr key={c.id} className="hover:bg-surface-alt/50">
                 <Td className="text-muted">{c.sortOrder}</Td>
-                <Td className="font-medium">{c.name}</Td>
+                <Td className="font-medium">
+                  <span className="flex items-center gap-3">
+                    {c.image ? (
+                      <ProductImage src={c.image} alt="" className="size-9 rounded-md" />
+                    ) : (
+                      <span className="flex size-9 items-center justify-center rounded-md bg-brand-soft text-brand" aria-hidden>
+                        <CategoryIcon icon={c.icon} className="size-5" />
+                      </span>
+                    )}
+                    {c.name}
+                  </span>
+                </Td>
                 <Td className="font-mono text-xs text-muted">{c.slug}</Td>
                 <Td className="text-right">{countOf(c.id)}</Td>
                 <Td>{c.active ? <Badge tone="ok">แสดง</Badge> : <Badge>ซ่อน</Badge>}</Td>

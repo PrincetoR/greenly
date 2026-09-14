@@ -18,12 +18,39 @@ export interface User {
   createdAt: string;
 }
 
+/** ชื่อไอคอนหมวดหมู่ (lucide) — รายการที่เลือกได้อยู่ที่ lib/catalog/category-icons.ts, component map ที่ components/category-icon.tsx */
+export type CategoryIconName =
+  | 'cup-soda'
+  | 'coffee'
+  | 'wheat'
+  | 'cookie'
+  | 'apple'
+  | 'cherry'
+  | 'carrot'
+  | 'pill'
+  | 'cooking-pot'
+  | 'utensils'
+  | 'leaf'
+  | 'sparkles'
+  | 'heart'
+  | 'gift'
+  | 'shopping-bag'
+  | 'package'
+  | 'shirt'
+  | 'baby'
+  | 'dumbbell'
+  | 'home';
+
 export interface Category {
   id: string;
   slug: string;
   name: string;
   sortOrder: number;
   active: boolean;
+  /** รูปหมวด (อัปโหลด) — ถ้ามีใช้แทนไอคอนบนการ์ดหน้าแรก */
+  image: string | null;
+  /** ชื่อไอคอน lucide จาก lib/catalog/category-icons */
+  icon: CategoryIconName | null;
 }
 
 export interface Product {

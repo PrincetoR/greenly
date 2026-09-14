@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { requirePermission } from '@/lib/auth/session';
+import type { Category } from '@/lib/types';
 import * as categories from '@/lib/db/categories';
 import * as products from '@/lib/db/products';
 import { categorySchema, productSchema } from '@/lib/validation/catalog';
@@ -23,14 +24,17 @@ export async function saveCategory(_prev: FormState, formData: FormData): Promis
     slug: formData.get('slug'),
     sortOrder: formData.get('sortOrder') ?? '0',
     active: formData.get('active'),
+    image: formData.get('image') ?? '',
+    icon: formData.get('icon') ?? '',
   });
   if (!parsed.success) return { errors: fieldErrors(parsed.error), values: formValues(formData) };
 
   const dup = await categories.findCategoryBySlug(parsed.data.slug);
   if (dup && dup.id !== id) return { errors: { slug: 'slug นี้ถูกใช้แล้ว' }, values: formValues(formData) };
 
-  if (id) await categories.updateCategory(id, parsed.data);
-  else await categories.createCategory(parsed.data);
+  const data = { ...parsed.data, icon: parsed.data.icon as Category['icon'] };
+  if (id) await categories.updateCategory(id, data);
+  else await categories.createCategory(data);
   revalidateCatalog();
   redirect('/admin/categories');
 }

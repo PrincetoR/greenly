@@ -10,6 +10,8 @@ import { PromoProductCard } from '@/components/shop/promo-product-card';
 import { PromoCard } from '@/components/shop/promo-card';
 import { Section } from '@/components/shop/section';
 import { buttonStyles } from '@/components/ui/button';
+import { CategoryIcon } from '@/components/category-icon';
+import { ProductImage } from '@/components/product-image';
 
 export default async function HomePage() {
   const [ctx, categories, featured, newest, allProducts, orders] = await Promise.all([
@@ -54,12 +56,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <Section title="หมวดหมู่">
-        <ul className="-mx-4 -my-1 flex gap-2 overflow-x-auto px-4 py-1 scrollbar-none sm:-mx-1 sm:flex-wrap sm:px-1">
+      {/* หมวดหมู่เป็นการ์ด แถวละ 8 (จอใหญ่) · มีรูปใช้รูป ไม่มีใช้ไอคอน (พี่ต่อสั่ง) */}
+      <Section title="หมวดหมู่" href="/products">
+        <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-8">
           {categories.map((c) => (
-            <li key={c.id} className="shrink-0">
-              <Link href={`/category/${c.slug}`} className="block rounded-full bg-surface px-4 py-2 text-sm font-medium border border-line transition-colors hover:bg-brand-soft hover:text-brand hover:ring-brand">
-                {c.name}
+            <li key={c.id}>
+              <Link href={`/category/${c.slug}`} className="group flex h-full flex-col items-center gap-2 rounded-card bg-surface p-3 text-center border border-line transition-colors hover:border-brand hover:bg-brand-soft/40">
+                {c.image ? (
+                  <ProductImage src={c.image} alt="" className="size-14 rounded-full" />
+                ) : (
+                  <span className="flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand" aria-hidden>
+                    <CategoryIcon icon={c.icon} className="size-7" />
+                  </span>
+                )}
+                <span className="line-clamp-2 text-xs leading-5 font-medium group-hover:text-brand sm:text-sm">{c.name}</span>
               </Link>
             </li>
           ))}

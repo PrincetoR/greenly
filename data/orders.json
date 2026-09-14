@@ -59161,7 +59161,7 @@
   {
     "id": "o-h0625",
     "orderNo": "OD-20260914-0001",
-    "status": "pending",
+    "status": "paid",
     "guestIds": [],
     "customer": {
       "name": "พิมพ์ชนก ทองดี",
@@ -59192,10 +59192,10 @@
       "provider": "beam",
       "channel": "card",
       "paymentId": "pay-h0434",
-      "status": "pending",
+      "status": "succeeded",
       "amount": 44000,
-      "fee": 0,
-      "paidAt": null,
+      "fee": 1166,
+      "paidAt": "2026-09-14T03:05:44.000Z",
       "refundedAmount": 0
     },
     "shipment": null,
@@ -59205,10 +59205,16 @@
         "type": "pending",
         "by": "customer",
         "note": "ลูกค้าสั่งซื้อ"
+      },
+      {
+        "at": "2026-09-14T03:05:44.000Z",
+        "type": "paid",
+        "by": "system",
+        "note": "ชำระผ่าน Beam (card) สำเร็จ · อ้างอิง bm_426df4537"
       }
     ],
     "note": "",
     "createdAt": "2026-09-14T02:53:44.000Z",
-    "updatedAt": "2026-09-14T02:53:44.000Z"
+    "updatedAt": "2026-09-14T03:05:44.000Z"
   }
 ]

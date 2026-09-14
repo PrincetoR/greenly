@@ -2,6 +2,7 @@ const { BASE, launch, login, shot, ok, DATA, PUBLIC, UPLOAD_TMP } = require('./l
 const fs = require('fs');
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
 fs.writeFileSync(UPLOAD_TMP, png);
+const read = (n) => JSON.parse(fs.readFileSync(`${DATA}/${n}.json`, 'utf8'));
 
 (async () => {
   const { browser, page } = await launch();
@@ -25,17 +26,29 @@ fs.writeFileSync(UPLOAD_TMP, png);
   await page.goto(`${BASE}/admin/categories`);
   await page.fill('#cat-name', 'ทดสอบหมวด');
   ok((await page.inputValue('#cat-slug')) === 'ทดสอบหมวด', 'slug auto from name');
+  await page.click('button[role=radio][title="ของขวัญ"]');
   await page.click('button:has-text("เพิ่มหมวดหมู่")');
   await page.waitForLoadState('networkidle');
   ok(await page.locator('td:has-text("ทดสอบหมวด")').first().isVisible(), 'category added appears in table');
+  ok(read('categories').find((c) => c.name === 'ทดสอบหมวด').icon === 'gift', 'category icon saved (gift)');
   // categories: edit
   const row = page.locator('tr', { hasText: 'ทดสอบหมวด' });
   await row.locator('a:has-text("แก้ไข")').click();
   await page.waitForURL(/edit=/);
+  ok(await page.locator('button[role=radio][title="ของขวัญ"][aria-checked=true]').isVisible(), 'edit form: icon preselected');
   await page.fill('#cat-name', 'ทดสอบหมวด 2');
+  await page.setInputFiles('input[type=file]', UPLOAD_TMP);
+  await page.waitForSelector('input[type=hidden][name=image]', { state: 'attached' });
   await page.click('button:has-text("บันทึกการแก้ไข")');
   await page.waitForURL(/\/admin\/categories$/);
   ok(await page.locator('td:has-text("ทดสอบหมวด 2")').first().isVisible(), 'category edited');
+  const catImg = read('categories').find((c) => c.name === 'ทดสอบหมวด 2').image;
+  ok(typeof catImg === 'string' && catImg.startsWith('/uploads/'), `category image uploaded (${catImg})`);
+  // หน้าแรก: การ์ดหมวดใช้รูปที่อัปโหลด
+  await page.goto(`${BASE}/`);
+  ok((await page.locator(`main a[href="/category/ทดสอบหมวด"] img[src="${catImg}"]`).count()) === 1, 'home: category card shows uploaded image');
+  ok((await page.locator('main h2:has-text("หมวดหมู่")').locator('xpath=ancestor::section').locator('ul > li').count()) === 7, 'home: 7 category cards');
+  await page.goto(`${BASE}/admin/categories`);
   await shot(page, 'p2-categories');
 
   // products: create with upload

@@ -4,15 +4,19 @@ import { newId, readCollection, updateCollection } from './store';
 
 const NAME = 'categories';
 
+/** หมวดรุ่นแรกไม่มี image/icon — เติมให้ตอนอ่าน */
+const normalize = (c: Category): Category => ({ ...c, image: c.image ?? null, icon: c.icon ?? null });
+
 export async function listCategories(opts: { activeOnly?: boolean } = {}): Promise<Category[]> {
-  const items = await readCollection<Category>(NAME);
+  const items = (await readCollection<Category>(NAME)).map(normalize);
   return items
     .filter((c) => !opts.activeOnly || c.active)
     .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'th'));
 }
 
 export async function findCategory(id: string): Promise<Category | undefined> {
-  return (await readCollection<Category>(NAME)).find((c) => c.id === id);
+  const c = (await readCollection<Category>(NAME)).find((x) => x.id === id);
+  return c && normalize(c);
 }
 
 export async function findCategoryBySlug(slug: string): Promise<Category | undefined> {
