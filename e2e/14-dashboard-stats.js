@@ -49,7 +49,14 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   await page.evaluate((y) => window.scrollTo(0, y), Math.round(bandH * 0.5) + 2);
   await page.waitForTimeout(150);
   ok((await fade()) === 0 && (await hb()) === 'rgba(0, 0, 0, 0)', 'เลื่อน 50%: จางหมด · เส้น header ยังไม่โผล่ (ขอบล่างแถบยังไม่ถึง)');
-  await page.evaluate((h) => window.scrollTo(0, Math.round(h) - 60), bandH);
+  // ขอบล่างแถบถึงขอบล่าง header (65) เมื่อ scrollY = bandBottom(ตอนบนสุด) − 65
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(100);
+  const reach = await page.evaluate(() => Math.round(document.querySelector('[data-hero-band]').getBoundingClientRect().bottom - document.querySelector('header').getBoundingClientRect().bottom));
+  await page.evaluate((y) => window.scrollTo(0, y - 5), reach);
+  await page.waitForTimeout(150);
+  ok((await hb()) === 'rgba(0, 0, 0, 0)', 'ก่อนขอบล่างแถบถึง header 5px: เส้นยังโปร่ง');
+  await page.evaluate((y) => window.scrollTo(0, y + 2), reach);
   await page.waitForTimeout(150);
   ok((await hb()) !== 'rgba(0, 0, 0, 0)', 'ขอบล่างแถบขึ้นมาถึง header → เส้น header กลับมา');
   await page.evaluate(() => window.scrollTo(0, 0));
