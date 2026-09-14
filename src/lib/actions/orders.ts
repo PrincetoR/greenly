@@ -11,6 +11,7 @@ import { NEXT_STATUS, ORDER_STATUS_LABEL } from '@/lib/orders/labels';
 import { carrierById, isCarrierId } from '@/lib/shipping/carriers';
 import { isMockDelivered } from '@/lib/shipping/tracking';
 import { refundPayment } from '@/lib/payments/service';
+import { updatePayment } from '@/lib/db/payments';
 import type { Order, OrderStatus } from '@/lib/types';
 
 /**
@@ -55,8 +56,15 @@ export async function changeOrderStatus(formData: FormData): Promise<void> {
   }
   if (status === 'done' && shipment) shipment = { ...shipment, deliveredAt: nowIso() };
 
+  // "ยืนยันรับชำระเอง" (Beam ยังไม่ส่งผลมา แต่เช็คในแดชบอร์ด Beam แล้วว่าเงินเข้า) → ปิดรายการชำระให้ตรงกัน
+  const manualPaid = status === 'paid' && order.payment?.provider === 'beam' && order.payment.status !== 'succeeded';
+  if (manualPaid && order.payment?.paymentId) {
+    await updatePayment(order.payment.paymentId, (p) => ({ ...p, status: 'succeeded', paidAt: nowIso(), net: p.amount - p.fee, reference: p.reference ?? `manual-${by}` }));
+  }
+
   await updateOrder(id, (o) => {
     let next: Order = { ...o, status, shipment };
+    if (manualPaid && next.payment) next = { ...next, payment: { ...next.payment, status: 'succeeded', paidAt: nowIso() } };
     // COD: เงินเข้าเมื่อของถึงมือ
     if (status === 'done' && next.payment?.provider === 'cod') next = { ...next, payment: { ...next.payment, status: 'succeeded', paidAt: nowIso() } };
     if (status === 'cancelled' && next.payment?.provider === 'cod') next = { ...next, payment: { ...next.payment, status: 'failed' } };
@@ -67,7 +75,9 @@ export async function changeOrderStatus(formData: FormData): Promise<void> {
           ? `พัสดุตีกลับ — ${note}`
           : status === 'packing' && o.status === 'returned'
             ? `ส่งใหม่ — เริ่มแพ็คอีกครั้ง${note ? ` · ${note}` : ''}`
-            : `${ORDER_STATUS_LABEL[status]}${note ? ` · ${note}` : ''}`;
+            : manualPaid
+              ? `ยืนยันรับชำระเอง (ตรวจจาก Beam แล้ว)${note ? ` · ${note}` : ''}`
+              : `${ORDER_STATUS_LABEL[status]}${note ? ` · ${note}` : ''}`;
     return withEvent(next, status, by, text);
   });
 
