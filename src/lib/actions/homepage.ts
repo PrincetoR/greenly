@@ -23,6 +23,7 @@ const slideSchema = z.object({
   buttonLabel: z.string().trim().max(30),
   active: checkbox,
   sortOrder: intInput({ min: 0, max: 999, label: 'ลำดับ' }),
+  slot: z.enum(['main', 'side'], { message: 'เลือกตำแหน่ง' }),
 });
 
 export async function saveSlide(_prev: FormState, formData: FormData): Promise<FormState> {
@@ -36,6 +37,7 @@ export async function saveSlide(_prev: FormState, formData: FormData): Promise<F
     buttonLabel: formData.get('buttonLabel') ?? '',
     active: formData.get('active'),
     sortOrder: formData.get('sortOrder') ?? '0',
+    slot: formData.get('slot') ?? 'main',
   });
   if (!parsed.success) return { errors: fieldErrors(parsed.error), values: formValues(formData) };
   await upsertSlide({ ...parsed.data, id: id || undefined });

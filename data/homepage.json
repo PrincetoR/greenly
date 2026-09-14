@@ -8,7 +8,8 @@
       "href": "/promotions",
       "buttonLabel": "ดูโปรโมชัน",
       "active": true,
-      "sortOrder": 10
+      "sortOrder": 10,
+      "slot": "main"
     },
     {
       "id": "slide-new",
@@ -18,7 +19,8 @@
       "href": "/products?sort=newest",
       "buttonLabel": "เลือกซื้อ",
       "active": true,
-      "sortOrder": 20
+      "sortOrder": 20,
+      "slot": "main"
     },
     {
       "id": "slide-brand",
@@ -28,7 +30,30 @@
       "href": "/products",
       "buttonLabel": "",
       "active": true,
-      "sortOrder": 30
+      "sortOrder": 30,
+      "slot": "main"
+    },
+    {
+      "id": "side-freeship",
+      "image": "/uploads/seed/banner-side-freeship.svg",
+      "title": "ส่งฟรีเมื่อครบ 1,000",
+      "subtitle": "ทุกออเดอร์ ทั่วไทย",
+      "href": "/products",
+      "buttonLabel": "",
+      "active": true,
+      "sortOrder": 40,
+      "slot": "side"
+    },
+    {
+      "id": "side-coupon",
+      "image": "/uploads/seed/banner-side-coupon.svg",
+      "title": "โค้ด SAVE100",
+      "subtitle": "ลูกค้าใหม่ลดทันที 100 บาท",
+      "href": "/promotions",
+      "buttonLabel": "",
+      "active": true,
+      "sortOrder": 50,
+      "slot": "side"
     }
   ],
   "autoplaySeconds": 5,
@@ -41,6 +66,6 @@
     "buttonLabel": "ดูโปรโมชัน",
     "width": 480,
     "frequency": "daily",
-    "version": "2026-09-14T09:57:20.564Z"
+    "version": "2026-09-14T10:08:39.690Z"
   }
 }

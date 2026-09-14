@@ -460,31 +460,34 @@ function demoOrders(): { orders: Order[]; payments: Payment[] } {
 
 /* ---------- หน้าแรก: สไลด์ + ป๊อปอัป (รูปเป็น SVG placeholder แนวนอน) ---------- */
 // withText = ฝังข้อความในรูป (ป๊อปอัป) · สไลด์ไม่ฝัง เพราะข้อความซ้อนบนรูปจากตั้งค่าอยู่แล้ว
-function bannerSvg(title: string, sub: string, hue: number, emoji: string, withText = false): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" width="1600" height="600">
+function bannerSvg(title: string, sub: string, hue: number, emoji: string, withText = false, height = 800): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 ${height}" width="1600" height="${height}">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="hsl(${hue} 60% 88%)"/>
       <stop offset="1" stop-color="hsl(${hue + 40} 55% 70%)"/>
     </linearGradient>
   </defs>
-  <rect width="1600" height="600" fill="url(#g)"/>
-  <circle cx="1250" cy="300" r="230" fill="hsl(${hue} 60% 96% / .6)"/>
-  <text x="1250" y="330" font-size="260" text-anchor="middle" dominant-baseline="middle">${emoji}</text>
-  ${withText ? `<text x="120" y="290" font-size="72" font-family="system-ui, sans-serif" font-weight="700" fill="hsl(${hue} 40% 20%)">${title}</text>
-  <text x="120" y="360" font-size="36" font-family="system-ui, sans-serif" fill="hsl(${hue} 30% 30%)">${sub}</text>` : ''}
+  <rect width="1600" height="${height}" fill="url(#g)"/>
+  <circle cx="1200" cy="${height / 2}" r="${Math.round(height * 0.36)}" fill="hsl(${hue} 60% 96% / .6)"/>
+  <text x="1200" y="${height / 2 + 30}" font-size="${Math.round(height * 0.4)}" text-anchor="middle" dominant-baseline="middle">${emoji}</text>
+  ${withText ? `<text x="120" y="${height / 2 - 10}" font-size="72" font-family="system-ui, sans-serif" font-weight="700" fill="hsl(${hue} 40% 20%)">${title}</text>
+  <text x="120" y="${height / 2 + 60}" font-size="36" font-family="system-ui, sans-serif" fill="hsl(${hue} 30% 30%)">${sub}</text>` : ''}
 </svg>
 `;
 }
 
-const bannerSeed = [
-  { id: 'slide-promo', file: 'banner-promo', title: 'ลด 20% เครื่องดื่มสุขภาพ', subtitle: 'สกัดเย็น คอมบูชา มัทฉะ — โปรถึงสิ้นเดือนนี้', href: '/promotions', buttonLabel: 'ดูโปรโมชัน', hue: 150, emoji: '🥤' },
-  { id: 'slide-new', file: 'banner-new', title: 'สินค้าใหม่ประจำสัปดาห์', subtitle: 'กราโนล่า โปรตีนบาร์ ขนมสุขภาพ ส่งฟรีเมื่อครบ 1,000 บาท', href: '/products?sort=newest', buttonLabel: 'เลือกซื้อ', hue: 30, emoji: '🍪' },
-  { id: 'slide-brand', file: 'banner-brand', title: 'Greenly', subtitle: 'อาหารสุขภาพ ส่งตรงถึงบ้าน', href: '/products', buttonLabel: '', hue: 200, emoji: '🌿' },
+const bannerSeed: { id: string; file: string; title: string; subtitle: string; href: string; buttonLabel: string; hue: number; emoji: string; slot: 'main' | 'side' }[] = [
+  { id: 'slide-promo', file: 'banner-promo', title: 'ลด 20% เครื่องดื่มสุขภาพ', subtitle: 'สกัดเย็น คอมบูชา มัทฉะ — โปรถึงสิ้นเดือนนี้', href: '/promotions', buttonLabel: 'ดูโปรโมชัน', hue: 150, emoji: '🥤', slot: 'main' },
+  { id: 'slide-new', file: 'banner-new', title: 'สินค้าใหม่ประจำสัปดาห์', subtitle: 'กราโนล่า โปรตีนบาร์ ขนมสุขภาพ ส่งฟรีเมื่อครบ 1,000 บาท', href: '/products?sort=newest', buttonLabel: 'เลือกซื้อ', hue: 30, emoji: '🍪', slot: 'main' },
+  { id: 'slide-brand', file: 'banner-brand', title: 'Greenly', subtitle: 'อาหารสุขภาพ ส่งตรงถึงบ้าน', href: '/products', buttonLabel: '', hue: 200, emoji: '🌿', slot: 'main' },
+  // ภาพเล็กด้านขวา 2 ช่อง (แบบ Shopee)
+  { id: 'side-freeship', file: 'banner-side-freeship', title: 'ส่งฟรีเมื่อครบ 1,000', subtitle: 'ทุกออเดอร์ ทั่วไทย', href: '/products', buttonLabel: '', hue: 100, emoji: '🚚', slot: 'side' },
+  { id: 'side-coupon', file: 'banner-side-coupon', title: 'โค้ด SAVE100', subtitle: 'ลูกค้าใหม่ลดทันที 100 บาท', href: '/promotions', buttonLabel: '', hue: 340, emoji: '🎟️', slot: 'side' },
 ];
 
 const homepage: Homepage = {
-  slides: bannerSeed.map((b, i) => ({ id: b.id, image: `/uploads/seed/${b.file}.svg`, title: b.title, subtitle: b.subtitle, href: b.href, buttonLabel: b.buttonLabel, active: true, sortOrder: (i + 1) * 10 })),
+  slides: bannerSeed.map((b, i) => ({ id: b.id, image: `/uploads/seed/${b.file}.svg`, title: b.title, subtitle: b.subtitle, href: b.href, buttonLabel: b.buttonLabel, active: true, sortOrder: (i + 1) * 10, slot: b.slot })),
   autoplaySeconds: 5,
   // ป๊อปอัปเปิดเฉพาะ seed สาธิต — e2e (seed:clean) ปิดไว้ ไม่งั้นบังปุ่มที่เทสต์กด
   popup: {
@@ -576,8 +579,8 @@ async function main() {
       return writeFile(path.join(SEED_IMG, `${p.id}.svg`), placeholderSvg(p.name, cat.emoji, cat.hue));
     }),
     ...categorySeed.filter((c) => c.withImage).map((c) => writeFile(path.join(SEED_IMG, `${c.id}.svg`), placeholderSvg(c.name, c.emoji, c.hue))),
-    ...bannerSeed.map((b) => writeFile(path.join(SEED_IMG, `${b.file}.svg`), bannerSvg(b.title, b.subtitle, b.hue, b.emoji))),
-    writeFile(path.join(SEED_IMG, 'popup-welcome.svg'), bannerSvg('ส่วนลด 100 บาท', 'สำหรับลูกค้าใหม่', 340, '🎁', true)),
+    ...bannerSeed.map((b) => writeFile(path.join(SEED_IMG, `${b.file}.svg`), bannerSvg(b.title, b.subtitle, b.hue, b.emoji, false, 800))),
+    writeFile(path.join(SEED_IMG, 'popup-welcome.svg'), bannerSvg('ส่วนลด 100 บาท', 'สำหรับลูกค้าใหม่', 340, '🎁', true, 600)),
   ]);
 
   console.log(

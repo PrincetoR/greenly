@@ -21,7 +21,7 @@ export function SlideForm({ slide }: { slide?: HeroSlide }) {
         <p className="text-sm font-medium">
           รูปแบนเนอร์ <span className="text-danger">*</span>
         </p>
-        <p className="text-xs text-muted">แนะนำ 1600×600 (สัดส่วน 8:3) · จอมือถือจะครอปกลางภาพ</p>
+        <p className="text-xs text-muted">สไลด์ใหญ่แนะนำ 1600×800 (2:1) · ภาพเล็กด้านขวาแนะนำ 800×400 (2:1) · ครอปกลางภาพให้พอดีช่อง</p>
         <div className="mt-2">
           <ImageUploader initial={slide?.image ? [slide.image] : v.image ? [v.image] : []} max={1} name="image" />
         </div>
@@ -38,6 +38,12 @@ export function SlideForm({ slide }: { slide?: HeroSlide }) {
       </Field>
       <Field label="ข้อความปุ่ม" htmlFor="slide-button" error={errors.buttonLabel} hint="แสดงเมื่อมีลิงก์ · ว่าง = ไม่มีปุ่ม (คลิกทั้งภาพได้)">
         <input id="slide-button" name="buttonLabel" defaultValue={v.buttonLabel ?? slide?.buttonLabel ?? ''} maxLength={30} placeholder="ดูโปรโมชัน" />
+      </Field>
+      <Field label="ตำแหน่ง" htmlFor="slide-slot" error={errors.slot} hint="แบบ Shopee: ซ้ายเป็นสไลด์ใหญ่ ขวาเป็นภาพเล็ก 2 ช่อง (ใช้ 2 ภาพแรกตามลำดับ)">
+        <select id="slide-slot" name="slot" defaultValue={v.slot ?? slide?.slot ?? 'main'}>
+          <option value="main">สไลด์ใหญ่ด้านซ้าย (เลื่อน)</option>
+          <option value="side">ภาพเล็กด้านขวา (นิ่ง)</option>
+        </select>
       </Field>
       <Field label="ลำดับ" htmlFor="slide-order" error={errors.sortOrder}>
         <input id="slide-order" name="sortOrder" type="number" min={0} defaultValue={v.sortOrder ?? slide?.sortOrder ?? 10} />

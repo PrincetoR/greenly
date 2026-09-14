@@ -27,7 +27,8 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
     getHomepage(),
     searchParams,
   ]);
-  const slides = home.slides.filter((s) => s.active);
+  const slides = home.slides.filter((s) => s.active && s.slot === 'main');
+  const sideBanners = home.slides.filter((s) => s.active && s.slot === 'side');
   const { settings, promotions, usage, now } = ctx;
   const live = promotions.filter((p) => promotionStatus(p, now, usage[p.id]) === 'live');
 
@@ -55,7 +56,7 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
       {slides.length > 0 ? (
         <div className="mx-auto max-w-6xl px-4 pt-4">
           <h1 className="sr-only">{settings.storeName}</h1>
-          <HeroSlider slides={slides} autoplaySeconds={home.autoplaySeconds} />
+          <HeroSlider slides={slides} side={sideBanners} autoplaySeconds={home.autoplaySeconds} />
         </div>
       ) : (
         <section className="bg-gradient-to-br from-brand-soft via-page to-accent-soft">

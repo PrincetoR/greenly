@@ -6,8 +6,8 @@
     </linearGradient>
   </defs>
   <rect width="1600" height="600" fill="url(#g)"/>
-  <circle cx="1250" cy="300" r="230" fill="hsl(340 60% 96% / .6)"/>
-  <text x="1250" y="330" font-size="260" text-anchor="middle" dominant-baseline="middle">🎁</text>
+  <circle cx="1200" cy="300" r="216" fill="hsl(340 60% 96% / .6)"/>
+  <text x="1200" y="330" font-size="240" text-anchor="middle" dominant-baseline="middle">🎁</text>
   <text x="120" y="290" font-size="72" font-family="system-ui, sans-serif" font-weight="700" fill="hsl(340 40% 20%)">ส่วนลด 100 บาท</text>
   <text x="120" y="360" font-size="36" font-family="system-ui, sans-serif" fill="hsl(340 30% 30%)">สำหรับลูกค้าใหม่</text>
 </svg>

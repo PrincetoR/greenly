@@ -303,6 +303,8 @@ export interface HeroSlide {
   buttonLabel: string;
   active: boolean;
   sortOrder: number;
+  /** main = สไลด์ใหญ่ซ้าย (เลื่อน) · side = ภาพเล็กด้านขวา 2 ช่อง (นิ่ง แบบ Shopee) */
+  slot: 'main' | 'side';
 }
 
 export type PopupFrequency = 'once' | 'daily' | 'always';

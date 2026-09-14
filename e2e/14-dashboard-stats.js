@@ -28,6 +28,9 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   // สไลด์: 3 สไลด์ กดถัดไปแล้วจุดที่ 2 active · คลิกสไลด์ไปตามลิงก์
   await page.goto(`${BASE}/`);
   ok((await page.locator('[aria-roledescription=slide]').count()) === 3 && (await page.locator('[role=tab][aria-label^="สไลด์"]').count()) === 3, 'สไลด์แบนเนอร์ 3 ใบ + จุด 3 จุด');
+  ok((await page.locator('[aria-label="แบนเนอร์เล็ก"] > a').count()) === 2, 'ภาพเล็กด้านขวา 2 ช่อง (แบบ Shopee) คลิกได้');
+  const heroBox = await page.locator('[aria-roledescription=carousel]').locator('xpath=..').boundingBox();
+  ok(Math.round(heroBox.x) === 80 && Math.round(heroBox.x + heroBox.width) === 1200, `card แบนเนอร์กว้างเท่าคอนเทนเนอร์ (${Math.round(heroBox.x)}–${Math.round(heroBox.x + heroBox.width)})`);
   await page.hover('[aria-roledescription=carousel]');
   await page.click('button[aria-label="สไลด์ถัดไป"]');
   await page.waitForTimeout(800);
@@ -45,7 +48,7 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
 
   // หลังบ้าน › หน้าแรก: แก้ความกว้างป๊อปอัปเป็น 640 → หน้าแรกใช้ค่าใหม่
   await page.goto(`${BASE}/admin/homepage`);
-  ok((await page.locator('main li:has(a[href^="/admin/homepage?edit="])').count()) === 3, 'หลังบ้าน: รายการสไลด์ 3 ใบ');
+  ok((await page.locator('main li:has(a[href^="/admin/homepage?edit="])').count()) === 5, 'หลังบ้าน: รายการ 5 (สไลด์ใหญ่ 3 + ภาพเล็ก 2)');
   await page.fill('#popup-width', '640');
   await page.click('button:has-text("บันทึกป๊อปอัป")');
   await page.waitForURL(/saved=popup/);

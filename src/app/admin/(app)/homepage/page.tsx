@@ -40,7 +40,7 @@ export default async function HomepageAdminPage({ searchParams }: PageProps<'/ad
         <Card>
           <CardHeader
             title={`สไลด์แบนเนอร์ (${home.slides.length})`}
-            description="เลื่อนอัตโนมัติ มีจุดบอกตำแหน่งและปุ่มเลื่อน · ไม่มีสไลด์ = แสดงชื่อร้านกับสโลแกนแทน"
+            description="แบบ Shopee: card ขาวเต็มความกว้าง ซ้ายสไลด์ใหญ่เลื่อนเอง ขวาภาพเล็ก 2 ช่อง · ไม่มีสไลด์ = แสดงชื่อร้านกับสโลแกนแทน"
             action={
               <form action={updateAutoplay} className="flex flex-wrap items-center gap-2 text-sm">
                 <label htmlFor="autoplaySeconds" className="text-muted whitespace-nowrap">
@@ -77,6 +77,7 @@ export default async function HomepageAdminPage({ searchParams }: PageProps<'/ad
                     </p>
                   </div>
                   <span className="text-xs text-muted">ลำดับ {s.sortOrder}</span>
+                  <Badge tone={s.slot === 'side' ? 'info' : 'brand'}>{s.slot === 'side' ? 'ภาพเล็กขวา' : 'สไลด์ใหญ่'}</Badge>
                   {s.active ? <Badge tone="ok">แสดง</Badge> : <Badge>ซ่อน</Badge>}
                   <Link href={`/admin/homepage?edit=${s.id}`} className={buttonStyles({ variant: 'secondary', size: 'sm' })}>
                     แก้ไข

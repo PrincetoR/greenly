@@ -10,7 +10,7 @@ export const DEFAULT_HOMEPAGE: Homepage = { slides: [], autoplaySeconds: 5, popu
 /** ผสาน default เผื่อไฟล์ยังไม่มี/ขาด field */
 function merge(doc: Partial<Homepage>): Homepage {
   return {
-    slides: (doc.slides ?? []).map((s) => ({ ...s, active: s.active ?? true, sortOrder: s.sortOrder ?? 0 })).sort((a, b) => a.sortOrder - b.sortOrder),
+    slides: (doc.slides ?? []).map((s) => ({ ...s, active: s.active ?? true, sortOrder: s.sortOrder ?? 0, slot: s.slot ?? 'main' })).sort((a, b) => a.sortOrder - b.sortOrder),
     autoplaySeconds: doc.autoplaySeconds ?? DEFAULT_HOMEPAGE.autoplaySeconds,
     popup: { ...DEFAULT_POPUP, ...doc.popup },
   };
