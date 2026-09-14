@@ -53,8 +53,8 @@ export function PromoCardView({ data: d }: { data: PromoCardData }) {
         }}
         className={cn('group card-hover flex h-full min-w-0 cursor-pointer flex-col gap-3 rounded-card bg-surface p-5 border border-line', !d.live && 'opacity-80')}
       >
-        {/* ไอคอน 52 ใหญ่กว่าบล็อกชื่อ+สถานะ (24 + 4 + 20 = 48) นิดหน่อย ไม่ให้ข้อความดูล้นออกมา (พี่ต่อสั่ง) · คำอธิบายเริ่มที่ขอบล่างไอคอนพอดี */}
-        <div className="flex items-start gap-3">
+        {/* ไอคอน 52 ใหญ่กว่าบล็อกชื่อ+สถานะ (24 + 4 + 20 = 48) นิดหน่อย ไม่ให้ข้อความดูล้นออกมา (พี่ต่อสั่ง) */}
+        <div className="flex items-center gap-3">
           <span className={cn('flex size-13 shrink-0 items-center justify-center rounded-xl', accent)} aria-hidden>
             <PromoTypeIcon type={d.type} className="size-6" />
           </span>
@@ -63,10 +63,11 @@ export function PromoCardView({ data: d }: { data: PromoCardData }) {
               {d.name}
             </h3>
             <div className="mt-1 flex h-5 items-center">{d.live ? <Badge tone="ok">กำลังใช้งาน</Badge> : <Badge tone="info">เร็ว ๆ นี้</Badge>}</div>
-            <p className="mt-1 line-clamp-2 text-sm leading-6 text-muted">{d.description}</p>
           </div>
           <span className={cn('shrink-0 rounded-lg px-3 py-1.5 text-lg font-bold', accent)}>{d.discount}</span>
         </div>
+        {/* คำอธิบายเต็มความกว้าง ชิดซ้ายเท่าไอคอน เหมือนในป๊อปอัป (พี่ต่อสั่ง) */}
+        <p className="line-clamp-2 text-sm leading-6 text-muted">{d.description}</p>
 
         <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
           <Countdown to={d.live ? d.endsAt : d.startsAt} initial={d.countdownInitial} prefix={d.live ? 'เหลืออีก' : 'เริ่มใน'} />

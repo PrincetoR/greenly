@@ -15,9 +15,9 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
   // การ์ดย่อ: ชื่อ 1 บรรทัด (truncate) · สถานะบรรทัด 2 · คำอธิบาย 2 บรรทัด (line-clamp-2) · กดแล้วเปิดป๊อปอัปรายละเอียดเต็ม
   const card = page.locator('article', { hasText: 'SAVE100' }).first();
   ok((await card.locator('h3').evaluate((h) => getComputedStyle(h).textOverflow === 'ellipsis' && getComputedStyle(h).whiteSpace === 'nowrap')) && (await card.locator('p').first().evaluate((p) => getComputedStyle(p).webkitLineClamp === '2')), 'card: ชื่อ 1 บรรทัด · คำอธิบาย 2 บรรทัด');
-  // ไอคอนการ์ด 52 ใหญ่กว่าบล็อกชื่อ+สถานะ (48) นิดหน่อย · คำอธิบายเริ่มที่ขอบล่างไอคอน (พี่ต่อ: ไม่ให้ข้อความดูล้น)
-  const ic = await card.locator('h3').evaluate((h) => { const icon = h.parentElement.previousElementSibling.getBoundingClientRect(); const hr = h.getBoundingClientRect(); return { icon: icon.height, block: h.nextElementSibling.getBoundingClientRect().bottom - hr.top, desc: h.nextElementSibling.nextElementSibling.getBoundingClientRect().top - hr.top }; });
-  ok(ic.icon === 52 && ic.block === 48 && ic.desc === 52, `card: ไอคอน ${ic.icon} > ชื่อ+สถานะ ${ic.block} · คำอธิบายเริ่มที่ ${ic.desc}`);
+  // ไอคอนการ์ด 52 ใหญ่กว่าบล็อกชื่อ+สถานะ (48) นิดหน่อย (พี่ต่อ: ไม่ให้ข้อความดูล้น) · คำอธิบายเต็มความกว้าง ชิดซ้ายเท่าไอคอน เหมือนป๊อปอัป
+  const ic = await card.locator('h3').evaluate((h) => { const icon = h.parentElement.previousElementSibling.getBoundingClientRect(); const hr = h.getBoundingClientRect(); const p = h.closest('article').querySelector('p').getBoundingClientRect(); return { icon: icon.height, block: h.nextElementSibling.getBoundingClientRect().bottom - hr.top, descLeft: p.left - icon.left, descGap: p.top - icon.bottom }; });
+  ok(ic.icon === 52 && ic.block === 48 && ic.descLeft === 0 && ic.descGap === 12, `card: ไอคอน ${ic.icon} > ชื่อ+สถานะ ${ic.block} · คำอธิบายชิดซ้าย (${ic.descLeft}) ห่างไอคอน ${ic.descGap}`);
   await card.click();
   await page.waitForSelector('[role=dialog]');
   ok((await page.locator('[role=dialog] code:has-text("SAVE100")').count()) === 1 && (await page.locator('[role=dialog] dt:has-text("ช่วงเวลา")').count()) === 1 && (await page.locator('[role=dialog] li:has-text("ยอดสั่งซื้อขั้นต่ำ")').count()) === 1, 'กดการ์ด → ป๊อปอัปรายละเอียดเต็ม (โค้ด ช่วงเวลา เงื่อนไข)');
