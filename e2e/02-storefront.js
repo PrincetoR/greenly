@@ -4,6 +4,8 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   const { browser, page } = await launch();
   await page.goto(`${BASE}/`);
   ok((await page.locator('h2:has-text("สินค้าแนะนำ")').count()) === 1, 'home: featured section');
+  // seed:clean ไม่มีออเดอร์ → ไม่มีอะไรให้จัดอันดับ ส่วน "สินค้าขายดี" ต้องซ่อน (ตรวจตอนมีข้อมูลใน e2e/14)
+  ok((await page.locator('h2:has-text("สินค้าขายดี")').count()) === 0, 'home: ไม่มีออเดอร์ → ซ่อนสินค้าขายดี');
   ok((await page.locator('a[href^="/category/"]').count()) >= 6, 'home: category chips');
   await shot(page, 'p3-home');
 

@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { listCategories } from '@/lib/db/categories';
 import { listProducts } from '@/lib/db/products';
+import { listOrders } from '@/lib/db/orders';
+import { topProducts } from '@/lib/analytics/categories';
 import { loadPromotionContext } from '@/lib/promotions/service';
 import { promotionStatus } from '@/lib/pricing/status';
 import { ProductGrid } from '@/components/shop/product-card';
@@ -10,15 +12,30 @@ import { Section } from '@/components/shop/section';
 import { buttonStyles } from '@/components/ui/button';
 
 export default async function HomePage() {
-  const [ctx, categories, featured, newest, allProducts] = await Promise.all([
+  const [ctx, categories, featured, newest, allProducts, orders] = await Promise.all([
     loadPromotionContext(),
     listCategories({ activeOnly: true }),
     listProducts({ activeOnly: true, featuredOnly: true, sort: 'newest' }),
     listProducts({ activeOnly: true, sort: 'newest' }),
     listProducts(),
+    listOrders(),
   ]);
   const { settings, promotions, usage, now } = ctx;
   const live = promotions.filter((p) => promotionStatus(p, now, usage[p.id]) === 'live');
+
+  // สินค้าขายดี = จำนวนชิ้นที่ขายได้ 30 วันล่าสุด (นิยามเดียวกับแดชบอร์ด) · ถ้าน้อยกว่า 4 ตัวให้นับทั้งหมด
+  const activeById = new Map(allProducts.filter((p) => p.active).map((p) => [p.id, p]));
+  const pickTop = (start: Date) =>
+    topProducts(orders, { start, end: now }, 12)
+      .map((t) => activeById.get(t.productId))
+      .filter((p): p is NonNullable<typeof p> => Boolean(p))
+      .slice(0, 8);
+  let bestsellers = pickTop(new Date(now.getTime() - 30 * 86_400_000));
+  let bestsellersHint = 'จัดอันดับจากยอดขายจริง 30 วันล่าสุด';
+  if (bestsellers.length < 4) {
+    bestsellers = pickTop(new Date(0));
+    bestsellersHint = 'จัดอันดับจากยอดขายจริงทั้งหมด';
+  }
 
   return (
     <div className="pb-8">
@@ -65,6 +82,16 @@ export default async function HomePage() {
           <ProductGrid>
             {featured.slice(0, 8).map((p, i) => (
               <PromoProductCard key={p.id} product={p} ctx={ctx} priority={i < 4} />
+            ))}
+          </ProductGrid>
+        </Section>
+      )}
+
+      {bestsellers.length > 0 && (
+        <Section title="สินค้าขายดี" description={bestsellersHint} href="/products">
+          <ProductGrid>
+            {bestsellers.map((p, i) => (
+              <PromoProductCard key={p.id} product={p} ctx={ctx} rank={i + 1} />
             ))}
           </ProductGrid>
         </Section>

@@ -9,6 +9,13 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   ok(orders.length > 300, `seed เต็มมีประวัติออเดอร์ (${orders.length})`);
 
   const { browser, page } = await launch();
+
+  // หน้าแรก: สินค้าขายดีอยู่ระหว่างสินค้าแนะนำกับสินค้าใหม่ (จัดอันดับจากออเดอร์จริง)
+  await page.goto(`${BASE}/`);
+  const homeH2 = (await page.locator('main h2').allTextContents()).map((t) => t.trim());
+  ok(homeH2.indexOf('สินค้าขายดี') === homeH2.indexOf('สินค้าแนะนำ') + 1 && homeH2.indexOf('สินค้าใหม่') === homeH2.indexOf('สินค้าขายดี') + 1, `หน้าแรก: สินค้าขายดี อยู่ระหว่างสินค้าแนะนำกับสินค้าใหม่ (${homeH2.join(' · ')})`);
+  ok((await page.locator('span:has-text("ขายดี #1")').count()) === 1 && (await page.locator('span:has-text("ขายดี #8")').count()) === 1, 'หน้าแรก: การ์ดขายดี 8 ใบมีป้ายอันดับ');
+
   await login(page, 'admin', 'admin1234');
 
   // รายวัน (ค่าเริ่มต้น)
