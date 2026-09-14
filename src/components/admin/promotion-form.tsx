@@ -154,7 +154,7 @@ export function PromotionForm({
         </Alert>
       )}
 
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-3">
         {/* 1. ประเภท */}
         <Step n={1} title="เลือกประเภทโปรโมชัน">
           <div role="radiogroup" aria-label="ประเภทโปรโมชัน" className="grid gap-3 sm:grid-cols-3">

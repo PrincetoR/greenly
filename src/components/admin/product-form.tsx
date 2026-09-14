@@ -21,10 +21,10 @@ export function ProductForm({ product, categories }: { product?: Product; catego
   const v = state.values ?? {};
 
   return (
-    <form action={action} className="grid gap-6 lg:grid-cols-[1fr_320px]">
+    <form action={action} className="grid gap-3 lg:grid-cols-[1fr_320px]">
       {product && <input type="hidden" name="id" value={product.id} />}
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
         <Card>
           <CardHeader title="ข้อมูลสินค้า" />
           <div className="grid gap-4 p-5 sm:grid-cols-2">
@@ -72,7 +72,7 @@ export function ProductForm({ product, categories }: { product?: Product; catego
         </Card>
       </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
         <Card>
           <CardHeader title="ราคาและสต็อก" />
           <div className="grid gap-4 p-5">

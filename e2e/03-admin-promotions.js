@@ -29,9 +29,15 @@ const readPromos = () => JSON.parse(fs.readFileSync(DATA + '/promotions.json', '
   const switches = page.locator('input[role=switch]');
   const n = await switches.count();
   ok(n >= 4, `switches rendered (${n})`);
-  await page.locator('input[role=switch][aria-label="จำกัดจำนวนชิ้นต่อสินค้า"]').check({ force: true });
+  // เลื่อนให้สวิตช์อยู่กลางจอก่อน — ไม่งั้นอาจโดนแถบสรุปที่ติดล่างบัง แล้ว click ไม่โดน
+  const centerSwitch = async (label) => {
+    const sw = page.locator(`input[role=switch][aria-label="${label}"]`);
+    await sw.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await sw.check({ force: true });
+  };
+  await centerSwitch('จำกัดจำนวนชิ้นต่อสินค้า');
   await page.fill('input[name=limitPerProductQty]', '3');
-  await page.locator('input[role=switch][aria-label="จำกัดต่อลูกค้า 1 คน"]').check({ force: true });
+  await centerSwitch('จำกัดต่อลูกค้า 1 คน');
   await page.fill('input[name=limitPerCustomer]', '2');
   const summary = await page.textContent('.fixed.bottom-0 p.line-clamp-2');
   ok(summary.includes('ลด 15%') && summary.includes('ธัญพืชและถั่ว') && summary.includes('3 ชิ้น/สินค้า') && summary.includes('2 ครั้ง/ลูกค้า'), `summary sentence: ${summary}`);
@@ -62,8 +68,8 @@ const readPromos = () => JSON.parse(fs.readFileSync(DATA + '/promotions.json', '
   const code = await page.inputValue('#couponCode');
   ok(/^[A-Z0-9]{8}$/.test(code), `random code ${code}`);
   await page.fill('#couponMinSubtotal', '300');
-  await page.locator('input[role=switch][aria-label="ส่งฟรี"]').check({ force: true });
-  await page.locator('input[role=switch][aria-label="จำกัดสิทธิ์รวมทั้งโปร"]').check({ force: true });
+  await centerSwitch('ส่งฟรี');
+  await centerSwitch('จำกัดสิทธิ์รวมทั้งโปร');
   await page.fill('input[name=limitTotalUses]', '5');
   await page.click('button:has-text("สร้างโปรโมชัน")');
   await page.waitForURL(/\/admin\/promotions\?saved=1/);

@@ -16,7 +16,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
   const v = state.values ?? {};
 
   return (
-    <form action={action} className="flex flex-col gap-5">
+    <form action={action} className="flex flex-col gap-3">
       {state.ok && <Alert tone="ok">{state.message}</Alert>}
       {state.errors && <Alert tone="danger">กรุณาตรวจสอบข้อมูลที่กรอก</Alert>}
 
