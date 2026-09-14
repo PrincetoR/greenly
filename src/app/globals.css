@@ -194,26 +194,35 @@
     }
 
     /*
-     * หน้าแรก: snap ทีละกลุ่ม (หมวดหมู่ · โปรโมชัน · สินค้าแนะนำ · ขายดี · สินค้าใหม่) — หัวข้อกลุ่มหยุดใต้ header 16px (65 + 16)
-     * ใช้กฎชุดเดียวกับหน้ารายการ (mandatory · footer snap end · แถบสถานะ snap start)
+     * หน้าแรก (จอ md+ จอสัมผัส): snap ทีละกลุ่ม — หัวข้อกลุ่มหยุดใต้ header 16px (65 + 16)
+     * ใช้กฎชุดเดียวกับหน้ารายการ (mandatory · footer snap end · แถบสถานะ snap start) · จอที่มีเมาส์ JS (SnapWheel) จัดการแทน
      */
     html:has(.snap-sections) {
       scroll-snap-type: y mandatory;
-    }
-    .snap-sections .snap-section {
-      scroll-snap-align: start;
-      scroll-margin-top: 81px;
-    }
-    html:has(.snap-sections) footer {
-      scroll-snap-align: end;
-    }
-    html:has(.snap-sections) .status-bar {
-      scroll-snap-align: start;
     }
     /* มีเมาส์ (SnapWheel ใส่ class) → ปิด snap ของเบราว์เซอร์ ให้ JS เลื่อนคนเดียว ไม่แย่งกันจนกระตุกตอนจบ */
     html.wheel-snap:has(.snap-sections) {
       scroll-snap-type: none;
     }
+  }
+  /*
+   * มือถือ (< md): snap แบบ proximity — กลุ่มสูงกว่าจอ (การ์ด 2 คอลัมน์ 4 แถว) ถ้า mandatory จะเลื่อนดูกลางกลุ่มไม่ได้
+   * proximity = เลื่อนอิสระ พอปล่อยนิ้วใกล้หัวกลุ่มค่อยดูดเข้าหา (พี่ต่อถามว่ามือถือไม่ snap หรือ)
+   */
+  @media (max-width: 47.999rem) {
+    html:has(.snap-sections) {
+      scroll-snap-type: y proximity;
+    }
+  }
+  .snap-sections .snap-section {
+    scroll-snap-align: start;
+    scroll-margin-top: 81px;
+  }
+  html:has(.snap-sections) footer {
+    scroll-snap-align: end;
+  }
+  html:has(.snap-sections) .status-bar {
+    scroll-snap-align: start;
   }
   /* หน้าแรกขณะแถบแบนเนอร์ยังอยู่ใต้ header (class จาก HeroHeaderSync): เส้นล่าง header โปร่ง — เส้นล่างของแถบทำหน้าที่แทนจนเลื่อนขึ้นมาถึง · ยังกินที่ 1px เท่าเดิม ไม่ให้ layout ขยับ */
   html.hero-at-top .site-header {
