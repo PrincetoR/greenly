@@ -28,11 +28,12 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
   const sides = side.slice(0, 2);
 
   /*
-   * โครงแบบ Shopee: card ขาวเต็มความกว้างคอนเทนเนอร์ ข้างใน [สไลด์ใหญ่ 2 ส่วน | ภาพเล็ก 2 ช่องซ้อนแนวตั้ง 1 ส่วน]
-   * สูงคงที่บนจอ md+ ให้ 2 ช่องขวารวมกันเท่าสไลด์พอดี · มือถือ: สไลด์เต็มแถว ภาพเล็กเรียง 2 คอลัมน์ข้างล่าง
+   * โครงแบบ Shopee: แถบพื้นขาวสุดจอ (ต่อจากเส้นขอบล่างของ header — ไม่มีเส้นบนของตัวเอง) มีเส้นขอบล่าง
+   * ข้างในจัดตามคอนเทนเนอร์ [สไลด์ใหญ่ 2 ส่วน | ภาพเล็ก 2 ช่องซ้อนแนวตั้ง 1 ส่วน] · สูงคงที่บนจอ md+ ให้ 2 ช่องขวารวมกันเท่าสไลด์พอดี
+   * มือถือ: สไลด์เต็มแถว ภาพเล็กเรียง 2 คอลัมน์ข้างล่าง
    */
   return (
-    <div className={cn('grid gap-3 rounded-card bg-surface p-3 border border-line', sides.length > 0 && 'md:h-[356px] md:grid-cols-[2fr_1fr]')}>
+    <div className={cn('mx-auto grid max-w-6xl gap-3 px-4 py-4', sides.length > 0 && 'md:h-[388px] md:grid-cols-[2fr_1fr]')}>
       <section
         className={cn('group relative aspect-[16/9] overflow-hidden rounded-lg bg-ink md:aspect-auto', sides.length === 0 ? 'md:aspect-[8/3]' : 'md:h-full')}
         aria-roledescription="carousel"

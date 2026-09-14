@@ -30,8 +30,14 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   await page.goto(`${BASE}/`);
   ok((await page.locator('[aria-roledescription=slide]').count()) === 3 && (await page.locator('[role=tab][aria-label^="สไลด์"]').count()) === 3, 'สไลด์แบนเนอร์ 3 ใบ + จุด 3 จุด');
   ok((await page.locator('[aria-label="แบนเนอร์เล็ก"] > a').count()) === 2, 'ภาพเล็กด้านขวา 2 ช่อง (แบบ Shopee) คลิกได้');
-  const heroBox = await page.locator('[aria-roledescription=carousel]').locator('xpath=..').boundingBox();
-  ok(Math.round(heroBox.x) === 80 && Math.round(heroBox.x + heroBox.width) === 1200, `card แบนเนอร์กว้างเท่าคอนเทนเนอร์ (${Math.round(heroBox.x)}–${Math.round(heroBox.x + heroBox.width)})`);
+  const hero = await page.evaluate(() => {
+    const c = document.querySelector('[aria-roledescription=carousel]').getBoundingClientRect();
+    const side = document.querySelector('[aria-label="แบนเนอร์เล็ก"]').getBoundingClientRect();
+    const band = document.querySelector('[aria-roledescription=carousel]').closest('.bg-surface').getBoundingClientRect();
+    const header = document.querySelector('header').getBoundingClientRect();
+    return { left: Math.round(c.left), right: Math.round(side.right), bandLeft: band.left, bandRight: band.right, bandTop: band.top, headerBottom: header.bottom, borderTop: getComputedStyle(document.querySelector('[aria-roledescription=carousel]').closest('.bg-surface')).borderTopWidth };
+  });
+  ok(hero.left === 80 && hero.right === 1200 && hero.bandLeft === 0 && hero.bandRight === 1280 && hero.bandTop === hero.headerBottom && hero.borderTop === '0px', `แถบแบนเนอร์ขาวสุดจอ ต่อจาก header ไม่มีเส้นบน · เนื้อหา 80–1200 (${JSON.stringify(hero)})`);
   await page.hover('[aria-roledescription=carousel]');
   await page.click('button[aria-label="สไลด์ถัดไป"]');
   await page.waitForTimeout(800);
