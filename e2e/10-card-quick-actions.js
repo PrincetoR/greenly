@@ -9,7 +9,8 @@ const read = (n) => JSON.parse(fs.readFileSync(`${DATA}/${n}.json`, 'utf8'));
   const { browser, page } = await launch();
   await page.goto(`${BASE}/`);
 
-  const card = page.locator('.group', { hasText: 'กราโนล่า' }).first();
+  // .group:has(h3) = การ์ดสินค้า (สไลด์หน้าแรกก็เป็น .group และมีคำว่ากราโนล่าในข้อความรอง)
+  const card = page.locator('.group:has(h3)', { hasText: 'กราโนล่า' }).first();
   // หัวใจกับตะกร้าอยู่แถวเดียวกับราคา (แนวตั้งใกล้กัน) และเรียง หัวใจ → ตะกร้า
   const priceBox = await card.locator('span.font-bold').first().boundingBox();
   const heartBox = await card.locator('button[aria-label="เพิ่มในรายการโปรด"]').boundingBox();
