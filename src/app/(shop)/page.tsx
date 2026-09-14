@@ -4,6 +4,7 @@ import { listProducts } from '@/lib/db/products';
 import { listOrders } from '@/lib/db/orders';
 import { getHomepage } from '@/lib/db/homepage';
 import { HeroSlider } from '@/components/shop/hero-slider';
+import { HeroHeaderSync } from '@/components/shop/hero-header-sync';
 import { WelcomePopup } from '@/components/shop/welcome-popup';
 import { topProducts } from '@/lib/analytics/categories';
 import { loadPromotionContext } from '@/lib/promotions/service';
@@ -56,6 +57,7 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
       {slides.length > 0 ? (
         // แถบขาวสุดจอ ต่อจาก header (ใช้เส้นขอบล่างของ header เป็นเส้นบน) มีเส้นขอบล่างของตัวเอง — พี่ต่อสั่ง
         <div className="bg-surface border-b border-line">
+          <HeroHeaderSync />
           <h1 className="sr-only">{settings.storeName}</h1>
           <HeroSlider slides={slides} side={sideBanners} autoplaySeconds={home.autoplaySeconds} />
         </div>
