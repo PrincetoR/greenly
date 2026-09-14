@@ -9,6 +9,7 @@ import type { Category } from '@/lib/types';
 import { isAdminMenuActive, type AdminMenuItem } from '@/lib/auth/roles';
 import { logout } from '@/lib/actions/auth';
 import { ACCOUNT_ITEMS } from './account-items';
+import { TopLine } from './top-line';
 
 const NAV = [
   { href: '/products', label: 'สินค้าทั้งหมด' },
@@ -59,6 +60,8 @@ export function ShopHeader({
 
   return (
     <>
+      {/* เส้นเขียว 2px ตรึงบนสุด + วิ่งตอนโหลดหน้า — กลืนกับแถบสถานะตอนอยู่บนสุด */}
+      <TopLine />
       {/* แถบสถานะ — ไม่ sticky (แถบหลักยังติดที่ top-0 ระยะ 65px ที่หน้ารายการใช้จึงไม่เปลี่ยน) */}
       {/* พื้นสีแบรนด์แบบ Shopee · ลิงก์ขาวโปร่ง ชื่อผู้ใช้ขาวเข้ม */}
       <div className="status-bar hidden bg-brand text-xs text-white/85 md:block">

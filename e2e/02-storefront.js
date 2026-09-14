@@ -6,6 +6,19 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   ok((await page.locator('h2:has-text("สินค้าแนะนำ")').count()) === 1, 'home: featured section');
   // seed:clean ไม่มีออเดอร์ → ไม่มีอะไรให้จัดอันดับ ส่วน "สินค้าขายดี" ต้องซ่อน (ตรวจตอนมีข้อมูลใน e2e/14)
   ok((await page.locator('h2:has-text("สินค้าขายดี")').count()) === 0, 'home: ไม่มีออเดอร์ → ซ่อนสินค้าขายดี');
+  // เส้นเขียว 2px ตรึงบนสุด + วิ่งตอนโหลดหน้า
+  const topLine = await page.evaluate(() => { const el = document.querySelector('header')?.previousElementSibling?.previousElementSibling ?? document.querySelector('.fixed.top-0'); const r = el.getBoundingClientRect(); return { top: r.top, h: r.height, bg: getComputedStyle(el).backgroundColor }; });
+  ok(topLine.top === 0 && topLine.h === 2 && topLine.bg === 'rgb(30, 138, 76)', `เส้นเขียว 2px ตรึงบนสุด (${JSON.stringify(topLine)})`);
+  const shown = await page.evaluate(async () => {
+    document.querySelector('header a[href="/promotions"]').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    return document.querySelector('.top-line-sweep') !== null;
+  });
+  ok(shown, 'คลิกลิงก์ → แถบวิ่งบนเส้นเขียวขึ้นทันที');
+  await page.waitForURL(/promotions/);
+  await page.waitForTimeout(300);
+  ok((await page.locator('.top-line-sweep').count()) === 0, 'หน้าใหม่มาแล้ว → แถบวิ่งหาย');
+  await page.goto(`${BASE}/`);
   // snap ทีละกลุ่ม: เลื่อนล้อเมาส์แล้วหัวข้อกลุ่มต้องหยุดที่ 81 (ใต้ header 16)
   ok((await page.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType)) === 'y mandatory', 'home: เปิด scroll snap');
   await page.mouse.wheel(0, 420);

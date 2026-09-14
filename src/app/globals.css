@@ -201,6 +201,18 @@
   html.hero-at-top .site-header {
     border-bottom-color: transparent;
   }
+  /* แถบขาววิ่งบนเส้นเขียว 2px ตอนกำลังโหลดหน้า (TopLine) */
+  .top-line-sweep {
+    animation: top-line-sweep 1s linear infinite;
+  }
+  @keyframes top-line-sweep {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(300%);
+    }
+  }
   /* ซ่อน scrollbar แต่ยังเลื่อนได้ — ใช้กับแถบหมวดหมู่บนมือถือ */
   .scrollbar-none {
     scrollbar-width: none;
