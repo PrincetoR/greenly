@@ -6,6 +6,13 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   ok((await page.locator('h2:has-text("สินค้าแนะนำ")').count()) === 1, 'home: featured section');
   // seed:clean ไม่มีออเดอร์ → ไม่มีอะไรให้จัดอันดับ ส่วน "สินค้าขายดี" ต้องซ่อน (ตรวจตอนมีข้อมูลใน e2e/14)
   ok((await page.locator('h2:has-text("สินค้าขายดี")').count()) === 0, 'home: ไม่มีออเดอร์ → ซ่อนสินค้าขายดี');
+  // snap ทีละกลุ่ม: เลื่อนล้อเมาส์แล้วหัวข้อกลุ่มต้องหยุดที่ 81 (ใต้ header 16)
+  ok((await page.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType)) === 'y mandatory', 'home: เปิด scroll snap');
+  await page.mouse.wheel(0, 420);
+  await page.waitForTimeout(700);
+  const snapped = await page.evaluate(() => [...document.querySelectorAll('.snap-section')].map((s) => Math.round(s.getBoundingClientRect().top)));
+  ok(snapped.includes(81), `home: เลื่อนแล้ว snap หัวข้อกลุ่มที่ 81 (${snapped.join(',')})`);
+  await page.evaluate(() => window.scrollTo(0, 0));
   ok((await page.locator('a[href^="/category/"]').count()) >= 6, 'home: category chips');
   await shot(page, 'p3-home');
 

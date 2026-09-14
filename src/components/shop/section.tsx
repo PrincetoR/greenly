@@ -14,7 +14,7 @@ export function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mx-auto mt-10 max-w-6xl px-4">
+    <section className="snap-section mx-auto mt-10 max-w-6xl px-4">
       <div className="mb-4 flex items-end justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold sm:text-2xl">{title}</h2>

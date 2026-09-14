@@ -174,6 +174,24 @@
     html:has(.snap-rows) .status-bar {
       scroll-snap-align: start;
     }
+
+    /*
+     * หน้าแรก: snap ทีละกลุ่ม (หมวดหมู่ · โปรโมชัน · สินค้าแนะนำ · ขายดี · สินค้าใหม่) — หัวข้อกลุ่มหยุดใต้ header 16px (65 + 16)
+     * ใช้กฎชุดเดียวกับหน้ารายการ (mandatory · footer snap end · แถบสถานะ snap start)
+     */
+    html:has(.snap-sections) {
+      scroll-snap-type: y mandatory;
+    }
+    .snap-sections .snap-section {
+      scroll-snap-align: start;
+      scroll-margin-top: 81px;
+    }
+    html:has(.snap-sections) footer {
+      scroll-snap-align: end;
+    }
+    html:has(.snap-sections) .status-bar {
+      scroll-snap-align: start;
+    }
   }
   /* ซ่อน scrollbar แต่ยังเลื่อนได้ — ใช้กับแถบหมวดหมู่บนมือถือ */
   .scrollbar-none {

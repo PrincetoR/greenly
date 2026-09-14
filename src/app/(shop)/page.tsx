@@ -40,7 +40,8 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="pb-8">
+    // snap-sections: จอ md+ เลื่อนแล้วหยุดทีละกลุ่ม (พี่ต่อสั่ง) — กฎอยู่ใน globals.css
+    <div className="snap-sections pb-8">
       <section className="bg-gradient-to-br from-brand-soft via-page to-accent-soft">
         <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-14 sm:py-20">
           <h1 className="text-3xl font-bold sm:text-5xl">{settings.storeName}</h1>
