@@ -197,7 +197,7 @@
       scroll-snap-type: none;
     }
   }
-  /* หน้าแรกขณะแถบแบนเนอร์ยังอยู่ใต้ header (class จาก HeroHeaderSync): เส้นล่าง header โปร่ง — โผล่เมื่อขอบล่างแถบเลื่อนมาถึง · ยังกินที่ 1px เท่าเดิม ไม่ให้ layout ขยับ */
+  /* หน้าแรกขณะยังเห็นรูปสไลด์ (class จาก HeroHeaderSync): เส้นล่าง header โปร่ง — โผล่ทันทีที่รูปจางหมด · ยังกินที่ 1px เท่าเดิม ไม่ให้ layout ขยับ */
   html.hero-at-top .site-header {
     border-bottom-color: transparent;
   }

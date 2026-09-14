@@ -49,17 +49,7 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   ok(Math.abs((await fade()) - 0.5) < 0.05 && (await hb()) === 'rgba(0, 0, 0, 0)', `เลื่อน 15% ของแถบ: จาง 50% · เส้น header ยังไม่โผล่ (opacity ${await fade()})`);
   await page.evaluate((y) => window.scrollTo(0, y), Math.round(bandH * 0.3) + 2);
   await page.waitForTimeout(150);
-  ok((await fade()) === 0 && (await hb()) === 'rgba(0, 0, 0, 0)', 'เลื่อน 30%: จางหมด · เส้น header ยังไม่โผล่ (ขอบล่างแถบยังไม่ถึง)');
-  // ขอบล่างแถบถึงขอบล่าง header sticky (สูง 65 — แถบสถานะเลื่อนพ้นไปแล้ว) เมื่อ scrollY = bandBottom(ตอนบนสุด) − 65
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(100);
-  const reach = await page.evaluate(() => Math.round(document.querySelector('[data-hero-band]').getBoundingClientRect().bottom - document.querySelector('header').offsetHeight));
-  await page.evaluate((y) => window.scrollTo(0, y - 5), reach);
-  await page.waitForTimeout(150);
-  ok((await hb()) === 'rgba(0, 0, 0, 0)', 'ก่อนขอบล่างแถบถึง header 5px: เส้นยังโปร่ง');
-  await page.evaluate((y) => window.scrollTo(0, y + 2), reach);
-  await page.waitForTimeout(150);
-  ok((await hb()) !== 'rgba(0, 0, 0, 0)', 'ขอบล่างแถบขึ้นมาถึง header → เส้น header กลับมา');
+  ok((await fade()) === 0 && (await hb()) !== 'rgba(0, 0, 0, 0)', 'เลื่อน 30%: จางหมด → เส้น header กลับมาทันที');
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(300);
   ok((await fade()) === 1 && (await hb()) === 'rgba(0, 0, 0, 0)', 'กลับบนสุด: ชัด 100% เส้นโปร่งอีกครั้ง');
