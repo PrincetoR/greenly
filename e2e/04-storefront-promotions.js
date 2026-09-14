@@ -51,6 +51,9 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
   const kombucha = page.locator('.group:has(h3)', { hasText: 'คอมบูชา' }).first(); // :has(h3) = การ์ดสินค้า (สไลด์ก็เป็น .group)
   ok((await kombucha.locator('text=-20%').count()) === 1, 'card: -20% badge on drinks');
   ok((await kombucha.locator('text=฿76').count()) === 1 && (await kombucha.locator('text=฿95').count()) === 1, 'card: ฿95 → ฿76');
+  // ราคาเดิมขีดฆ่าอยู่บรรทัดบน ราคาโปรอยู่ล่าง (พี่ต่อสั่ง 2026-09-15)
+  const pr = await kombucha.locator('.line-through').evaluate((s) => ({ strike: s.getBoundingClientRect().bottom, price: s.nextElementSibling.getBoundingClientRect().top, txt: s.nextElementSibling.textContent }));
+  ok(pr.strike <= pr.price && pr.txt === '฿76', 'card: ขีดฆ่า ฿95 อยู่บน · ฿76 อยู่ล่าง');
   const granola = page.locator('.group:has(h3)', { hasText: 'กราโนล่า' }).first();
   ok((await granola.locator('text=ซื้อ 2 แถม 1').count()) === 1, 'card: bogo badge on snacks');
   await shot(page, 'p5-home');
