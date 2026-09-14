@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 
 /**
- * หน้าแรก (จอ md+ ที่มีเมาส์/ทัชแพด): เลื่อนตามมืออิสระ พอมือหยุดค่อย "เกลี่ย" ไปหัวกลุ่มที่เลื่อนไปถึง
+ * หน้าแรก (จอ md+ ที่มีเมาส์/ทัชแพด): เลื่อนตามมืออิสระ แล้ว "เกลี่ย" ไปหัวกลุ่มที่เลื่อนไปถึง — เริ่มตั้งแต่ช่วงท้ายของแรงเฉื่อย ไม่รอหยุดสนิท
  *  · ทิศลง → กลุ่มถัดไปข้างหน้า (เลื่อนแค่นิดเดียวก็ไปต่อ ไม่เด้งกลับ) · ทิศขึ้น → กลุ่มก่อนหน้า
  *  · ถ้าเพิ่งผ่านหัวกลุ่มมาไม่เกิน 24px ถือว่าถึงกลุ่มนั้นแล้ว · ห่างเกินหนึ่งจอ (กลุ่มสูงมาก) ไม่บังคับ
  * แอนิเมชันเกลี่ยเขียนเอง (ไม่ใช้ scrollTo smooth ที่เริ่มจากหยุดนิ่งแล้วเด้ง): เริ่มด้วยความเร็วเท่าที่กำลังเลื่อนอยู่
@@ -77,6 +77,7 @@ export function SnapWheel() {
           animating = false;
           lastSettled = target;
           samples = [];
+          lastDelta = 0;
         }
       };
       raf = requestAnimationFrame(step);
@@ -98,12 +99,44 @@ export function SnapWheel() {
       animateTo(target, v);
     };
 
-    const onWheel = () => {
+    // ตรวจจับ "แรงเฉื่อยกำลังจาง" ของทัชแพด (deltaY เล็กลงติดกัน) แล้วเริ่มเกลี่ยก่อนที่จะหยุดสนิท — ให้ต่อเนื่องไม่กระตุก (พี่ต่อสั่ง)
+    let lastDelta = 0;
+    let decreasing = 0;
+    let peak = 0;
+    const onWheel = (e: WheelEvent) => {
       if (!active()) return;
-      // มือขยับอีก → ยกเลิกการเกลี่ย ให้มือคุม แล้วนัดเกลี่ยใหม่หลังมือหยุด
-      cancelAnim();
+      const d = Math.abs(e.deltaY);
+      if (animating) {
+        // ระหว่างเกลี่ย: เหตุการณ์จากแรงเฉื่อยเดิม (เล็กลงเรื่อย ๆ) → กันไว้ไม่ให้แย่งตำแหน่ง · ถ้าใหญ่ขึ้นชัดเจน = มือขยับใหม่ → ยกเลิกเกลี่ย ปล่อยให้เลื่อน
+        if (d <= lastDelta * 1.5 + 4) {
+          e.preventDefault();
+          lastDelta = d;
+          return;
+        }
+        cancelAnim();
+      }
+      if (d > lastDelta) {
+        decreasing = 0;
+        peak = Math.max(peak, d);
+      } else decreasing += 1;
+      lastDelta = d;
       clearTimeout(gestureTimer);
-      gestureTimer = window.setTimeout(settle, GESTURE_GAP);
+      // เล็กลงติดกัน ≥3 ครั้งจนต่ำกว่า 10px (หลังเคยแรง ≥20) = ช่วงท้ายของแรงเฉื่อย → เกลี่ยเลย
+      if (decreasing >= 3 && d < 10 && peak >= 20) {
+        // กันเหตุการณ์นี้เลื่อนเพิ่มหลังเราจับตำแหน่งเริ่มไปแล้ว (ไม่งั้นเฟรมแรกถอยหลังนิดหนึ่ง)
+        e.preventDefault();
+        peak = 0;
+        decreasing = 0;
+        settle();
+        return;
+      }
+      // ล้อเมาส์ทีละติ๊ก/หยุดกะทันหัน → เกลี่ยหลังไม่มี wheel มา 90ms
+      gestureTimer = window.setTimeout(() => {
+        peak = 0;
+        decreasing = 0;
+        lastDelta = 0;
+        settle();
+      }, GESTURE_GAP);
     };
     const onScroll = () => {
       samples.push({ y: window.scrollY, t: performance.now() });
@@ -114,7 +147,7 @@ export function SnapWheel() {
       idleTimer = window.setTimeout(settle, 150);
     };
 
-    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       window.removeEventListener('wheel', onWheel);
