@@ -20,9 +20,8 @@ const { BASE, launch, login, ok } = require('./lib');
 
   // logout แล้วเมนูหาย
   await page.click('main button:has-text("ออกจากระบบ")');
-  await page.waitForURL(/\/admin\/login/);
-  await page.goto(`${BASE}/`);
-  ok((await page.locator('header a[href="/admin"]').count()) === 0, 'logout แล้วเมนูการจัดการหาย');
+  await page.waitForURL((u) => u.pathname === '/');
+  ok((await page.locator('header a[href="/admin"]').count()) === 0, 'logout → หน้าแรก · เมนูการจัดการหาย');
 
   // มือถือ: staff login → แถบเมนูล่างช่องขวาสุดเป็น การจัดการ (แทนโปรไฟล์) · header หน้าร้านไม่มี hamburger (พี่ต่อสั่ง 2026-09-15)
   await login(page, 'staff', 'staff1234');

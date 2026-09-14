@@ -25,7 +25,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/admin/logi
           <LoginForm next={typeof next === 'string' ? next : undefined} />
         </div>
         <p className="mt-4 text-center text-xs text-muted">
-          บัญชีสาธิต: admin / admin1234 · staff / staff1234
+          บัญชีสาธิต: admin / admin1234 · staff / staff1234 · customer / customer1234
         </p>
       </div>
     </main>

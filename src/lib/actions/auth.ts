@@ -24,18 +24,13 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   if (!user.active) return { error: 'บัญชีนี้ถูกปิดใช้งาน ติดต่อผู้ดูแลระบบ', username };
 
   await createSession(user);
-  // ลูกค้า → โปรไฟล์เสมอ · พนักงาน: รับ next เฉพาะ path ภายใน /admin หรือ /account กัน open redirect
+  // ลูกค้า → โปรไฟล์เสมอ · พนักงาน → การจัดการ (พี่ต่อสั่ง 2026-09-15) · next ใช้เฉพาะ deep link ใน /admin/* กัน open redirect
   if (!isStaffRole(user.role)) redirect('/account');
-  redirect(next === '/account' || (next.startsWith('/admin') && !next.startsWith('/admin/login')) ? next : '/admin');
+  redirect(next.startsWith('/admin') && !next.startsWith('/admin/login') ? next : '/admin');
 }
 
+/** ออกจากระบบ (hamburger หลังบ้าน / ปุ่มล่างโปรไฟล์ลูกค้า) → หน้าแรกเสมอ (พี่ต่อสั่ง 2026-09-15) */
 export async function logout(): Promise<void> {
   await destroySession();
-  redirect('/admin/login');
-}
-
-/** ปุ่มออกจากระบบล่างสุดของหน้าโปรไฟล์ (ลูกค้า) — กลับมาหน้าโปรไฟล์แบบ guest */
-export async function logoutToAccount(): Promise<void> {
-  await destroySession();
-  redirect('/account');
+  redirect('/');
 }

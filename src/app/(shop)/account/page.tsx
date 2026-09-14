@@ -3,7 +3,7 @@ import { Heart, LayoutDashboard, LogOut, Package, ShoppingCart } from 'lucide-re
 import { readGuestId } from '@/lib/guest';
 import { getSession } from '@/lib/auth/session';
 import { ROLE_LABEL, isStaffRole } from '@/lib/auth/roles';
-import { logoutToAccount } from '@/lib/actions/auth';
+import { logout } from '@/lib/actions/auth';
 import { AccountPanel } from '@/components/shop/account-panel';
 import { listOrdersByGuest } from '@/lib/db/orders';
 import { readMyWishlist } from '@/lib/wishlist/storage';
@@ -83,7 +83,7 @@ export default async function AccountPage() {
       )}
       {/* ลูกค้า: ออกจากระบบล่างสุดของโปรไฟล์ (พนักงานใช้ hamburger) */}
       {session && !staff && (
-        <form action={logoutToAccount} className="mt-6">
+        <form action={logout} className="mt-6">
           <Button type="submit" variant="secondary" className="w-full text-danger">
             <LogOut className="size-4" aria-hidden />
             ออกจากระบบ

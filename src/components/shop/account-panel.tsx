@@ -9,7 +9,7 @@ import { cn } from '@/lib/cn';
 /**
  * หน้าโปรไฟล์ 2 บาน (พี่ต่อสั่ง 2026-09-15): บานซ้าย = โปรไฟล์ (children จาก server) · กด "เข้าสู่ระบบ" แล้ว
  * เลื่อนไปทางซ้ายเผยบานขวา = ฟอร์ม login — header/แถบเมนูล่างอยู่ที่เดิม ไม่พาไปหน้าอื่น
- * login สำเร็จ action พากลับ /account (server render ใหม่เป็นโหมด customer/staff) · บานที่ซ่อนใส่ inert กันโฟกัสหลง
+ * login สำเร็จ: ลูกค้า → กลับ /account (server render ใหม่เป็นโหมด customer) · พนักงาน → /admin · บานที่ซ่อนใส่ inert กันโฟกัสหลง
  * โฟกัสช่องชื่อผู้ใช้เองด้วย preventScroll — autoFocus ธรรมดาจะทำให้ container overflow-hidden เลื่อน scrollLeft ไปอีก 1 บาน (เลื่อนซ้อนกับ translate → จอว่าง)
  */
 export function AccountPanel({ name, sub, guest, children }: { name: string; sub: string; guest: boolean; children: ReactNode }) {
@@ -54,11 +54,19 @@ export function AccountPanel({ name, sub, guest, children }: { name: string; sub
           </button>
           <div className="mt-4 rounded-card bg-surface p-5 border border-line sm:max-w-sm">
             <h2 className="text-lg font-bold">เข้าสู่ระบบ</h2>
-            <p className="mt-0.5 mb-4 text-sm text-muted">ใช้บัญชีลูกค้า — พนักงานร้านก็เข้าได้ แล้วไปต่อที่ “การจัดการ”</p>
+            <p className="mt-0.5 mb-4 text-sm text-muted">ใช้บัญชีลูกค้า — พนักงานร้านเข้าตรงนี้ได้เหมือนกัน จะพาไปหน้าการจัดการ</p>
             {/* mount เฉพาะตอนเปิด — ฟอร์มสั้น ไม่ต้องอยู่ใน DOM ตลอด */}
-            {open && <LoginForm next="/account" autoFocus={false} />}
+            {open && <LoginForm autoFocus={false} />}
           </div>
-          <p className="mt-3 text-xs text-muted">บัญชีสาธิต: customer / customer1234</p>
+          {/* บัญชีสาธิตทั้ง 3 role พร้อมรหัส (พี่ต่อสั่ง 2026-09-15) */}
+          <div className="mt-3 text-xs text-muted sm:max-w-sm">
+            <p className="font-medium">บัญชีสาธิต</p>
+            <ul className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5">
+              <li className="contents"><span>ลูกค้า</span><code className="font-mono">customer / customer1234</code></li>
+              <li className="contents"><span>ผู้ดูแลระบบ</span><code className="font-mono">admin / admin1234</code></li>
+              <li className="contents"><span>พนักงาน</span><code className="font-mono">staff / staff1234</code></li>
+            </ul>
+          </div>
         </section>
       </div>
     </div>

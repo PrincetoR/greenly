@@ -1,6 +1,6 @@
 /**
  * บัญชีลูกค้า (role customer — พี่ต่อสั่ง 2026-09-15): login จากหน้าโปรไฟล์แบบเลื่อนบานในหน้าเดียว (header/แถบล่างอยู่ที่เดิม)
- * ลูกค้า: ปุ่มออกจากระบบล่างสุดของโปรไฟล์ · เข้าหลังบ้านไม่ได้ · แถบล่างยังเป็นโปรไฟล์ · พนักงาน: login ทางเดียวกันแล้วเห็น "ไปหน้าการจัดการ" ไม่มีปุ่มออกจากระบบในโปรไฟล์
+ * ลูกค้า: login แล้วอยู่โปรไฟล์ · ปุ่มออกจากระบบล่างสุดของโปรไฟล์ → หน้าแรก · เข้าหลังบ้านไม่ได้ · พนักงาน: login ทางเดียวกัน → การจัดการ (พี่ต่อสั่ง 2026-09-15)
  */
 const { BASE, launch, ok, shot } = require('./lib');
 
@@ -50,21 +50,20 @@ const { BASE, launch, ok, shot } = require('./lib');
   ok(page.url().endsWith('/account'), 'ลูกค้าเข้า /admin/products → เด้งกลับโปรไฟล์');
   await shot(page, 'p16-account-customer');
   await page.click('form button:has-text("ออกจากระบบ")');
-  await page.waitForSelector('button:has-text("เข้าสู่ระบบ")');
-  ok(page.url().endsWith('/account') && (await page.locator('h1').textContent()) === 'ลูกค้าทั่วไป', 'ออกจากระบบ → กลับเป็น guest ที่หน้าโปรไฟล์');
+  await page.waitForURL((u) => u.pathname === '/');
+  await page.goto(`${BASE}/account`);
+  ok((await page.locator('h1').textContent()) === 'ลูกค้าทั่วไป' && (await page.locator('button:has-text("เข้าสู่ระบบ")').isVisible()), 'ออกจากระบบ → หน้าแรก · โปรไฟล์กลับเป็น guest');
 
-  // พนักงาน login ทางเดียวกัน → ลิงก์ไปการจัดการ · ไม่มีปุ่มออกจากระบบในโปรไฟล์ (อยู่ใน hamburger หลังบ้าน)
+  // พนักงาน login ทางเดียวกัน → ไปหน้าการจัดการ · โปรไฟล์ของพนักงานมีลิงก์การจัดการ ไม่มีปุ่มออกจากระบบ (อยู่ใน hamburger หลังบ้าน)
   await page.click('button:has-text("เข้าสู่ระบบ")');
   await page.waitForTimeout(400);
   await page.fill('#username', 'staff');
   await page.fill('#password', 'staff1234');
   await page.click('form button[type=submit]:has-text("เข้าสู่ระบบ")');
-  await page.waitForSelector('a:has-text("ไปหน้าการจัดการ")');
-  ok(page.url().endsWith('/account') && (await page.locator('form button:has-text("ออกจากระบบ")').count()) === 0 && (await page.locator('nav[aria-label="เมนูมือถือ"] a[href="/admin"]').count()) === 1, 'พนักงาน login จากโปรไฟล์ → กลับโปรไฟล์ มีลิงก์การจัดการ ไม่มีปุ่มออกจากระบบ · แถบล่างเป็นการจัดการ');
-
-  // จอใหญ่: บาน login กว้างไม่เกิน max-w-sm
-  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.waitForURL((u) => u.pathname === '/admin');
+  ok(true, 'พนักงาน login จากโปรไฟล์ → หน้าการจัดการ');
   await page.goto(`${BASE}/account`);
-  ok((await page.locator('a:has-text("ไปหน้าการจัดการ")').isVisible()), 'desktop: พนักงานเห็นลิงก์การจัดการ');
+  await page.waitForLoadState('networkidle');
+  ok((await page.locator('a:has-text("ไปหน้าการจัดการ")').isVisible()) && (await page.locator('form button:has-text("ออกจากระบบ")').count()) === 0 && (await page.locator('nav[aria-label="เมนูมือถือ"] a[href="/admin"]').count()) === 1, 'โปรไฟล์พนักงาน: ลิงก์การจัดการ ไม่มีปุ่มออกจากระบบ · แถบล่างเป็นการจัดการ');
   await browser.close();
 })().catch((e) => { console.error('💥', e); process.exit(1); });
