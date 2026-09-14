@@ -52,6 +52,7 @@ const cartBadge = async (page) => (await page.locator('header a[href="/cart"] sp
   await page.fill('#name', 'ลูกค้า เครื่องเอ');
   await page.fill('#phone', '081-000-1111');
   await page.fill('#address', '1 ซอยทดสอบ แขวงทดสอบ เขตทดสอบ กรุงเทพ 10000');
+  await page.click('label:has-text("เก็บเงินปลายทาง")');
   await page.click('button[type=submit]:has-text("ยืนยันสั่งซื้อ")');
   await page.waitForURL(/\/order\/OD-/);
   const orderNo = new URL(page.url()).pathname.split('/').pop();

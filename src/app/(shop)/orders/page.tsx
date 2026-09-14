@@ -3,7 +3,8 @@ import { readGuestId } from '@/lib/guest';
 import { listOrdersByGuest } from '@/lib/db/orders';
 import { formatBaht } from '@/lib/money';
 import { formatDateTime } from '@/lib/datetime';
-import { ORDER_STATUS_LABEL, ORDER_STATUS_TONE } from '@/lib/orders/labels';
+import { ORDER_STATUS_HINT, ORDER_STATUS_LABEL, ORDER_STATUS_TONE } from '@/lib/orders/labels';
+import { carrierById } from '@/lib/shipping/carriers';
 import { ProductImage } from '@/components/product-image';
 import { OrderLookupForm } from '@/components/shop/order-lookup-form';
 import { Badge } from '@/components/ui/badge';
@@ -45,7 +46,9 @@ export default async function MyOrdersPage() {
                   <span className="font-mono font-semibold">{o.orderNo}</span>
                   <Badge tone={ORDER_STATUS_TONE[o.status]}>{ORDER_STATUS_LABEL[o.status]}</Badge>
                 </div>
-                <p className="mt-1 text-xs text-muted">{formatDateTime(o.createdAt)}</p>
+                <p className="mt-1 text-xs text-muted">
+                  {formatDateTime(o.createdAt)} · {o.status === 'shipped' && o.shipment ? `${carrierById(o.shipment.carrier).short} ${o.shipment.trackingNo}` : ORDER_STATUS_HINT[o.status]}
+                </p>
                 <div className="mt-3 flex items-center gap-2">
                   <div className="flex -space-x-2">
                     {o.lines.slice(0, 4).map((l, i) => (

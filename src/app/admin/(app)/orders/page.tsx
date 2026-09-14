@@ -3,7 +3,8 @@ import { requirePermission } from '@/lib/auth/session';
 import { listOrders } from '@/lib/db/orders';
 import { formatBaht } from '@/lib/money';
 import { formatDateTime } from '@/lib/datetime';
-import { ORDER_STATUS_LABEL, ORDER_STATUS_TONE, PAYMENT_LABEL } from '@/lib/orders/labels';
+import { ORDER_STATUS_LABEL, ORDER_STATUS_TONE, PAYMENT_CHANNEL_LABEL, PAYMENT_LABEL, PAYMENT_STATUS_LABEL, PAYMENT_STATUS_TONE } from '@/lib/orders/labels';
+import { carrierById } from '@/lib/shipping/carriers';
 import type { OrderStatus } from '@/lib/types';
 import { PageHeader } from '@/components/admin/page-header';
 import { Table, Td, Th } from '@/components/ui/table';
@@ -14,7 +15,7 @@ import { Receipt } from 'lucide-react';
 
 export const metadata = { title: 'คำสั่งซื้อ' };
 
-const STATUSES: OrderStatus[] = ['pending', 'paid', 'shipped', 'done', 'cancelled'];
+const STATUSES: OrderStatus[] = ['pending', 'paid', 'packing', 'shipped', 'done', 'returned', 'cancelled'];
 const PAGE_SIZE = 50;
 
 export default async function OrdersPage({ searchParams }: PageProps<'/admin/orders'>) {
@@ -42,7 +43,7 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
 
   return (
     <div>
-      <PageHeader title="คำสั่งซื้อ" description={`ทั้งหมด ${all.length} รายการ · รอยืนยัน ${count('pending')}`} />
+      <PageHeader title="คำสั่งซื้อ" description={`ทั้งหมด ${all.length.toLocaleString('th-TH')} รายการ · รอชำระ/ยืนยัน ${count('pending')} · รอแพ็ค ${count('paid')} · กำลังแพ็ค ${count('packing')} · ระหว่างส่ง ${count('shipped')}`} />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Chip href="/admin/orders" active={!status}>
@@ -71,6 +72,7 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
                   <Th>วันที่</Th>
                   <Th>ลูกค้า</Th>
                   <Th>ชำระ</Th>
+                  <Th>จัดส่ง</Th>
                   <Th className="text-right">ยอด</Th>
                   <Th>สถานะ</Th>
                 </tr>
@@ -88,7 +90,20 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
                       {o.customer.name}
                       <span className="block text-xs text-muted">{o.customer.phone}</span>
                     </Td>
-                    <Td className="text-muted">{PAYMENT_LABEL[o.paymentMethod]}</Td>
+                    <Td className="text-muted">
+                      <span className="block whitespace-nowrap">{o.paymentMethod === 'cod' ? PAYMENT_LABEL.cod : o.payment?.channel ? PAYMENT_CHANNEL_LABEL[o.payment.channel] : 'Beam'}</span>
+                      {o.payment && <Badge tone={PAYMENT_STATUS_TONE[o.payment.status]}>{PAYMENT_STATUS_LABEL[o.payment.status]}</Badge>}
+                    </Td>
+                    <Td className="text-muted">
+                      {o.shipment ? (
+                        <>
+                          <span className="block whitespace-nowrap">{carrierById(o.shipment.carrier).short}</span>
+                          <span className="font-mono text-xs">{o.shipment.trackingNo}</span>
+                        </>
+                      ) : (
+                        '—'
+                      )}
+                    </Td>
                     <Td className="text-right font-medium">{formatBaht(o.total)}</Td>
                     <Td>
                       <Badge tone={ORDER_STATUS_TONE[o.status]}>{ORDER_STATUS_LABEL[o.status]}</Badge>

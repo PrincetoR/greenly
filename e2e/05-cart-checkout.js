@@ -98,6 +98,7 @@ async function add(page, path, qty) {
   await page.fill('#name', 'ทดสอบ ระบบ');
   await page.fill('#phone', '0812345678');
   await page.fill('#address', '123 ถนนสุขุมวิท แขวงคลองเตย เขตคลองเตย กทม 10110');
+  await page.click('label:has-text("เก็บเงินปลายทาง")');
   await page.click('button[type=submit]:has-text("ยืนยันสั่งซื้อ")');
   await page.waitForSelector('form [role=alert]');
   ok((await page.textContent('form [role=alert]')).includes('ใช้ไม่ได้'), 'coupon per-customer blocked at checkout');
@@ -108,6 +109,7 @@ async function add(page, path, qty) {
   await page.fill('#name', 'ทดสอบ ระบบ');
   await page.fill('#phone', '0812345678');
   await page.fill('#address', '123 ถนนสุขุมวิท แขวงคลองเตย เขตคลองเตย กทม 10110');
+  await page.click('label:has-text("เก็บเงินปลายทาง")');
   await page.click('button[type=submit]:has-text("ยืนยันสั่งซื้อ")');
   await page.waitForSelector('form [role=status]');
   const warn = await page.textContent('form [role=status]');

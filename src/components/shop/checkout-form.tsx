@@ -8,14 +8,19 @@ import { Field } from '@/components/ui/field';
 import { Alert } from '@/components/ui/alert';
 import { cn } from '@/lib/cn';
 
-const PAYMENTS = [
-  { value: 'transfer', title: 'โอนเงินผ่านธนาคาร', desc: 'แจ้งเลขบัญชีหลังสั่งซื้อ (จำลอง)' },
-  { value: 'cod', title: 'เก็บเงินปลายทาง', desc: 'ชำระกับพนักงานส่งของ' },
-] as const;
+type PaymentValue = 'beam' | 'cod';
 
-export function CheckoutForm({ total, gifts }: { total: number; gifts: number }) {
+/**
+ * ฟอร์มสั่งซื้อ — วิธีชำระ: Beam (ชำระออนไลน์ เลือกช่องทางย่อยที่หน้า Beam หลังกดยืนยัน) · เก็บเงินปลายทาง
+ * beam = รายชื่อช่องทางที่เปิดรับตอนนี้ (null = ปิด Beam) · cod = เปิดรับ COD ไหม
+ */
+export function CheckoutForm({ total, gifts, beam, cod }: { total: number; gifts: number; beam: string[] | null; cod: boolean }) {
+  const PAYMENTS: { value: PaymentValue; title: string; desc: string }[] = [
+    ...(beam ? [{ value: 'beam' as const, title: 'ชำระออนไลน์ผ่าน Beam', desc: beam.join(' · ') || 'ไม่มีช่องทางที่รองรับยอดนี้' }] : []),
+    ...(cod ? [{ value: 'cod' as const, title: 'เก็บเงินปลายทาง', desc: 'ชำระเงินสดกับพนักงานส่งของ' }] : []),
+  ];
   const [state, action, pending] = useActionState<CheckoutState, FormData>(placeOrder, {});
-  const [payment, setPayment] = useState<'transfer' | 'cod'>('transfer');
+  const [payment, setPayment] = useState<PaymentValue>(PAYMENTS[0]?.value ?? 'cod');
   const errors = state.errors ?? {};
   const v = state.values ?? {};
   // ถ้า server บอกว่ายอดเปลี่ยน ให้ส่งยอดใหม่กลับไปในการยืนยันครั้งถัดไป
@@ -60,12 +65,24 @@ export function CheckoutForm({ total, gifts }: { total: number; gifts: number })
 
       <section className="rounded-card bg-surface p-5 border border-line">
         <h2 className="font-semibold">วิธีชำระเงิน</h2>
+        {/* ค่าที่ส่งจริงอยู่ใน hidden (React รีเซ็ตฟอร์มหลัง action → radio หลุด แต่ hidden ไม่โดนรีเซ็ต) · ref ซิงก์ radio ให้ตรง state ทุกครั้ง */}
+        <input type="hidden" name="paymentMethod" value={payment} />
         <div role="radiogroup" className="mt-4 grid gap-3 sm:grid-cols-2">
           {PAYMENTS.map((p) => {
             const on = payment === p.value;
             return (
               <label key={p.value} className={cn('flex cursor-pointer gap-3 rounded-lg p-3 ring-1 transition-colors', on ? 'bg-brand-soft ring-2 ring-brand' : 'ring-line hover:bg-surface-alt')}>
-                <input type="radio" name="paymentMethod" value={p.value} checked={on} onChange={() => setPayment(p.value)} className="mt-1 accent-brand" />
+                <input
+                  type="radio"
+                  name="paymentChoice"
+                  value={p.value}
+                  checked={on}
+                  ref={(el) => {
+                    if (el) el.checked = on;
+                  }}
+                  onChange={() => setPayment(p.value)}
+                  className="mt-1 accent-brand"
+                />
                 <span>
                   <span className="block font-medium">{p.title}</span>
                   <span className="block text-xs text-muted">{p.desc}</span>
@@ -83,7 +100,7 @@ export function CheckoutForm({ total, gifts }: { total: number; gifts: number })
       <Button type="submit" size="lg" disabled={pending} className="w-full">
         {pending ? 'กำลังสั่งซื้อ…' : state.newTotal !== undefined ? `ยืนยันสั่งซื้อ ${formatBaht(state.newTotal)}` : `ยืนยันสั่งซื้อ ${formatBaht(total)}`}
       </Button>
-      <p className="text-center text-xs text-muted">นี่คือระบบสาธิต — ไม่มีการตัดเงินจริง</p>
+      <p className="text-center text-xs text-muted">{payment === 'beam' ? 'กดยืนยันแล้วจะไปหน้าชำระเงินของ Beam (จำลอง — ไม่มีการตัดเงินจริง)' : 'นี่คือระบบสาธิต — ไม่มีการตัดเงินจริง'}</p>
     </form>
   );
 }

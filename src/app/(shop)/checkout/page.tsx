@@ -6,6 +6,7 @@ import { formatBaht } from '@/lib/money';
 import { ProductImage } from '@/components/product-image';
 import { OrderSummary } from '@/components/shop/order-summary';
 import { CheckoutForm } from '@/components/shop/checkout-form';
+import { availableChannels } from '@/lib/payments/beam';
 
 export const metadata = { title: 'ชำระเงิน' };
 
@@ -18,7 +19,12 @@ export default async function CheckoutPage() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="text-2xl font-bold sm:text-3xl">ชำระเงิน</h1>
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_380px] lg:items-start">
-        <CheckoutForm total={quote.total} gifts={quote.lines.filter((l) => l.isGift).reduce((s, l) => s + l.qty, 0)} />
+        <CheckoutForm
+          total={quote.total}
+          gifts={quote.lines.filter((l) => l.isGift).reduce((s, l) => s + l.qty, 0)}
+          beam={settings.payments.beam.enabled ? availableChannels(settings.payments, quote.total).map((c) => c.name) : null}
+          cod={settings.payments.cod.enabled}
+        />
 
         <aside className="rounded-card bg-surface p-5 border border-line lg:sticky lg:top-20">
           <h2 className="font-semibold">รายการสินค้า</h2>

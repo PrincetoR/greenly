@@ -39,6 +39,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
   const today = active.filter((o) => new Date(o.createdAt) >= startOfToday);
   const revenueToday = today.reduce((s, o) => s + o.total, 0);
   const pending = orders.filter((o) => o.status === 'pending');
+  const toShip = orders.filter((o) => o.status === 'paid' || o.status === 'packing').length;
   const lowStock = products.filter((p) => p.active && p.stock <= settings.lowStockThreshold);
   const live = promotions.filter((p) => promotionStatus(p, now, usage[p.id]) === 'live');
   const canOrders = roleCan(session.role, 'order.manage');
@@ -61,7 +62,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
       {/* ไม่มีหัวข้อ/บรรทัดทักทาย (พี่ต่อเอาออก) — แถว KPI เริ่มที่ขอบบนเดียวกับ card "จัดการสินค้า" · ชื่อหน้าอยู่ใน metadata.title */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="ยอดขายวันนี้" value={formatBaht(revenueToday)} sub={`${today.length} ออเดอร์`} href={canOrders ? '/admin/orders' : undefined} />
-        <Kpi label="รอยืนยัน/ชำระ" value={String(pending.length)} sub="ออเดอร์" href={canOrders ? '/admin/orders?status=pending' : undefined} tone={pending.length > 0 ? 'warn' : undefined} />
+        <Kpi label="รอยืนยัน/ชำระ" value={String(pending.length)} sub={`ออเดอร์ · รอแพ็ค/กำลังแพ็ค ${toShip}`} href={canOrders ? '/admin/orders?status=pending' : undefined} tone={pending.length > 0 ? 'warn' : undefined} />
         <Kpi label="สินค้าใกล้หมด" value={String(lowStock.length)} sub={`≤ ${settings.lowStockThreshold} ชิ้น`} href="/admin/products?status=low" tone={lowStock.length > 0 ? 'danger' : undefined} />
         <Kpi label="โปรที่กำลังใช้งาน" value={String(live.length)} sub="โปรโมชัน" href={canPromo ? '/admin/promotions?status=live' : '/promotions'} />
       </div>

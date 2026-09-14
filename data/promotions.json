@@ -4,8 +4,8 @@
     "name": "ลด 20% เครื่องดื่มสุขภาพ",
     "type": "discount",
     "active": true,
-    "startsAt": "2026-09-12T22:44:19.522Z",
-    "endsAt": "2026-09-27T22:44:19.522Z",
+    "startsAt": "2026-09-13T08:38:23.343Z",
+    "endsAt": "2026-09-28T08:38:23.343Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -23,16 +23,16 @@
       "perProductQty": 5,
       "perCustomer": null
     },
-    "createdAt": "2026-09-13T22:44:19.522Z",
-    "updatedAt": "2026-09-13T22:44:19.522Z"
+    "createdAt": "2026-09-14T08:38:23.343Z",
+    "updatedAt": "2026-09-14T08:38:23.343Z"
   },
   {
     "id": "promo-save100",
     "name": "คูปอง SAVE100 ลดทันที 100 บาท",
     "type": "coupon",
     "active": true,
-    "startsAt": "2026-09-12T22:44:19.522Z",
-    "endsAt": "2026-10-13T22:44:19.522Z",
+    "startsAt": "2026-09-13T08:38:23.343Z",
+    "endsAt": "2026-10-14T08:38:23.343Z",
     "scope": {
       "kind": "all",
       "ids": []
@@ -52,16 +52,16 @@
       "perProductQty": null,
       "perCustomer": 1
     },
-    "createdAt": "2026-09-13T22:44:19.522Z",
-    "updatedAt": "2026-09-13T22:44:19.522Z"
+    "createdAt": "2026-09-14T08:38:23.343Z",
+    "updatedAt": "2026-09-14T08:38:23.343Z"
   },
   {
     "id": "promo-snack-b2g1",
     "name": "ขนมสุขภาพ ซื้อ 2 แถม 1",
     "type": "bogo",
     "active": true,
-    "startsAt": "2026-09-12T22:44:19.522Z",
-    "endsAt": "2026-09-20T22:44:19.522Z",
+    "startsAt": "2026-09-13T08:38:23.343Z",
+    "endsAt": "2026-09-21T08:38:23.343Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -79,16 +79,16 @@
       "perProductQty": null,
       "perCustomer": 1
     },
-    "createdAt": "2026-09-13T22:44:19.522Z",
-    "updatedAt": "2026-09-13T22:44:19.522Z"
+    "createdAt": "2026-09-14T08:38:23.343Z",
+    "updatedAt": "2026-09-14T08:38:23.343Z"
   },
   {
     "id": "promo-upcoming",
     "name": "Flash Sale อาหารเสริม ลด 150 บาท",
     "type": "discount",
     "active": true,
-    "startsAt": "2026-09-16T22:44:19.522Z",
-    "endsAt": "2026-09-18T22:44:19.522Z",
+    "startsAt": "2026-09-17T08:38:23.343Z",
+    "endsAt": "2026-09-19T08:38:23.343Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -106,16 +106,16 @@
       "perProductQty": 2,
       "perCustomer": 1
     },
-    "createdAt": "2026-09-13T22:44:19.522Z",
-    "updatedAt": "2026-09-13T22:44:19.522Z"
+    "createdAt": "2026-09-14T08:38:23.343Z",
+    "updatedAt": "2026-09-14T08:38:23.343Z"
   },
   {
     "id": "promo-expired",
     "name": "ลด 10% ทั้งร้าน กลางเดือน",
     "type": "discount",
     "active": true,
-    "startsAt": "2026-08-14T22:44:19.522Z",
-    "endsAt": "2026-09-03T22:44:19.522Z",
+    "startsAt": "2026-08-15T08:38:23.343Z",
+    "endsAt": "2026-09-04T08:38:23.343Z",
     "scope": {
       "kind": "all",
       "ids": []
@@ -131,16 +131,16 @@
       "perProductQty": null,
       "perCustomer": null
     },
-    "createdAt": "2026-09-13T22:44:19.522Z",
-    "updatedAt": "2026-09-13T22:44:19.522Z"
+    "createdAt": "2026-09-14T08:38:23.343Z",
+    "updatedAt": "2026-09-14T08:38:23.343Z"
   },
   {
     "id": "promo-past-coupon",
     "name": "คูปอง SUMMER50 ลด 50 บาท",
     "type": "coupon",
     "active": true,
-    "startsAt": "2026-04-16T22:44:19.522Z",
-    "endsAt": "2026-05-16T22:44:19.522Z",
+    "startsAt": "2026-04-17T08:38:23.343Z",
+    "endsAt": "2026-05-17T08:38:23.343Z",
     "scope": {
       "kind": "all",
       "ids": []
@@ -160,16 +160,16 @@
       "perProductQty": null,
       "perCustomer": null
     },
-    "createdAt": "2026-09-13T22:44:19.522Z",
-    "updatedAt": "2026-09-13T22:44:19.522Z"
+    "createdAt": "2026-09-14T08:38:23.343Z",
+    "updatedAt": "2026-09-14T08:38:23.343Z"
   },
   {
     "id": "promo-past-anniv",
     "name": "ครบรอบร้าน ลด 15% ธัญพืชและขนม",
     "type": "discount",
     "active": true,
-    "startsAt": "2025-12-12T22:44:19.522Z",
-    "endsAt": "2026-01-01T22:44:19.522Z",
+    "startsAt": "2025-12-13T08:38:23.343Z",
+    "endsAt": "2026-01-02T08:38:23.343Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -188,7 +188,7 @@
       "perProductQty": null,
       "perCustomer": null
     },
-    "createdAt": "2026-09-13T22:44:19.522Z",
-    "updatedAt": "2026-09-13T22:44:19.522Z"
+    "createdAt": "2026-09-14T08:38:23.343Z",
+    "updatedAt": "2026-09-14T08:38:23.343Z"
   }
 ]

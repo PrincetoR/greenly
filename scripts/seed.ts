@@ -1,7 +1,7 @@
 /**
  * สร้างข้อมูลสาธิตใหม่ทั้งหมด: data/*.json + รูป placeholder ใน public/uploads/seed/
  *   npm run seed
- * ระวัง: เขียนทับ orders/carts/products/promotions ที่มีอยู่ (ใช้เพื่อ reset demo)
+ * ระวัง: เขียนทับ orders/payments/carts/products/promotions ที่มีอยู่ (ใช้เพื่อ reset demo)
  *
  * รันด้วย tsx จึง import โมดูลที่มี 'server-only' ไม่ได้ — เขียนไฟล์ตรง ๆ ที่นี่
  *
@@ -10,7 +10,9 @@
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { hashPassword } from '../src/lib/auth/password';
-import type { Category, Order, Product, Promotion, Settings, User } from '../src/lib/types';
+import type { Category, Order, Payment, Product, Promotion, Settings, User } from '../src/lib/types';
+import { CARRIERS } from '../src/lib/shipping/carriers';
+import { beamFee, mockReference, type BeamChannelId } from '../src/lib/payments/beam';
 
 const ROOT = process.cwd();
 const DATA = path.join(ROOT, 'data');
@@ -259,7 +261,22 @@ const customers = [
 /** น้ำหนักต่อหมวด — ให้หมวดเครื่องดื่ม/ขนมขายดี ของใช้ในครัวขายน้อย แดชบอร์ดจะได้เห็นความต่าง */
 const categoryWeight: Record<string, number> = { 'c-drinks': 0.3, 'c-snacks': 0.22, 'c-grains': 0.18, 'c-dried': 0.12, 'c-supplement': 0.1, 'c-kitchen': 0.08 };
 
-function demoOrders(): Order[] {
+/** ช่องทาง Beam ที่ลูกค้าสาธิตเลือก (น้ำหนักตามความนิยมในไทย) */
+const beamChannelWeight: [BeamChannelId, number][] = [
+  ['promptpay', 0.5],
+  ['card', 0.2],
+  ['mobile_banking', 0.14],
+  ['truemoney', 0.07],
+  ['shopeepay', 0.04],
+  ['linepay', 0.03],
+  ['installment', 0.02],
+];
+const RETURN_REASONS = ['ไม่มีผู้รับ ติดต่อไม่ได้', 'ที่อยู่ไม่ชัดเจน', 'ผู้รับปฏิเสธรับสินค้า', 'กล่องเสียหายระหว่างขนส่ง'];
+const BOX_SIZES = ['A', 'B', 'C', 'D'];
+
+/** ลำดับ [orders, payments] — payments เป็น ledger ฝั่ง Beam (mock) ที่อ้างถึงออเดอร์ */
+function demoOrders(): { orders: Order[]; payments: Payment[] } {
+  const payments: Payment[] = [];
   const rand = mulberry32(20260914);
   const pick = <T,>(arr: readonly T[]) => arr[Math.floor(rand() * arr.length)];
   const weightedProduct = () => {
@@ -324,14 +341,97 @@ function demoOrders(): Order[] {
       }
       const net = subtotal - discountTotal;
       const shippingFee = net >= settings.freeShippingMin! ? 0 : settings.shippingFee;
+      const total = net + shippingFee;
       const ageDays = -i;
-      const status: Order['status'] = ageDays > 1 && rand() < 0.05 ? 'cancelled' : ageDays > 7 ? 'done' : ageDays > 2 ? 'shipped' : ageDays > 0 ? 'paid' : 'pending';
+      const ageH = (now.getTime() - createdAt.getTime()) / 3_600_000;
+      // วงจร: เก่า → ถึงมือลูกค้า · 2–4 วัน → ระหว่างจัดส่ง · 1–2 วัน → รอแพ็ค/กำลังแพ็ค · วันนี้ → รอชำระ/รอแพ็ค · ตีกลับ 2% ของที่ส่งแล้ว · ยกเลิก 5%
+      let status: Order['status'];
+      if (ageDays > 1 && rand() < 0.05) status = 'cancelled';
+      else if (ageDays > 6) status = rand() < 0.02 ? 'returned' : 'done';
+      else if (ageDays > 2) status = 'shipped';
+      else if (ageDays > 0) status = rand() < 0.5 ? 'packing' : 'paid';
+      else status = ageH > 6 ? 'paid' : 'pending';
+      const paymentMethod: Order['paymentMethod'] = rand() < 0.7 ? 'beam' : 'cod';
       const ymd = createdAt.toISOString().slice(0, 10).replace(/-/g, '');
       const seq = (perDay.get(ymd) ?? 0) + 1;
       perDay.set(ymd, seq);
+      const id = `o-h${String(orders.length + 1).padStart(4, '0')}`;
+      const orderNo = `OD-${ymd}-${String(seq).padStart(4, '0')}`;
+      const history: Order['history'] = [{ at: iso(createdAt), type: 'pending', by: 'customer', note: 'ลูกค้าสั่งซื้อ' }];
+      const later = (h: number) => iso(new Date(Math.min(createdAt.getTime() + h * 3_600_000, now.getTime() - 1000)));
+
+      // การชำระเงิน
+      let payment: Order['payment'] = null;
+      if (paymentMethod === 'beam') {
+        let r = rand();
+        let channel: BeamChannelId = 'promptpay';
+        for (const [c, w] of beamChannelWeight) {
+          if (r < w) {
+            channel = c;
+            break;
+          }
+          r -= w;
+        }
+        if (channel === 'installment' && total < 300000) channel = 'card';
+        const fee = beamFee(channel, total);
+        const paid = status !== 'pending';
+        // ลองจ่ายไม่สำเร็จก่อน 4% (เห็นรายการ failed ใน ledger)
+        if (rand() < 0.04) {
+          payments.push({ id: `pay-h${String(payments.length + 1).padStart(4, '0')}`, orderId: id, orderNo, provider: 'beam', channel: 'card', amount: total, fee: 0, net: 0, status: 'failed', reference: mockReference(`${id}-fail`), installmentTerm: null, customer: { name, phone }, refunds: [], createdAt: later(0.05), updatedAt: later(0.1), paidAt: null, expiresAt: later(0.25) });
+        }
+        const refunded = status === 'cancelled' && paid;
+        const pay: Payment = {
+          id: `pay-h${String(payments.length + 1).padStart(4, '0')}`,
+          orderId: id,
+          orderNo,
+          provider: 'beam',
+          channel,
+          amount: total,
+          fee: paid ? fee : 0,
+          net: paid ? total - fee : 0,
+          status: refunded ? 'refunded' : paid ? 'succeeded' : 'pending',
+          reference: paid ? mockReference(id) : null,
+          installmentTerm: channel === 'installment' ? pick([3, 6, 10] as const) : null,
+          customer: { name, phone },
+          refunds: refunded ? [{ id: `rf-${id}`, amount: total, reason: 'ยกเลิกคำสั่งซื้อ', at: later(30), by: 'admin' }] : [],
+          createdAt: later(0.1),
+          updatedAt: later(0.2),
+          paidAt: paid ? later(0.2) : null,
+          expiresAt: later(0.35),
+        };
+        payments.push(pay);
+        payment = { provider: 'beam', channel, paymentId: pay.id, status: pay.status, amount: total, fee: pay.fee, paidAt: pay.paidAt, refundedAmount: refunded ? total : 0 };
+        if (paid) history.push({ at: pay.paidAt!, type: 'paid', by: 'system', note: `ชำระผ่าน Beam (${channel}) สำเร็จ · อ้างอิง ${pay.reference}` });
+      } else {
+        const collected = status === 'done';
+        payment = { provider: 'cod', channel: 'cod', paymentId: null, status: collected ? 'succeeded' : status === 'cancelled' ? 'failed' : 'pending', amount: total, fee: 0, paidAt: null, refundedAmount: 0 };
+        if (status !== 'pending') history.push({ at: later(2), type: 'paid', by: 'staff', note: 'ยืนยันรับออเดอร์ (เก็บเงินปลายทาง)' });
+      }
+
+      // การจัดส่ง
+      let shipment: Order['shipment'] = null;
+      if (['packing', 'shipped', 'done', 'returned'].includes(status)) history.push({ at: later(6), type: 'packing', by: 'staff', note: 'เริ่มแพ็คสินค้า' });
+      if (['shipped', 'done', 'returned'].includes(status)) {
+        const carrier = pick(CARRIERS.filter((c) => settings.shipping.carriers.includes(c.id)));
+        const shippedAt = later(20);
+        shipment = { carrier: carrier.id, trackingNo: carrier.sampleTracking(100000 + orders.length * 7), shippedAt, deliveredAt: null, returnedAt: null, returnReason: null, weightGrams: 300 + Math.floor(rand() * 1700), boxSize: pick(BOX_SIZES), note: '' };
+        history.push({ at: shippedAt, type: 'shipped', by: 'staff', note: `ส่งกับ ${carrier.name} เลขพัสดุ ${shipment.trackingNo}` });
+        if (status === 'done') {
+          shipment.deliveredAt = later(20 + 30 + Math.floor(rand() * 30));
+          history.push({ at: shipment.deliveredAt, type: 'done', by: 'system', note: 'ขนส่งยืนยันจัดส่งสำเร็จ' });
+          if (payment.provider === 'cod') { payment.paidAt = shipment.deliveredAt; history.push({ at: shipment.deliveredAt, type: 'payment', by: 'system', note: 'เก็บเงินปลายทางแล้ว' }); }
+        }
+        if (status === 'returned') {
+          shipment.returnedAt = later(20 + 60);
+          shipment.returnReason = pick(RETURN_REASONS);
+          history.push({ at: shipment.returnedAt, type: 'returned', by: 'staff', note: `พัสดุตีกลับ — ${shipment.returnReason}` });
+        }
+      }
+      if (status === 'cancelled') history.push({ at: later(30), type: 'cancelled', by: 'admin', note: payment.provider === 'beam' && payment.status === 'refunded' ? 'ยกเลิกและคืนเงินผ่าน Beam แล้ว' : 'ลูกค้าขอยกเลิก' });
+
       orders.push({
-        id: `o-h${String(orders.length + 1).padStart(4, '0')}`,
-        orderNo: `OD-${ymd}-${String(seq).padStart(4, '0')}`,
+        id,
+        orderNo,
         status,
         guestIds: [],
         customer: { name, phone, email: '', address },
@@ -339,17 +439,20 @@ function demoOrders(): Order[] {
         subtotal,
         discountTotal,
         shippingFee,
-        total: net + shippingFee,
+        total,
         couponCode,
         promotionUsages: usages,
-        paymentMethod: rand() < 0.6 ? 'transfer' : 'cod',
+        paymentMethod,
+        payment,
+        shipment,
+        history,
         note: '',
         createdAt: iso(createdAt),
-        updatedAt: iso(createdAt),
+        updatedAt: history[history.length - 1]?.at ?? iso(createdAt),
       });
     }
   }
-  return orders;
+  return { orders, payments };
 }
 
 /* ---------- settings ---------- */
@@ -361,6 +464,25 @@ const settings: Settings = {
   lowStockThreshold: 5,
   contact: { phone: '02-000-0000', email: 'hello@greenly.example', line: '@greenly' },
   dashboard: { topPromotions: 5, topCategories: 5, topProducts: 5 },
+  payments: {
+    beam: {
+      enabled: true,
+      mode: 'sandbox',
+      merchantId: 'mch_greenly_demo',
+      publicKey: 'pk_test_greenly_1a2b3c4d5e6f',
+      secretKeyLast4: '9f3e',
+      channels: { promptpay: true, card: true, mobile_banking: true, truemoney: true, shopeepay: true, linepay: true, alipay: false, wechatpay: false, installment: true, bnpl: false },
+      expiryMinutes: 15,
+    },
+    cod: { enabled: true, fee: 0 },
+  },
+  shipping: {
+    senderName: 'Greenly',
+    senderPhone: '02-000-0000',
+    senderAddress: '99/9 อาคารกรีนลี่ ชั้น 2 ถ.พระราม 9 แขวงห้วยขวาง เขตห้วยขวาง กรุงเทพฯ 10310',
+    carriers: ['kerry', 'flash', 'jt', 'thaipost', 'spx'],
+    defaultCarrier: 'kerry',
+  },
 };
 
 async function main() {
@@ -384,7 +506,7 @@ async function main() {
       createdAt: iso(daysFromNow(-59)),
     },
   ];
-  const orders: Order[] = WITH_HISTORY ? demoOrders() : [];
+  const { orders, payments } = WITH_HISTORY ? demoOrders() : { orders: [] as Order[], payments: [] as Payment[] };
 
   await mkdir(DATA, { recursive: true });
   await rm(SEED_IMG, { recursive: true, force: true });
@@ -398,6 +520,7 @@ async function main() {
     write('products', products),
     write('promotions', promotions),
     write('orders', orders),
+    write('payments', payments),
     write('carts', {}),
     write('wishlists', {}),
     write('users', users),
@@ -409,7 +532,7 @@ async function main() {
   ]);
 
   console.log(
-    `seeded: ${categories.length} categories · ${products.length} products · ${promotions.length} promotions · ${orders.length} orders · ${users.length} users (admin/admin1234, staff/staff1234)`,
+    `seeded: ${categories.length} categories · ${products.length} products · ${promotions.length} promotions · ${orders.length} orders · ${payments.length} payments · ${users.length} users (admin/admin1234, staff/staff1234)`,
   );
 }
 

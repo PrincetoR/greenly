@@ -4,7 +4,7 @@ const fs = require('fs');
 const read = (n) => JSON.parse(fs.readFileSync(`${DATA}/${n}.json`, 'utf8'));
 
 const SHOP = ['/', '/products', '/products?q=มะม่วง', '/category/ธัญพืชและถั่ว', '/product/เมล็ดเจีย-500-กรัม-p-006', '/promotions', '/cart', '/nope-404'];
-const ADMIN = ['/admin', '/admin/products', '/admin/products/new', '/admin/products/p-001', '/admin/categories', '/admin/promotions', '/admin/promotions/new', '/admin/promotions/promo-save100', '/admin/orders', '/admin/users', '/admin/settings', '/admin/login'];
+const ADMIN = ['/admin', '/admin/products', '/admin/products/new', '/admin/products/p-001', '/admin/categories', '/admin/promotions', '/admin/promotions/new', '/admin/promotions/promo-save100', '/admin/orders', '/admin/shipping', '/admin/shipping?tab=settings', '/admin/payments', '/admin/payments?tab=settings', '/admin/users', '/admin/settings', '/admin/login'];
 
 (async () => {
   const { browser, page } = await launch();

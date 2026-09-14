@@ -5,13 +5,18 @@ import { getSettings } from '@/lib/db/settings';
 import { readGuestId } from '@/lib/guest';
 import { OrderLookupForm } from '@/components/shop/order-lookup-form';
 import { formatBaht } from '@/lib/money';
-import { formatDateTime } from '@/lib/datetime';
-import { ORDER_STATUS_LABEL, ORDER_STATUS_TONE, PAYMENT_LABEL } from '@/lib/orders/labels';
+import { formatDate, formatDateTime } from '@/lib/datetime';
+import { ORDER_STATUS_HINT, ORDER_STATUS_LABEL, ORDER_STATUS_TONE, PAYMENT_CHANNEL_LABEL, PAYMENT_LABEL, PAYMENT_STATUS_LABEL, PAYMENT_STATUS_TONE } from '@/lib/orders/labels';
+import { carrierById } from '@/lib/shipping/carriers';
+import { guessProvince, trackingTimeline } from '@/lib/shipping/tracking';
+import { payOrder } from '@/lib/actions/payments';
+import { StatusStepper } from '@/components/orders/status-stepper';
+import { TrackingTimeline } from '@/components/orders/tracking-timeline';
 import { ProductImage } from '@/components/product-image';
 import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
-import { buttonStyles } from '@/components/ui/button';
-import { CheckCircle2, Gift, Lock } from 'lucide-react';
+import { Button, buttonStyles } from '@/components/ui/button';
+import { CheckCircle2, ExternalLink, Gift, Lock, Truck } from 'lucide-react';
 
 export const metadata = { title: 'คำสั่งซื้อ' };
 
@@ -51,6 +56,13 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
           สั่งซื้อสำเร็จ! ขอบคุณที่อุดหนุน {settings.storeName}
         </Alert>
       )}
+      {sp.paid && (
+        <Alert tone="ok" className="mb-6 flex items-center gap-2 text-base">
+          <CheckCircle2 className="size-5 shrink-0" aria-hidden />
+          ชำระเงินสำเร็จ! ร้านกำลังเตรียมสินค้าให้คุณ
+        </Alert>
+      )}
+      {sp.failed && <Alert tone="danger" className="mb-6">ชำระเงินไม่สำเร็จ — ลองใหม่อีกครั้งหรือเลือกช่องทางอื่นได้ด้านล่าง</Alert>}
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -63,24 +75,63 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
         </Badge>
       </div>
 
-      {order.status === 'pending' && order.paymentMethod === 'transfer' && (
-        <div className="mt-6 rounded-card bg-info-soft p-5 text-sm">
-          <p className="font-semibold text-info">โอนเงินเพื่อยืนยันคำสั่งซื้อ (จำลอง)</p>
-          <p className="mt-1">
-            ธนาคารตัวอย่าง · เลขบัญชี <span className="font-mono font-bold">123-4-56789-0</span> · ชื่อบัญชี {settings.storeName}
-          </p>
-          <p className="mt-1 text-muted">
-            ยอด <b className="text-ink">{formatBaht(order.total)}</b> — ร้านจะยืนยันหลังตรวจสอบยอดโอน
-          </p>
+      {/* ขั้นตอน + คำอธิบายสถานะปัจจุบัน */}
+      <section className="mt-6 rounded-card bg-surface p-5 border border-line">
+        <StatusStepper status={order.status} />
+        <p className="mt-4 text-sm text-muted">{ORDER_STATUS_HINT[order.status]}</p>
+      </section>
+
+      {order.status === 'pending' && order.paymentMethod === 'beam' && (
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-card bg-warn-soft p-5 text-sm">
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-warn">ยังไม่ได้ชำระเงิน</p>
+            <p className="mt-1 text-muted">
+              ยอด <b className="text-ink">{formatBaht(order.total)}</b> — ชำระผ่าน Beam ได้ด้วย PromptPay บัตร Mobile Banking หรือ E-Wallet · ร้านจะแพ็คสินค้าหลังได้รับเงิน
+            </p>
+          </div>
+          <form action={payOrder}>
+            <input type="hidden" name="orderNo" value={order.orderNo} />
+            <Button type="submit">ชำระเงินตอนนี้</Button>
+          </form>
         </div>
       )}
       {order.status === 'pending' && order.paymentMethod === 'cod' && (
-        <div className="mt-6 rounded-card bg-info-soft p-5 text-sm">
+        <div className="mt-4 rounded-card bg-info-soft p-5 text-sm">
           <p className="font-semibold text-info">เก็บเงินปลายทาง</p>
           <p className="mt-1 text-muted">
-            เตรียมเงินสด <b className="text-ink">{formatBaht(order.total)}</b> ให้พนักงานจัดส่ง
+            เตรียมเงินสด <b className="text-ink">{formatBaht(order.total)}</b> ให้พนักงานจัดส่ง · ร้านจะยืนยันคำสั่งซื้อและเริ่มแพ็คเร็ว ๆ นี้
           </p>
         </div>
+      )}
+
+      {/* ติดตามพัสดุ */}
+      {order.shipment && (
+        <section className="mt-4 rounded-card bg-surface p-5 border border-line">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="flex items-center gap-2 font-semibold">
+                <Truck className="size-4 text-brand" aria-hidden />
+                ติดตามพัสดุ
+              </h2>
+              <p className="mt-1 text-sm">
+                {carrierById(order.shipment.carrier).name} · เลขพัสดุ <span className="font-mono font-semibold">{order.shipment.trackingNo}</span>
+              </p>
+              <p className="text-xs text-muted">
+                ส่งเมื่อ {formatDateTime(order.shipment.shippedAt)}
+                {order.status === 'shipped' && ` · คาดว่าถึงภายใน ${carrierById(order.shipment.carrier).etaDays[1]} วัน`}
+                {order.shipment.deliveredAt && ` · ถึงเมื่อ ${formatDateTime(order.shipment.deliveredAt)}`}
+              </p>
+            </div>
+            <a href={carrierById(order.shipment.carrier).trackUrl(order.shipment.trackingNo)} target="_blank" rel="noreferrer" className={buttonStyles({ variant: 'secondary', size: 'sm' })}>
+              เช็คที่เว็บขนส่ง
+              <ExternalLink className="size-3.5" aria-hidden />
+            </a>
+          </div>
+          <div className="mt-4">
+            <TrackingTimeline events={trackingTimeline(order.shipment, order.status, new Date(), guessProvince(order.customer.address))} />
+          </div>
+          <p className="mt-3 text-xs text-muted">ข้อมูลพัสดุเป็นการจำลอง — ของจริงจะดึงจากระบบขนส่งโดยตรง</p>
+        </section>
       )}
 
       <section className="mt-6 rounded-card bg-surface p-5 border border-line">
@@ -127,7 +178,17 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
         </div>
         <div>
           <h2 className="font-semibold">การชำระเงิน</h2>
-          <p className="mt-1">{PAYMENT_LABEL[order.paymentMethod]}</p>
+          <p className="mt-1 flex flex-wrap items-center gap-2">
+            {PAYMENT_LABEL[order.paymentMethod]}
+            {order.payment && <Badge tone={PAYMENT_STATUS_TONE[order.payment.status]}>{PAYMENT_STATUS_LABEL[order.payment.status]}</Badge>}
+          </p>
+          {order.payment?.channel && order.payment.channel !== 'cod' && (
+            <p className="text-muted">
+              {PAYMENT_CHANNEL_LABEL[order.payment.channel]}
+              {order.payment.paidAt && ` · ${formatDate(order.payment.paidAt)}`}
+            </p>
+          )}
+          {order.payment && order.payment.refundedAmount > 0 && <p className="text-info">คืนเงินแล้ว {formatBaht(order.payment.refundedAmount)} — เงินจะกลับเข้าช่องทางเดิมภายใน 5–10 วันทำการ</p>}
           {order.note && <p className="mt-2 text-muted">หมายเหตุ: {order.note}</p>}
         </div>
       </section>

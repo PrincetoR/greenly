@@ -1,4 +1,4 @@
-import { FolderOpen, LayoutDashboard, Package, Receipt, Settings, Tag, Users, type LucideProps } from 'lucide-react';
+import { CreditCard, FolderOpen, LayoutDashboard, Package, Receipt, Settings, Tag, Truck, Users, type LucideProps } from 'lucide-react';
 import type { AdminIconName } from '@/lib/auth/roles';
 
 /** ไอคอนเมนูหลังบ้าน — roles.ts เก็บแค่ชื่อ (pure module) ส่วน component อยู่ที่นี่ */
@@ -8,6 +8,8 @@ const ICONS: Record<AdminIconName, React.ComponentType<LucideProps>> = {
   categories: FolderOpen,
   promotions: Tag,
   orders: Receipt,
+  shipping: Truck,
+  payments: CreditCard,
   users: Users,
   settings: Settings,
 };

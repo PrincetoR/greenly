@@ -63,3 +63,13 @@ export function humanCountdown(toIso: string, now: Date): string | null {
   if (h > 0) return `${h} ชม. ${mi} นาที`;
   return `${Math.max(mi, 1)} นาที`;
 }
+
+/** "3 ชม." / "2 วัน" / "5 นาที" ที่ผ่านมา — ใช้บอกว่าออเดอร์ค้างในคิวนานแค่ไหน */
+export function timeAgo(iso: string, now: Date): string {
+  const min = Math.max(0, Math.floor((now.getTime() - new Date(iso).getTime()) / 60000));
+  if (min < 60) return `${Math.max(min, 1)} นาที`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `${h} ชม.`;
+  const d = Math.floor(h / 24);
+  return `${d} วัน${h % 24 ? ` ${h % 24} ชม.` : ''}`;
+}

@@ -1,10 +1,12 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { requirePermission, requireSession } from '@/lib/auth/session';
 import { getSettings, saveSettings } from '@/lib/db/settings';
 import type { DashboardRankKey } from '@/lib/types';
 import { isValidRank, RANK_MAX, RANK_MIN } from '@/lib/analytics/ranks';
+import { BEAM_CHANNELS } from '@/lib/payments/beam';
 import { toSatang } from '@/lib/money';
 import { settingsSchema } from '@/lib/validation/user';
 import { fieldErrors, formValues, type FormState } from '@/lib/validation/common';
@@ -52,4 +54,40 @@ export async function updateDashboardRank(formData: FormData): Promise<{ ok: boo
   await saveSettings({ dashboard: { ...dashboard, [key as DashboardRankKey]: value } });
   revalidatePath('/admin');
   return { ok: true };
+}
+
+/** ตั้งค่า Beam (mock) — โหมด/ร้านค้า/กุญแจ/ช่องทางที่เปิด · COD */
+export async function updateBeamSettings(formData: FormData): Promise<void> {
+  await requirePermission('payment.manage');
+  const current = (await getSettings()).payments;
+  const channels: Record<string, boolean> = {};
+  for (const c of BEAM_CHANNELS) channels[c.id] = formData.get(`channel:${c.id}`) === 'on';
+  const secret = String(formData.get('secretKey') ?? '').trim();
+  const expiry = Number.parseInt(String(formData.get('expiryMinutes') ?? ''), 10);
+  const codFee = Number(String(formData.get('codFee') ?? '0'));
+  await saveSettings({
+    payments: {
+      beam: {
+        enabled: formData.get('beamEnabled') === 'on',
+        mode: formData.get('mode') === 'live' ? 'live' : 'sandbox',
+        merchantId: String(formData.get('merchantId') ?? '').trim(),
+        publicKey: String(formData.get('publicKey') ?? '').trim(),
+        // ไม่เก็บ secret จริง — เก็บแค่ 4 ตัวท้ายไว้ยืนยันว่าใส่แล้ว (ของจริงต้องอยู่ใน env/secret manager)
+        secretKeyLast4: secret ? secret.slice(-4) : current.beam.secretKeyLast4,
+        channels,
+        expiryMinutes: Number.isInteger(expiry) && expiry >= 5 && expiry <= 1440 ? expiry : current.beam.expiryMinutes,
+      },
+      cod: { enabled: formData.get('codEnabled') === 'on', fee: Number.isFinite(codFee) && codFee >= 0 ? Math.round(codFee * 100) : current.cod.fee },
+    },
+  });
+  revalidatePath('/', 'layout');
+  redirect('/admin/payments?tab=settings&saved=1');
+}
+
+/** "ทดสอบการเชื่อมต่อ" กับ Beam (mock) — ของจริงยิง GET /v1/merchant ด้วย secret key */
+export async function testBeamConnection(): Promise<void> {
+  await requirePermission('payment.manage');
+  const { payments } = await getSettings();
+  const ok = payments.beam.enabled && payments.beam.merchantId.length > 3 && payments.beam.publicKey.length > 8;
+  redirect(`/admin/payments?tab=settings&test=${ok ? 'ok' : 'fail'}`);
 }

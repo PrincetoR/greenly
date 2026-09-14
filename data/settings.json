@@ -13,5 +13,44 @@
     "topPromotions": 5,
     "topCategories": 5,
     "topProducts": 5
+  },
+  "payments": {
+    "beam": {
+      "enabled": true,
+      "mode": "sandbox",
+      "merchantId": "mch_greenly_demo",
+      "publicKey": "pk_test_greenly_1a2b3c4d5e6f",
+      "secretKeyLast4": "9f3e",
+      "channels": {
+        "promptpay": true,
+        "card": true,
+        "mobile_banking": true,
+        "truemoney": true,
+        "shopeepay": true,
+        "linepay": true,
+        "alipay": false,
+        "wechatpay": false,
+        "installment": true,
+        "bnpl": false
+      },
+      "expiryMinutes": 15
+    },
+    "cod": {
+      "enabled": true,
+      "fee": 0
+    }
+  },
+  "shipping": {
+    "senderName": "Greenly",
+    "senderPhone": "02-000-0000",
+    "senderAddress": "99/9 อาคารกรีนลี่ ชั้น 2 ถ.พระราม 9 แขวงห้วยขวาง เขตห้วยขวาง กรุงเทพฯ 10310",
+    "carriers": [
+      "kerry",
+      "flash",
+      "jt",
+      "thaipost",
+      "spx"
+    ],
+    "defaultCarrier": "kerry"
   }
 }

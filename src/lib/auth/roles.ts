@@ -15,6 +15,7 @@ export const PERMISSIONS = [
   'catalog.manage', // สินค้า + หมวดหมู่
   'order.manage', // ดู/เปลี่ยนสถานะคำสั่งซื้อ
   'promotion.manage',
+  'payment.manage', // ดู ledger Beam · คืนเงิน · ตั้งค่าช่องทาง
   'user.manage',
   'settings.manage',
 ] as const;
@@ -38,7 +39,7 @@ export function isRole(value: unknown): value is Role {
  * เมนูหลังบ้าน = แหล่งความจริงเดียวของ "หน้าไหนต้องใช้สิทธิ์อะไร"
  * sidebar, proxy และ layout อ่านจากตรงนี้ทั้งหมด — เมนูที่เห็นกับหน้าที่เข้าได้จึงตรงกันเสมอ
  */
-export type AdminIconName = 'dashboard' | 'products' | 'categories' | 'promotions' | 'orders' | 'users' | 'settings';
+export type AdminIconName = 'dashboard' | 'products' | 'categories' | 'promotions' | 'orders' | 'shipping' | 'payments' | 'users' | 'settings';
 
 export interface AdminMenuItem {
   href: string;
@@ -55,6 +56,9 @@ export const ADMIN_MENU: AdminMenuItem[] = [
   { href: '/admin/categories', label: 'หมวดหมู่', icon: 'categories', permission: 'catalog.manage' },
   { href: '/admin/promotions', label: 'โปรโมชัน', icon: 'promotions', permission: 'promotion.manage' },
   { href: '/admin/orders', label: 'คำสั่งซื้อ', icon: 'orders', permission: 'order.manage' },
+  // จัดส่ง = มุมมองคลัง (คิวแพ็ค · ใบปะหน้า · เลขพัสดุ · ตีกลับ) แยกจากคำสั่งซื้อที่เป็นมุมมองบริการลูกค้า/การเงิน — ข้อมูลชุดเดียวกัน
+  { href: '/admin/shipping', label: 'จัดส่ง', icon: 'shipping', permission: 'order.manage' },
+  { href: '/admin/payments', label: 'การชำระเงิน', icon: 'payments', permission: 'payment.manage' },
   { href: '/admin/users', label: 'ผู้ใช้', icon: 'users', permission: 'user.manage' },
   { href: '/admin/settings', label: 'ตั้งค่าร้าน', icon: 'settings', permission: 'settings.manage' },
 ];

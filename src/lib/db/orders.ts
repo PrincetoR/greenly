@@ -1,13 +1,34 @@
 import 'server-only';
-import type { Order, OrderStatus } from '@/lib/types';
+import type { Order, OrderEvent, OrderStatus } from '@/lib/types';
 import { normalizeCustomerKey } from '@/lib/pricing/usage';
 import { newId, nowIso, readCollection, updateCollection } from './store';
 
 const NAME = 'orders';
 
-/** order รุ่นแรกไม่มี guestIds — เติมให้ตอนอ่านเพื่อไม่ต้อง migrate ไฟล์ */
+/** order รุ่นแรกไม่มี guestIds/payment/shipment/history — เติมให้ตอนอ่านเพื่อไม่ต้อง migrate ไฟล์ */
+function normalize(o: Order): Order {
+  return { ...o, guestIds: o.guestIds ?? [], payment: o.payment ?? null, shipment: o.shipment ?? null, history: o.history ?? [] };
+}
 async function readOrders(): Promise<Order[]> {
-  return (await readCollection<Order>(NAME)).map((o) => ({ ...o, guestIds: o.guestIds ?? [] }));
+  return (await readCollection<Order>(NAME)).map(normalize);
+}
+
+/** แก้ order หนึ่งใบแบบ atomic (ผ่าน write queue) — ทุกการเปลี่ยนสถานะ/ชำระ/จัดส่งใช้ตัวนี้ */
+export async function updateOrder(id: string, fn: (order: Order) => Order): Promise<Order | undefined> {
+  let updated: Order | undefined;
+  await updateCollection<Order>(NAME, (items) =>
+    items.map((o) => {
+      if (o.id !== id) return o;
+      updated = { ...fn(normalize(o)), updatedAt: nowIso() };
+      return updated;
+    }),
+  );
+  return updated;
+}
+
+/** เพิ่มเหตุการณ์ในไทม์ไลน์ของออเดอร์ (ใช้ร่วมกับ updateOrder) */
+export function withEvent(order: Order, type: OrderEvent['type'], by: string, note: string): Order {
+  return { ...order, history: [...order.history, { at: nowIso(), type, by, note }] };
 }
 
 export async function listOrders(opts: { status?: OrderStatus } = {}): Promise<Order[]> {

@@ -25,6 +25,7 @@ async function placeOrder(page, path, qty, phone, coupon) {
   await page.fill('#name', 'ลูกค้า ทดสอบ');
   await page.fill('#phone', phone);
   await page.fill('#address', '99 หมู่ 1 ต.ในเมือง อ.เมือง จ.เชียงใหม่ 50000');
+  await page.click('label:has-text("เก็บเงินปลายทาง")'); // Beam เป็นค่าเริ่มต้น → เทสต์นี้ใช้ COD ให้ไปหน้าออเดอร์ทันที
   await page.click('button[type=submit]:has-text("ยืนยันสั่งซื้อ")');
   await page.waitForURL(/\/order\/OD-/);
   return new URL(page.url()).pathname.split('/').pop();
@@ -52,20 +53,24 @@ async function placeOrder(page, path, qty, phone, coupon) {
   ok((await page.locator('tbody tr').count()) === 1, 'search by phone → 1');
   await shot(page, 'p7-orders');
 
-  // status flow A: pending → paid → shipped → done
+  // status flow A (COD): pending → paid(รอแพ็ค) → packing → shipped (เลขพัสดุ) → done
   await page.goto(`${BASE}/admin/orders/${A.id}`);
-  ok(await page.locator('button:text-is("ชำระแล้ว")').isVisible() && await page.locator('button:has-text("ยกเลิกคำสั่งซื้อ")').isVisible(), 'pending: next = paid / cancel');
+  ok(await page.locator('button:text-is("ยืนยันรับออเดอร์")').isVisible() && await page.locator('button:has-text("ยกเลิกคำสั่งซื้อ")').isVisible(), 'pending: next = ยืนยันรับออเดอร์ / cancel');
   ok(await page.locator('text=คูปอง SAVE100').first().isVisible(), 'detail shows coupon');
   ok((await page.locator('span:has-text("ลด 20% เครื่องดื่มสุขภาพ")').count()) >= 1, 'detail shows promo usage badges');
   await shot(page, 'p7-order-detail');
-  await page.click('button:text-is("ชำระแล้ว")');
-  await page.waitForSelector('button:text-is("จัดส่งแล้ว")');
-  ok(true, 'paid: next = shipped');
-  await page.click('button:text-is("จัดส่งแล้ว")');
-  await page.waitForSelector('button:text-is("สำเร็จ")');
-  await page.click('button:text-is("สำเร็จ")');
+  await page.click('button:text-is("ยืนยันรับออเดอร์")');
+  await page.waitForSelector('button:text-is("เริ่มแพ็ค")');
+  ok(true, 'paid: next = เริ่มแพ็ค');
+  await page.click('button:text-is("เริ่มแพ็ค")');
+  await page.waitForSelector('input[name=trackingNo]');
+  await page.fill('input[name=trackingNo]', 'KEX0012345678');
+  await page.click('button:text-is("จัดส่ง")');
+  await page.waitForSelector('button:text-is("ถึงมือลูกค้าแล้ว")');
+  await page.click('button:text-is("ถึงมือลูกค้าแล้ว")');
   await page.waitForSelector('text=สถานะสุดท้ายแล้ว');
-  ok(read('orders').find((o) => o.id === A.id).status === 'done', 'A → done');
+  const doneA = read('orders').find((o) => o.id === A.id);
+  ok(doneA.status === 'done' && doneA.shipment.trackingNo === 'KEX0012345678' && doneA.payment.status === 'succeeded', 'A → done · มีเลขพัสดุ · COD เก็บเงินแล้ว');
 
   // cancel B → stock + usage restored
   await page.goto(`${BASE}/admin/orders/${B.id}`);

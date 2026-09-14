@@ -6,6 +6,7 @@ import { writeCart, writeCoupon } from '@/lib/cart/storage';
 import { loadCart } from '@/lib/cart/service';
 import { ensureGuestId } from '@/lib/guest';
 import { createOrder } from '@/lib/db/orders';
+import { startBeamPayment } from '@/lib/payments/service';
 import { decrementStock, findProductsByIds } from '@/lib/db/products';
 import { formatBaht } from '@/lib/money';
 import { normalizeCustomerKey } from '@/lib/pricing/usage';
@@ -103,11 +104,19 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     couponCode: quote.coupon?.status === 'applied' ? quote.coupon.code : null,
     promotionUsages: quote.usages,
     paymentMethod: customer.paymentMethod,
+    // COD: รอร้านยืนยัน เก็บเงินตอนส่งถึง · Beam: สร้างรายการชำระด้านล่างแล้วพาไปหน้า Beam
+    payment: customer.paymentMethod === 'cod' ? { provider: 'cod', channel: 'cod', paymentId: null, status: 'pending', amount: quote.total, fee: 0, paidAt: null, refundedAmount: 0 } : null,
+    shipment: null,
+    history: [{ at: new Date().toISOString(), type: 'pending', by: 'customer', note: `ลูกค้าสั่งซื้อ · ${customer.paymentMethod === 'cod' ? 'เก็บเงินปลายทาง' : 'ชำระออนไลน์ผ่าน Beam'}` }],
     note: customer.note,
   });
 
   await writeCart([]);
   await writeCoupon(null);
   revalidatePath('/', 'layout');
+  if (customer.paymentMethod === 'beam') {
+    const payment = await startBeamPayment(order);
+    redirect(`/pay/${payment.id}`);
+  }
   redirect(`/order/${order.orderNo}?new=1`);
 }

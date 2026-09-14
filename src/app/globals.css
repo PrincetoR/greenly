@@ -183,3 +183,19 @@
     display: none;
   }
 }
+
+/* ใบปะหน้ากล่อง (admin/shipping/labels) — A4 แนวตั้ง ใบละครึ่งหน้า ตัดแบ่งได้ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+  html,
+  body {
+    background: #fff;
+  }
+  .label-sheet {
+    margin-bottom: 0;
+    page-break-inside: avoid;
+  }
+}

@@ -80,8 +80,87 @@ export interface Promotion {
   updatedAt: string;
 }
 
-export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'done' | 'cancelled';
-export type PaymentMethod = 'transfer' | 'cod';
+/**
+ * วงจรคำสั่งซื้อ: pending (รอชำระ/ยืนยัน) → paid (รอแพ็ค) → packing (กำลังแพ็ค) → shipped (จัดส่งแล้ว) → done (ถึงมือลูกค้า)
+ * shipped → returned (ตีกลับ) → packing (ส่งใหม่) หรือ cancelled · ทุกสถานะก่อนส่งยกเลิกได้ · การคืนเงินอยู่ที่ payment ไม่ใช่สถานะออเดอร์
+ */
+export type OrderStatus = 'pending' | 'paid' | 'packing' | 'shipped' | 'done' | 'returned' | 'cancelled';
+/** วิธีชำระที่ลูกค้าเลือกตอน checkout: beam = ชำระออนไลน์ผ่าน Beam (เลือกช่องทางย่อยที่หน้า Beam) · cod = เก็บเงินปลายทาง */
+export type PaymentMethod = 'beam' | 'cod';
+
+/** ช่องทางย่อยของ Beam (mock) + cod */
+export type PaymentChannel = 'promptpay' | 'card' | 'mobile_banking' | 'truemoney' | 'shopeepay' | 'linepay' | 'alipay' | 'wechatpay' | 'installment' | 'bnpl' | 'cod';
+export type PaymentStatus = 'pending' | 'succeeded' | 'failed' | 'expired' | 'refunded' | 'partially_refunded';
+
+/** สรุปการชำระเงินที่ฝังใน order — รายละเอียดเต็มอยู่ใน data/payments.json (Beam) */
+export interface OrderPayment {
+  provider: 'beam' | 'cod';
+  channel: PaymentChannel | null;
+  /** id ใน payments.json (beam เท่านั้น) */
+  paymentId: string | null;
+  status: PaymentStatus;
+  amount: number;
+  /** ค่าธรรมเนียม (สตางค์) ที่ผู้ให้บริการหัก */
+  fee: number;
+  paidAt: string | null;
+  refundedAmount: number;
+}
+
+export type CarrierId = 'kerry' | 'flash' | 'jt' | 'thaipost' | 'spx' | 'ninja' | 'best' | 'dhl';
+
+export interface Shipment {
+  carrier: CarrierId;
+  trackingNo: string;
+  shippedAt: string;
+  deliveredAt: string | null;
+  returnedAt: string | null;
+  returnReason: string | null;
+  /** น้ำหนัก (กรัม) / ขนาดกล่อง — ใส่ตอนแพ็ค ใช้พิมพ์ใบปะหน้า */
+  weightGrams: number | null;
+  boxSize: string | null;
+  note: string;
+}
+
+/** บันทึกเหตุการณ์ของออเดอร์ (เปลี่ยนสถานะ ชำระเงิน จัดส่ง โน้ต) — แสดงเป็นไทม์ไลน์ */
+export interface OrderEvent {
+  at: string;
+  /** สถานะที่เปลี่ยนไป · 'payment' / 'shipment' / 'note' = เหตุการณ์ที่ไม่เปลี่ยนสถานะ */
+  type: OrderStatus | 'payment' | 'shipment' | 'note';
+  /** ใครทำ: 'customer' · 'system' · username หลังบ้าน */
+  by: string;
+  note: string;
+}
+
+/** รายการชำระเงินฝั่ง Beam (mock) — 1 ออเดอร์มีได้หลายรายการ (ชำระไม่สำเร็จแล้วลองใหม่) */
+export interface Payment {
+  id: string;
+  orderId: string;
+  orderNo: string;
+  provider: 'beam';
+  channel: PaymentChannel | null;
+  amount: number;
+  fee: number;
+  net: number;
+  status: PaymentStatus;
+  /** เลขอ้างอิงจาก Beam (mock) */
+  reference: string | null;
+  /** ใช้เมื่อ channel = installment: จำนวนงวด */
+  installmentTerm: number | null;
+  customer: { name: string; phone: string };
+  refunds: PaymentRefund[];
+  createdAt: string;
+  updatedAt: string;
+  paidAt: string | null;
+  expiresAt: string;
+}
+
+export interface PaymentRefund {
+  id: string;
+  amount: number;
+  reason: string;
+  at: string;
+  by: string;
+}
 
 export interface OrderLine {
   productId: string;
@@ -128,6 +207,9 @@ export interface Order {
   couponCode: string | null;
   promotionUsages: PromotionUsage[];
   paymentMethod: PaymentMethod;
+  payment: OrderPayment | null;
+  shipment: Shipment | null;
+  history: OrderEvent[];
   note: string;
   createdAt: string;
   updatedAt: string;
@@ -145,6 +227,34 @@ export interface Settings {
   contact: { phone: string; email: string; line: string };
   /** แดชบอร์ด: แสดงหมวด/สินค้าขายดีกี่อันดับ (ตั้งจากรูปเฟืองบนการ์ด) */
   dashboard: DashboardRanks;
+  payments: PaymentSettings;
+  shipping: ShippingSettings;
+}
+
+export interface PaymentSettings {
+  beam: {
+    enabled: boolean;
+    mode: 'sandbox' | 'live';
+    merchantId: string;
+    publicKey: string;
+    /** เก็บเฉพาะ 4 ตัวท้ายไว้โชว์ (mock — ของจริงต้องอยู่ใน env) */
+    secretKeyLast4: string;
+    /** ช่องทางที่เปิดรับ */
+    channels: Partial<Record<Exclude<PaymentChannel, 'cod'>, boolean>>;
+    /** นาทีที่รายการชำระมีอายุ */
+    expiryMinutes: number;
+  };
+  cod: { enabled: boolean; /** ค่าธรรมเนียม COD (สตางค์) */ fee: number };
+}
+
+export interface ShippingSettings {
+  /** ชื่อ/ที่อยู่ผู้ส่งบนใบปะหน้า */
+  senderName: string;
+  senderPhone: string;
+  senderAddress: string;
+  /** ขนส่งที่ร้านใช้ (แสดงในตัวเลือกตอนจัดส่ง) */
+  carriers: CarrierId[];
+  defaultCarrier: CarrierId;
 }
 
 export interface DashboardRanks {
