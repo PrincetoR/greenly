@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 /**
  * หน้าแรก — ผูกแบนเนอร์กับการเลื่อน (พี่ต่อสั่ง):
  *  1) เส้นล่างของ header โปร่งตราบใดที่แถบแบนเนอร์ยังอยู่ใต้ header · โผล่เมื่อ "เส้นขอบล่างของแถบ" เลื่อนขึ้นมาถึง header
- *  2) รูปสไลด์/ภาพเล็กค่อย ๆ จางตามการเลื่อน — จางหมด (opacity 0) เมื่อเลื่อนได้ 50% ของความสูงแถบ
+ *  2) รูปสไลด์/ภาพเล็กค่อย ๆ จางตามการเลื่อน — จางหมด (opacity 0) เมื่อเลื่อนได้ 30% ของความสูงแถบ
  * ใส่ class ที่ <html> (CSS ใน globals.css) และ style opacity ที่ [data-hero-content] · ถอดทิ้งตอนออกจากหน้า
  */
 export function HeroHeaderSync() {
@@ -22,7 +22,8 @@ export function HeroHeaderSync() {
       const rect = band.getBoundingClientRect();
       // เส้น header กลับมาเมื่อขอบล่างของแถบขึ้นมาถึง (หรือพ้น) ขอบล่าง header
       root.classList.toggle('hero-at-top', rect.bottom > headerBottom + 0.5);
-      const fadeDistance = Math.max(1, rect.height * 0.5);
+      // จางหมดเมื่อเลื่อนได้ 30% ของความสูงแถบ (พี่ต่อสั่ง — เดิม 50%)
+      const fadeDistance = Math.max(1, rect.height * 0.3);
       content.style.opacity = String(Math.max(0, 1 - window.scrollY / fadeDistance));
     };
     const onScroll = () => {

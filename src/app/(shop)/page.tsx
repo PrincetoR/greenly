@@ -5,6 +5,7 @@ import { listOrders } from '@/lib/db/orders';
 import { getHomepage } from '@/lib/db/homepage';
 import { HeroSlider } from '@/components/shop/hero-slider';
 import { HeroHeaderSync } from '@/components/shop/hero-header-sync';
+import { SnapWheel } from '@/components/shop/snap-wheel';
 import { WelcomePopup } from '@/components/shop/welcome-popup';
 import { topProducts } from '@/lib/analytics/categories';
 import { loadPromotionContext } from '@/lib/promotions/service';
@@ -50,6 +51,8 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
   return (
     // snap-sections: จอ md+ เลื่อนแล้วหยุดทีละกลุ่ม (พี่ต่อสั่ง) — กฎอยู่ใน globals.css
     <div className="snap-sections pb-8">
+      {/* ล้อเมาส์นิดเดียว = ไปกลุ่มถัดไปทันที (จอ md+) */}
+      <SnapWheel />
       {/* ป๊อปอัปตอนเข้าเว็บ (ตั้งค่าที่หลังบ้าน › หน้าแรก) · ?popup=1 บังคับโชว์เพื่อดูตัวอย่าง */}
       <WelcomePopup popup={home.popup} force={sp.popup === '1'} />
 
