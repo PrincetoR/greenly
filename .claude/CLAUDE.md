@@ -42,7 +42,7 @@ src/lib/orders/labels ป้าย/สี/hint ของสถานะ · NEXT_
 src/lib/shipping/     carriers (8 ขนส่ง + trackUrl + pattern เลขพัสดุ) · tracking (ไทม์ไลน์จำลองตามชั่วโมงหลังส่ง · isMockDelivered ≥ 44 ชม. · guessProvince)
 src/lib/payments/     beam.ts pure (10 ช่องทาง + ค่าธรรมเนียมตัวอย่าง + BEAM_FEATURES + beamFee/availableChannels) · service.ts server (startBeamPayment / settleMockPayment / refundPayment)
 src/lib/db/payments   ledger data/payments.json (1 ออเดอร์มีได้หลายรายการ: failed แล้วลองใหม่)
-src/app/(pay)/pay/[id]  hosted checkout ของ Beam (จำลอง) — layout แยกไม่มี header ร้าน · components/pay/beam-checkout.tsx
+src/app/(pay)/pay/[id]  หน้าชำระเงิน **ของแอป** (พี่ต่อสั่ง 2026-09-15: ไม่โชว์ Beam ให้ลูกค้าเห็น — ของจริงหลังบ้านเชื่อม API Beam เอง ไม่ใช้ hosted checkout) — layout ใช้ ShopHeader ไม่มี footer/แถบล่าง · `components/pay/checkout.tsx` `PaymentCheckout`: จอใหญ่ [สรุปยอด sticky | รายการวิธี (role=tab) + รายละเอียด] สีแบรนด์ · มือถือ (`useSyncExternalStore` matchMedia ≤767) = accordion รายละเอียดกางใต้แถวที่เลือก + แถบ [ยอด · ชำระเงิน] fixed ล่าง · grid ต้อง `grid-cols-1` กัน track ถ่าง · ป้ายลูกค้า `PAYMENT_LABEL.beam` = "ชำระออนไลน์"
 src/app/api/payments/beam/webhook  POST รับ payment.succeeded/failed (mock — ยังไม่ตรวจลายเซ็น)
 src/app/admin/(app)/shipping   คิวจัดส่ง (tabs รอแพ็ค/กำลังแพ็ค/ระหว่างส่ง/ตีกลับ/ตั้งค่า) · components/admin/shipping-queue.tsx (เลือกหลายใบ) · order-actions.tsx (ฟอร์ม transition ใช้ร่วมกับหน้ารายละเอียด)
 src/app/admin/(print)/shipping/labels  ใบปะหน้ากล่อง ?ids=a,b (layout แยก ไม่มี chrome · @media print ใน globals.css)
