@@ -39,6 +39,8 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   });
   const hb = () => page.evaluate(() => getComputedStyle(document.querySelector('header')).borderBottomColor);
   const fade = () => page.evaluate(() => Number(document.querySelector('[data-hero-content]').style.opacity));
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForFunction(() => document.querySelector('[data-hero-content]')?.style.opacity === '1'); // รอ HeroHeaderSync ตั้งค่ารอบแรก
   ok((await hb()) === 'rgba(0, 0, 0, 0)' && (await fade()) === 1, 'อยู่บนสุด: เส้นล่าง header โปร่ง · แบนเนอร์ชัด 100%');
   // ปิด snap/การเกลี่ยชั่วคราวเพื่อวัดค่ากลางทาง (ของจริงเห็นตอนลากทัชแพด/ระหว่างแอนิเมชัน)
   await page.addStyleTag({ content: 'html{scroll-snap-type:none!important}' });
