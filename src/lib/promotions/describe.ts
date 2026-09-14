@@ -19,31 +19,38 @@ export function shortDiscount(promo: Pick<Promotion, 'type' | 'discount' | 'coup
 }
 
 /**
- * ประโยคสรุปโปรโมชันภาษาคน — ใช้ทั้งแถบสรุปในฟอร์มและหน้ารายการ
- * เช่น "ลด 20% สินค้าในหมวด เครื่องดื่มสุขภาพ · 11 ก.ย. – 26 ก.ย. 69 · จำกัด 5 ชิ้น/สินค้า"
+ * ประโยคสรุปโปรโมชันแยก 3 ส่วน — การ์ดหน้าร้านโชว์ `what` บรรทัดเดียว และ `period · limits` เป็นบรรทัดเงื่อนไข (พี่ต่อสั่ง)
+ * what   "ลด 20% สินค้าในหมวด เครื่องดื่มสุขภาพ" · period "11 ก.ย. – 26 ก.ย. 69" (null ถ้าวันที่ยังไม่ครบ) · limits "จำกัด 5 ชิ้น/สินค้า"
  */
-export function describePromotion(promo: PromoLike, names: { categories: Map<string, string>; products: Map<string, string> }): string {
-  const parts: string[] = [];
+export function describePromotionParts(promo: PromoLike, names: { categories: Map<string, string>; products: Map<string, string> }): { what: string; period: string | null; limits: string } {
   const scope = describeScope(promo.scope, names);
-
-  if (promo.type === 'discount') parts.push(`${shortDiscount(promo)} ${scope}`);
-  if (promo.type === 'bogo' && promo.bogo) parts.push(`ซื้อ ${promo.bogo.buyQty} แถม ${promo.bogo.getQty} ${scope}`);
+  let what = '';
+  if (promo.type === 'discount') what = `${shortDiscount(promo)} ${scope}`;
+  if (promo.type === 'bogo' && promo.bogo) what = `ซื้อ ${promo.bogo.buyQty} แถม ${promo.bogo.getQty} ${scope}`;
   if (promo.type === 'coupon' && promo.coupon) {
-    const what = [promo.discount ? shortDiscount({ ...promo, coupon: null }) : null, promo.coupon.freeShipping ? 'ส่งฟรี' : null].filter(Boolean).join(' + ') || 'คูปอง';
-    parts.push(`โค้ด ${promo.coupon.code || '…'} ${what} ${scope}${promo.coupon.minSubtotal ? ` เมื่อซื้อครบ ${formatBaht(promo.coupon.minSubtotal)}` : ''}`);
+    const deal = [promo.discount ? shortDiscount({ ...promo, coupon: null }) : null, promo.coupon.freeShipping ? 'ส่งฟรี' : null].filter(Boolean).join(' + ') || 'คูปอง';
+    what = `โค้ด ${promo.coupon.code || '…'} ${deal} ${scope}${promo.coupon.minSubtotal ? ` เมื่อซื้อครบ ${formatBaht(promo.coupon.minSubtotal)}` : ''}`;
   }
 
   const start = new Date(promo.startsAt).getTime();
   const end = new Date(promo.endsAt).getTime();
-  if (Number.isFinite(start) && Number.isFinite(end)) parts.push(formatRange(promo.startsAt, promo.endsAt));
+  const period = Number.isFinite(start) && Number.isFinite(end) ? formatRange(promo.startsAt, promo.endsAt) : null;
 
   const limits: string[] = [];
   if (promo.limits.totalUses !== null) limits.push(`${promo.limits.totalUses} สิทธิ์`);
   if (promo.limits.perProductQty !== null) limits.push(`${promo.limits.perProductQty} ชิ้น/สินค้า`);
   if (promo.limits.perCustomer !== null) limits.push(`${promo.limits.perCustomer} ครั้ง/ลูกค้า`);
-  parts.push(limits.length ? `จำกัด ${limits.join(', ')}` : 'ไม่จำกัดจำนวน');
 
-  return parts.join(' · ');
+  return { what, period, limits: limits.length ? `จำกัด ${limits.join(', ')}` : 'ไม่จำกัดจำนวน' };
+}
+
+/**
+ * ประโยคสรุปโปรโมชันภาษาคนบรรทัดเดียว — แถบสรุปในฟอร์ม/หลังบ้าน/ป๊อปอัป
+ * เช่น "ลด 20% สินค้าในหมวด เครื่องดื่มสุขภาพ · 11 ก.ย. – 26 ก.ย. 69 · จำกัด 5 ชิ้น/สินค้า"
+ */
+export function describePromotion(promo: PromoLike, names: { categories: Map<string, string>; products: Map<string, string> }): string {
+  const { what, period, limits } = describePromotionParts(promo, names);
+  return [what, period, limits].filter(Boolean).join(' · ');
 }
 
 function describeScope(scope: Promotion['scope'], names: { categories: Map<string, string>; products: Map<string, string> }): string {

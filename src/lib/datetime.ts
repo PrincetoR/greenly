@@ -64,6 +64,20 @@ export function humanCountdown(toIso: string, now: Date): string | null {
   return `${Math.max(mi, 1)} นาที`;
 }
 
+/**
+ * นับถอยหลังแบบนาฬิกา "13 วัน 23:59:59" / "05:07:09" — การ์ดโปรหน้าร้าน (พี่ต่อขอเห็นวินาทีเดินด้วย)
+ * null เมื่อถึงเวลาแล้ว
+ */
+export function clockCountdown(toIso: string, now: Date): string | null {
+  let sec = Math.floor((new Date(toIso).getTime() - now.getTime()) / 1000);
+  if (sec <= 0) return null;
+  const d = Math.floor(sec / 86400);
+  sec -= d * 86400;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const clock = `${pad(Math.floor(sec / 3600))}:${pad(Math.floor((sec % 3600) / 60))}:${pad(sec % 60)}`;
+  return d > 0 ? `${d} วัน ${clock}` : clock;
+}
+
 /** "3 ชม." / "2 วัน" / "5 นาที" ที่ผ่านมา — ใช้บอกว่าออเดอร์ค้างในคิวนานแค่ไหน */
 export function timeAgo(iso: string, now: Date): string {
   const min = Math.max(0, Math.floor((now.getTime() - new Date(iso).getTime()) / 60000));

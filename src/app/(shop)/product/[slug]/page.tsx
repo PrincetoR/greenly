@@ -5,7 +5,7 @@ import { findProductBySlug, listProducts } from '@/lib/db/products';
 import { loadPromotionContext } from '@/lib/promotions/service';
 import { displayPrice } from '@/lib/pricing/quote';
 import { formatBaht } from '@/lib/money';
-import { humanCountdown } from '@/lib/datetime';
+import { clockCountdown } from '@/lib/datetime';
 import { decodeSlug } from '@/lib/validation/common';
 import { Gallery } from '@/components/shop/gallery';
 import { AddToCart } from '@/components/shop/add-to-cart';
@@ -84,7 +84,7 @@ export default async function ProductPage({ params }: PageProps<'/product/[slug]
                     <Tag className="size-4 text-accent" aria-hidden />
                     <span className="font-semibold text-accent">{d.promotion.name}</span>
                     <span className="text-muted">
-                      <Countdown to={d.promotion.endsAt} initial={humanCountdown(d.promotion.endsAt, now)} />
+                      <Countdown to={d.promotion.endsAt} initial={clockCountdown(d.promotion.endsAt, now)} />
                     </span>
                     {discountLeft !== null && <span className="text-muted">· ราคาโปรเหลือ {discountLeft} ชิ้น</span>}
                   </li>
@@ -96,7 +96,7 @@ export default async function ProductPage({ params }: PageProps<'/product/[slug]
                       ซื้อ {d.bogo.bogo!.buyQty} แถม {d.bogo.bogo!.getQty}
                     </span>
                     <span className="text-muted">
-                      <Countdown to={d.bogo.endsAt} initial={humanCountdown(d.bogo.endsAt, now)} />
+                      <Countdown to={d.bogo.endsAt} initial={clockCountdown(d.bogo.endsAt, now)} />
                     </span>
                     {bogoLeft !== null && <span className="text-muted">· ของแถมเหลือ {bogoLeft} ชิ้น</span>}
                   </li>

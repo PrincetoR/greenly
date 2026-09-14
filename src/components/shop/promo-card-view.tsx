@@ -15,7 +15,12 @@ export interface PromoCardData {
   id: string;
   type: PromotionType;
   name: string;
+  /** ประโยคเต็ม (what · ช่วงเวลา · จำกัด) — ใช้ในป๊อปอัป */
   description: string;
+  /** เฉพาะส่วน "ทำอะไร" — บรรทัดคำอธิบายบนการ์ด */
+  summary: string;
+  /** ช่วงเวลา · เงื่อนไข — บรรทัด 2 บนการ์ด */
+  terms: string;
   discount: string;
   live: boolean;
   startsAt: string;
@@ -62,16 +67,21 @@ export function PromoCardView({ data: d }: { data: PromoCardData }) {
             <h3 className="truncate leading-6 font-bold transition-colors group-hover:text-brand" title={d.name}>
               {d.name}
             </h3>
-            <div className="mt-1 flex h-5 items-center">{d.live ? <Badge tone="ok">กำลังใช้งาน</Badge> : <Badge tone="info">เร็ว ๆ นี้</Badge>}</div>
+            {/* บรรทัด 2 = ช่วงเวลา · เงื่อนไข (แทนสถานะ — สถานะดูจากป๊อปอัป/นับถอยหลัง) พี่ต่อสั่ง */}
+            <p className="mt-1 truncate text-xs leading-5 text-muted" title={d.terms}>
+              {d.terms}
+            </p>
           </div>
           <span className={cn('shrink-0 rounded-lg px-3 py-1.5 text-lg font-bold', accent)}>{d.discount}</span>
         </div>
-        {/* คำอธิบายเต็มความกว้าง ชิดซ้ายเท่าไอคอน เหมือนในป๊อปอัป (พี่ต่อสั่ง) */}
-        <p className="line-clamp-2 text-sm leading-6 text-muted">{d.description}</p>
+        {/* คำอธิบาย 1 บรรทัด ตัด … · เต็มความกว้าง ชิดซ้ายเท่าไอคอน เหมือนในป๊อปอัป (พี่ต่อสั่ง) */}
+        <p className="truncate text-sm leading-6 text-muted" title={d.summary}>
+          {d.summary}
+        </p>
 
         <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
+          {/* ไม่ซ้ำ "ถึง วันที่" — ช่วงเวลาอยู่บรรทัด 2 แล้ว */}
           <Countdown to={d.live ? d.endsAt : d.startsAt} initial={d.countdownInitial} prefix={d.live ? 'เหลืออีก' : 'เริ่มใน'} />
-          <span>ถึง {formatDateTime(d.endsAt)}</span>
           {d.left !== null && <span className={cn(d.left <= 5 && 'font-semibold text-accent')}>เหลือ {d.left} สิทธิ์</span>}
           {!d.couponCode && (
             <Link href={d.href} onClick={(e) => e.stopPropagation()} className="ml-auto font-semibold text-brand hover:underline">

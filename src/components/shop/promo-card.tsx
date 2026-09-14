@@ -1,8 +1,8 @@
 import type { Category, Product, Promotion } from '@/lib/types';
-import { describePromotion, shortDiscount } from '@/lib/promotions/describe';
+import { describePromotion, describePromotionParts, shortDiscount } from '@/lib/promotions/describe';
 import { promotionStatus, type PromotionStatus } from '@/lib/pricing/status';
 import type { PromotionUsageStats } from '@/lib/pricing/types';
-import { humanCountdown } from '@/lib/datetime';
+import { clockCountdown } from '@/lib/datetime';
 import { formatBaht } from '@/lib/money';
 import { PromoCardView, type PromoCardData } from './promo-card-view';
 
@@ -17,7 +17,7 @@ export function promoHref(promo: Promotion, categories: Category[]): string {
 
 /**
  * การ์ดโปรโมชัน (server): เตรียมข้อมูลที่ต้องใช้ (ประโยคสรุป · สิทธิ์เหลือ · สินค้า/หมวดในโปร · เงื่อนไข) แล้วส่งให้ PromoCardView (client)
- * ซึ่งวาดการ์ดแบบย่อ (ชื่อ 1 บรรทัด · สถานะ · คำอธิบาย 2 บรรทัด) และเปิดป๊อปอัปรายละเอียดเต็มเมื่อกด (พี่ต่อสั่ง)
+ * ซึ่งวาดการ์ดแบบย่อ (ชื่อ 1 บรรทัด · ช่วงเวลา+เงื่อนไข 1 บรรทัด · คำอธิบาย 1 บรรทัด) และเปิดป๊อปอัปรายละเอียดเต็มเมื่อกด (พี่ต่อสั่ง)
  */
 export function PromoCard({
   promo,
@@ -53,16 +53,19 @@ export function PromoCard({
   if (promo.limits.perProductQty !== null) conditions.push(`ลดได้สูงสุด ${promo.limits.perProductQty} ชิ้นต่อสินค้า`);
   if (promo.limits.perCustomer !== null) conditions.push(`ใช้ได้ ${promo.limits.perCustomer} ครั้งต่อลูกค้า (นับจากเบอร์โทร)`);
 
+  const parts = describePromotionParts(promo, names);
   const data: PromoCardData = {
     id: promo.id,
     type: promo.type,
     name: promo.name,
     description: describePromotion(promo, names),
+    summary: parts.what,
+    terms: [parts.period, parts.limits].filter(Boolean).join(' · '),
     discount: shortDiscount(promo),
     live,
     startsAt: promo.startsAt,
     endsAt: promo.endsAt,
-    countdownInitial: live ? humanCountdown(promo.endsAt, now) : humanCountdown(promo.startsAt, now),
+    countdownInitial: live ? clockCountdown(promo.endsAt, now) : clockCountdown(promo.startsAt, now),
     left,
     couponCode: promo.coupon?.code ?? null,
     scopeKind: promo.scope.kind,
