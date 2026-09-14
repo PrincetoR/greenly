@@ -49,10 +49,10 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   await page.evaluate((y) => window.scrollTo(0, y), Math.round(bandH * 0.5) + 2);
   await page.waitForTimeout(150);
   ok((await fade()) === 0 && (await hb()) === 'rgba(0, 0, 0, 0)', 'เลื่อน 50%: จางหมด · เส้น header ยังไม่โผล่ (ขอบล่างแถบยังไม่ถึง)');
-  // ขอบล่างแถบถึงขอบล่าง header (65) เมื่อ scrollY = bandBottom(ตอนบนสุด) − 65
+  // ขอบล่างแถบถึงขอบล่าง header sticky (สูง 65 — แถบสถานะเลื่อนพ้นไปแล้ว) เมื่อ scrollY = bandBottom(ตอนบนสุด) − 65
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(100);
-  const reach = await page.evaluate(() => Math.round(document.querySelector('[data-hero-band]').getBoundingClientRect().bottom - document.querySelector('header').getBoundingClientRect().bottom));
+  const reach = await page.evaluate(() => Math.round(document.querySelector('[data-hero-band]').getBoundingClientRect().bottom - document.querySelector('header').offsetHeight));
   await page.evaluate((y) => window.scrollTo(0, y - 5), reach);
   await page.waitForTimeout(150);
   ok((await hb()) === 'rgba(0, 0, 0, 0)', 'ก่อนขอบล่างแถบถึง header 5px: เส้นยังโปร่ง');
