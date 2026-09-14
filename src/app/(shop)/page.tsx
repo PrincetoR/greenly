@@ -56,7 +56,7 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
       {/* แบนเนอร์: สไลด์จากหลังบ้าน · ไม่มีสไลด์ = ชื่อร้าน + สโลแกนแบบเดิม · h1 ซ่อนไว้ให้ SEO/screen reader */}
       {slides.length > 0 ? (
         // แถบขาวสุดจอ ต่อจาก header (ใช้เส้นขอบล่างของ header เป็นเส้นบน) มีเส้นขอบล่างของตัวเอง — พี่ต่อสั่ง
-        <div className="bg-surface border-b border-line">
+        <div className="bg-surface border-b border-line" data-hero-band>
           <HeroHeaderSync />
           <h1 className="sr-only">{settings.storeName}</h1>
           <HeroSlider slides={slides} side={sideBanners} autoplaySeconds={home.autoplaySeconds} />
