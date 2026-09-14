@@ -1,6 +1,5 @@
 import 'server-only';
 import { cartCount, readCart } from '@/lib/cart/storage';
-import { listCategories } from '@/lib/db/categories';
 import { getSettings } from '@/lib/db/settings';
 import { readMyWishlist } from '@/lib/wishlist/storage';
 import { getSession } from '@/lib/auth/session';
@@ -10,9 +9,8 @@ import { getSession } from '@/lib/auth/session';
  * (หลังบ้านใช้ header เดียวกับหน้าร้าน ให้เมนู "การจัดการ" ต่อเนื่องกับหน้าสินค้าทั้งหมด)
  */
 export async function loadShopHeaderProps() {
-  const [settings, categories, cart, wishlist, session] = await Promise.all([
+  const [settings, cart, wishlist, session] = await Promise.all([
     getSettings(),
-    listCategories({ activeOnly: true }),
     readCart(),
     readMyWishlist(),
     getSession(),
@@ -23,7 +21,6 @@ export async function loadShopHeaderProps() {
     headerProps: {
       storeName: settings.storeName,
       tagline: settings.tagline,
-      categories,
       cartCount: cartCount(cart),
       wishlistCount: wishlist.length,
       isStaff: Boolean(session),

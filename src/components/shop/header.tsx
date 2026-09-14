@@ -5,10 +5,8 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { Heart, Menu, Package, ShoppingCart, User, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import type { Category } from '@/lib/types';
 import { isAdminMenuActive, type AdminMenuItem } from '@/lib/auth/roles';
 import { logout } from '@/lib/actions/auth';
-import { ACCOUNT_ITEMS } from './account-items';
 import { TopLine } from './top-line';
 
 const NAV = [
@@ -24,13 +22,12 @@ type NavItem = (typeof NAV)[number] | typeof STAFF_NAV;
  * แถบสถานะบนสุด (แบบ Shopee, จอ md+): ขวา = รายการโปรด · ประวัติการสั่งซื้อ · ชื่อผู้ใช้ (หรือ guest) — เลื่อนไปกับหน้า
  * แถบหลัก (sticky): โลโก้ · เมนู · ตะกร้า (ขวาสุด)
  * มือถือ (พี่ต่อสั่ง 2026-09-15): หน้าร้าน = ตะกร้าอย่างเดียว (นำทางด้วยแถบเมนูล่าง MobileTabBar) · หน้าหลังบ้าน = ปุ่มเมนู (hamburger) อย่างเดียว ไม่มีตะกร้า
- * → drawer มือถือจึงเปิดได้เฉพาะหลังบ้าน: เมนูหลัก · เมนูหลังบ้าน · บัญชี · หมวดหมู่
+ * → drawer มือถือจึงเปิดได้เฉพาะหลังบ้าน และมีแค่เมนูหลังบ้าน + ออกจากระบบ (ไม่มีเมนูหน้าร้าน/บัญชี/หมวดหมู่ — แถบเมนูล่างทำหน้าที่แทน)
  * หลังบ้านใช้ header ตัวนี้ด้วย — เมนู "การจัดการ" active และเส้นแนวตั้งตรงกับ card เมนูหลังบ้าน
  */
 export function ShopHeader({
   storeName,
   tagline,
-  categories,
   cartCount,
   wishlistCount,
   isStaff = false,
@@ -39,7 +36,6 @@ export function ShopHeader({
 }: {
   storeName: string;
   tagline?: string;
-  categories: Category[];
   cartCount: number;
   wishlistCount: number;
   /** login หลังบ้านอยู่ → แสดงเมนู "การจัดการ" */
@@ -151,62 +147,28 @@ export function ShopHeader({
         </div>
       </div>
 
-      {/* drawer มือถือ */}
-      <div id="mobile-menu" hidden={!open} className="border-t border-line bg-surface px-4 py-4 md:hidden">
-        <nav aria-label="เมนูหลัก (มือถือ)" className="flex flex-col">
-          {nav.map((item) => (
-            <Link key={item.href} href={item.href} className="rounded-lg px-3 py-2.5 font-medium hover:bg-surface-alt">
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        {adminItems && (
-          <>
-            <p className="mt-3 px-3 text-xs font-semibold tracking-wide text-muted uppercase">จัดการสินค้า</p>
-            <nav aria-label="เมนูหลังบ้าน (มือถือ)" className="mt-1 flex flex-col">
-              {adminItems.map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  aria-current={isAdminMenuActive(href, pathname) ? 'page' : undefined}
-                  className={cn('rounded-lg px-3 py-2.5 font-medium', isAdminMenuActive(href, pathname) ? 'bg-brand-soft text-brand' : 'hover:bg-surface-alt')}
-                >
-                  {label}
-                </Link>
-              ))}
-              <form action={logout}>
-                <button type="submit" className="w-full rounded-lg px-3 py-2.5 text-left font-medium text-danger hover:bg-danger-soft">
-                  ออกจากระบบ
-                </button>
-              </form>
-            </nav>
-          </>
-        )}
-        <p className="mt-3 px-3 text-xs font-semibold tracking-wide text-muted uppercase">บัญชี</p>
-        <nav aria-label="เมนูบัญชี (มือถือ)" className="mt-1 flex flex-col">
-          {ACCOUNT_ITEMS.map(({ href, label, Icon }) => (
-            <Link key={href} href={href} className="flex items-center gap-2 rounded-lg px-3 py-2.5 font-medium hover:bg-surface-alt">
-              <Icon className="size-4 text-muted" aria-hidden />
-              {label}
-              {href === '/wishlist' && wishlistCount > 0 && <span className="ml-auto rounded-full bg-accent-soft px-2 text-xs font-semibold text-accent">{wishlistCount}</span>}
-            </Link>
-          ))}
-        </nav>
-        {categories.length > 0 && (
-          <>
-            <p className="mt-3 px-3 text-xs font-semibold tracking-wide text-muted uppercase">หมวดหมู่</p>
-            <ul className="mt-1 grid grid-cols-2 gap-1">
-              {categories.map((c) => (
-                <li key={c.id}>
-                  <Link href={`/category/${c.slug}`} className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-alt">
-                    {c.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </div>
+      {/* drawer มือถือ — เปิดได้เฉพาะหลังบ้าน: เมนูหลังบ้าน (แดชบอร์ด … ตั้งค่าร้าน) + ออกจากระบบ เท่านั้น ไม่มีหัวข้อ/เมนูหน้าร้าน (พี่ต่อสั่ง 2026-09-15) */}
+      {adminItems && (
+        <div id="mobile-menu" hidden={!open} className="border-t border-line bg-surface px-4 py-4 md:hidden">
+          <nav aria-label="เมนูหลังบ้าน (มือถือ)" className="flex flex-col">
+            {adminItems.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                aria-current={isAdminMenuActive(href, pathname) ? 'page' : undefined}
+                className={cn('rounded-lg px-3 py-2.5 font-medium', isAdminMenuActive(href, pathname) ? 'bg-brand-soft text-brand' : 'hover:bg-surface-alt')}
+              >
+                {label}
+              </Link>
+            ))}
+            <form action={logout}>
+              <button type="submit" className="w-full rounded-lg px-3 py-2.5 text-left font-medium text-danger hover:bg-danger-soft">
+                ออกจากระบบ
+              </button>
+            </form>
+          </nav>
+        </div>
+      )}
     </header>
     </>
   );
