@@ -53,10 +53,10 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
 
       {/* แบนเนอร์: สไลด์จากหลังบ้าน · ไม่มีสไลด์ = ชื่อร้าน + สโลแกนแบบเดิม · h1 ซ่อนไว้ให้ SEO/screen reader */}
       {slides.length > 0 ? (
-        <>
+        <div className="mx-auto max-w-6xl px-4 pt-4">
           <h1 className="sr-only">{settings.storeName}</h1>
           <HeroSlider slides={slides} autoplaySeconds={home.autoplaySeconds} />
-        </>
+        </div>
       ) : (
         <section className="bg-gradient-to-br from-brand-soft via-page to-accent-soft">
           <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-14 sm:py-20">
