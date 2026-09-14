@@ -86,7 +86,7 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
         <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-8">
           {categories.map((c) => (
             <li key={c.id}>
-              <Link href={`/category/${c.slug}`} className="group flex h-full flex-col items-center gap-2 rounded-card bg-surface p-3 text-center border border-line transition-colors hover:border-brand hover:bg-brand-soft/40">
+              <Link href={`/category/${c.slug}`} className="group card-hover flex h-full flex-col items-center gap-2 rounded-card bg-surface p-3 text-center border border-line">
                 {c.image ? (
                   <ProductImage src={c.image} alt="" className="size-14 rounded-full" />
                 ) : (

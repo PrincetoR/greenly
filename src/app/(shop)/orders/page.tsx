@@ -41,9 +41,9 @@ export default async function MyOrdersPage() {
         <ul className="mt-6 flex flex-col gap-3">
           {orders.map((o) => (
             <li key={o.id}>
-              <Link href={`/order/${o.orderNo}`} className="block rounded-card bg-surface p-4 border border-line transition-shadow hover:shadow-md">
+              <Link href={`/order/${o.orderNo}`} className="group card-hover block rounded-card bg-surface p-4 border border-line">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-mono font-semibold">{o.orderNo}</span>
+                  <span className="font-mono font-semibold transition-colors group-hover:text-brand">{o.orderNo}</span>
                   <Badge tone={ORDER_STATUS_TONE[o.status]}>{ORDER_STATUS_LABEL[o.status]}</Badge>
                 </div>
                 <p className="mt-1 text-xs text-muted">

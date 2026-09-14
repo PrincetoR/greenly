@@ -201,6 +201,18 @@
   html.hero-at-top .site-header {
     border-bottom-color: transparent;
   }
+  /*
+   * hover ของการ์ดที่คลิกได้ทั้งเว็บ (พี่ต่อชอบแบบการ์ดหมวดหมู่หน้าแรก): ขอบเป็นสีแบรนด์ + พื้นอมเขียวจาง
+   * ใช้คู่กับ `group` แล้ว `group-hover:text-brand` ที่ชื่อ/หัวข้อได้ · ไม่ใช้เงา (เคยเป็น shadow-md/lg)
+   */
+  .card-hover {
+    transition-property: border-color, background-color;
+    transition-duration: 150ms;
+  }
+  .card-hover:hover {
+    border-color: var(--brand);
+    background-color: color-mix(in srgb, var(--brand-soft) 40%, var(--surface));
+  }
   /* แถบขาววิ่งบนเส้นเขียว 2px ตอนกำลังโหลดหน้า (TopLine) */
   .top-line-sweep {
     animation: top-line-sweep 1s linear infinite;

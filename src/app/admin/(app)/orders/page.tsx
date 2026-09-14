@@ -116,7 +116,7 @@ export default async function OrdersPage({ searchParams }: PageProps<'/admin/ord
           <ul className="flex flex-col gap-3 md:hidden">
             {orders.map((o) => (
               <li key={o.id}>
-                <Link href={`/admin/orders/${o.id}`} className="block rounded-card bg-surface p-4 border border-line">
+                <Link href={`/admin/orders/${o.id}`} className="card-hover block rounded-card bg-surface p-4 border border-line">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono font-medium">{o.orderNo}</span>
                     <Badge tone={ORDER_STATUS_TONE[o.status]}>{ORDER_STATUS_LABEL[o.status]}</Badge>
