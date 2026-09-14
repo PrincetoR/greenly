@@ -10,7 +10,7 @@ import { cn } from '@/lib/cn';
  *  · scroll-snap ทีละหน้า (snap-x mandatory) · ปัดนิ้ว/ทัชแพดได้ตามปกติ
  * ผู้เรียกจัด layout ของลูกเอง (grid/flex) — ตัวนี้แค่ครอบให้เลื่อน + วัดหน้า
  */
-export function HScroller({ children, className, ariaLabel }: { children: React.ReactNode; className?: string; ariaLabel: string }) {
+export function HScroller({ children, className, gridClassName, ariaLabel }: { children: React.ReactNode; className?: string; /** class ของกริดข้างใน — ตัว scroll container เป็น grid เอง (ให้ % ของคอลัมน์อิงความกว้างช่อง และ Chrome นับ padding ท้ายให้เลื่อนสุดหน้าได้) */ gridClassName: string; ariaLabel: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [pages, setPages] = useState(1);
   const [page, setPage] = useState(0);
@@ -57,7 +57,7 @@ export function HScroller({ children, className, ariaLabel }: { children: React.
   return (
     <div className={cn('group/hs relative', className)}>
       {/* scroll-padding = padding เดียวกัน ไม่งั้น snap ดึงการ์ดแรกไปซ่อนใต้ padding ซ้าย */}
-      <div ref={ref} className="scrollbar-none -mx-4 snap-x snap-mandatory scroll-pl-4 overflow-x-auto px-4 sm:-mx-1 sm:scroll-pl-1 sm:px-1" role="region" aria-label={ariaLabel}>
+      <div ref={ref} className={cn('scrollbar-none -mx-4 snap-x snap-mandatory scroll-pl-4 overflow-x-auto px-4 sm:-mx-1 sm:scroll-pl-1 sm:px-1', gridClassName)} role="region" aria-label={ariaLabel}>
         {children}
       </div>
       {/* ไม่มีขอบไล่จาง — พี่ต่อ: จุดด้านล่างก็บอกอยู่แล้วว่าเลื่อนได้ ขอบให้แสดงปกติ */}

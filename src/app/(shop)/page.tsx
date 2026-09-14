@@ -7,7 +7,7 @@ import { getHomepage } from '@/lib/db/homepage';
 import { HeroSlider } from '@/components/shop/hero-slider';
 import { HeroHeaderSync } from '@/components/shop/hero-header-sync';
 import { HScroller } from '@/components/shop/h-scroller';
-import { gridCell } from '@/lib/grid-cell';
+import { gridCell, pageFillers, pageSnapClass } from '@/lib/grid-cell';
 import { SnapWheel } from '@/components/shop/snap-wheel';
 import { WelcomePopup } from '@/components/shop/welcome-popup';
 import { topProducts } from '@/lib/analytics/categories';
@@ -20,6 +20,10 @@ import { Section } from '@/components/shop/section';
 import { buttonStyles } from '@/components/ui/button';
 import { CategoryIcon } from '@/components/category-icon';
 import { ProductImage } from '@/components/product-image';
+
+/** คอลัมน์ต่อแถวของแถวเลื่อนข้าง (มือถือ / sm / lg) — 2 แถวต่อหน้า */
+const CAT_COLS = { m: 3, s: 4, l: 8 };
+const PROMO_COLS = { m: 1, s: 2, l: 2 };
 
 export default async function HomePage({ searchParams }: PageProps<'/'>) {
   const [ctx, categories, featured, newest, allProducts, orders, home, sp] = await Promise.all([
@@ -89,15 +93,17 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
        * มีรูปใช้รูป ไม่มีใช้ไอคอน · HScroller ใส่จุดบอกหน้า/ขอบจาง/ปุ่มให้รู้ว่าเลื่อนได้
        */}
       <Section title="หมวดหมู่" href="/products">
-        <HScroller ariaLabel="หมวดหมู่">
-          {/* ไม่กำหนด grid-rows-2 — แถวที่ 2 เกิดเองเมื่อมีของ (ไม่งั้นแถวว่างกินที่เท่าแถวแรก) */}
-          <ul className="grid auto-cols-[calc((100%-24px)/3)] gap-3 sm:auto-cols-[calc((100%-36px)/4)] lg:auto-cols-[calc((100%-84px)/8)]">
-            {categories.map((c, i) => (
-              <li key={c.id} className="hs-cell snap-start" style={gridCell(i, { m: 3, s: 4, l: 8 })}>
-                <CategoryCard c={c} />
-              </li>
-            ))}
-          </ul>
+        {/* scroll container เป็น grid เอง (ไม่กำหนด grid-rows-2 — แถวที่ 2 เกิดเองเมื่อมีของ ไม่งั้นแถวว่างกินที่) */}
+        <HScroller ariaLabel="หมวดหมู่" gridClassName="grid auto-cols-[calc((100%-24px)/3)] gap-3 sm:auto-cols-[calc((100%-36px)/4)] lg:auto-cols-[calc((100%-84px)/8)]">
+          {categories.map((c, i) => (
+            <div key={c.id} className={`hs-cell ${pageSnapClass(i, CAT_COLS)}`} style={gridCell(i, CAT_COLS)}>
+              <CategoryCard c={c} />
+            </div>
+          ))}
+          {/* ช่องว่างเติมหน้าสุดท้ายให้เต็ม — เลื่อนแล้วเห็นหน้าถัดไปเต็ม ๆ ไม่ค้างครึ่งหน้า (พี่ต่อสั่ง) */}
+          {pageFillers(categories.length, CAT_COLS).map((f) => (
+            <div key={`fill-${f.i}`} aria-hidden className={`hs-cell ${f.className}`} style={gridCell(f.i, CAT_COLS)} />
+          ))}
         </HScroller>
       </Section>
 
@@ -105,14 +111,15 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
       {live.length > 0 && (
         <Section title="โปรโมชันตอนนี้" description="ราคาโปรมีผลอัตโนมัติ ไม่ต้องทำอะไรเพิ่ม" href="/promotions">
           {/* 2 แถว เรียงซ้าย→ขวาแล้วลงแถวล่าง: จอใหญ่ 2 ใบ/แถว (4 ใบ/หน้า) · มือถือ 1 ใบ/แถว (2 ใบ/หน้า) แล้วเลื่อนข้าง — มีจุด/ขอบจาง/ปุ่มบอกว่าเลื่อนได้ (พี่ต่อสั่ง) */}
-          <HScroller ariaLabel="โปรโมชันตอนนี้">
-            <div className="grid auto-cols-[100%] gap-3 sm:auto-cols-[calc((100%-12px)/2)]">
-              {live.map((p, i) => (
-                <div key={p.id} className="hs-cell h-full snap-start" style={gridCell(i, { m: 1, s: 2, l: 2 })}>
-                  <PromoCard promo={p} status="live" usage={usage[p.id]} categories={categories} products={allProducts} now={now} />
-                </div>
-              ))}
-            </div>
+          <HScroller ariaLabel="โปรโมชันตอนนี้" gridClassName="grid auto-cols-[100%] gap-3 sm:auto-cols-[calc((100%-12px)/2)]">
+            {live.map((p, i) => (
+              <div key={p.id} className={`hs-cell h-full ${pageSnapClass(i, PROMO_COLS)}`} style={gridCell(i, PROMO_COLS)}>
+                <PromoCard promo={p} status="live" usage={usage[p.id]} categories={categories} products={allProducts} now={now} />
+              </div>
+            ))}
+            {pageFillers(live.length, PROMO_COLS).map((f) => (
+              <div key={`fill-${f.i}`} aria-hidden className={`hs-cell ${f.className}`} style={gridCell(f.i, PROMO_COLS)} />
+            ))}
           </HScroller>
         </Section>
       )}
