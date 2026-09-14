@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 /**
  * หน้าแรก — ผูกแบนเนอร์กับการเลื่อน (พี่ต่อสั่ง):
- *  1) เส้นล่างของ header โปร่งตราบใดที่ยังเห็นรูปสไลด์ (opacity > 0) · โผล่ทันทีที่รูปจางหมด
+ *  1) เส้นล่างของ header โปร่งตราบใดที่แถบแบนเนอร์ยังอยู่ใต้ header · โผล่เมื่อ "เส้นขอบล่างของแถบ" เลื่อนขึ้นมาถึง header (เหมือนเส้นเดียวกันหดขึ้นมา)
  *  2) รูปสไลด์/ภาพเล็กค่อย ๆ จางตามการเลื่อน — จางหมด (opacity 0) เมื่อเลื่อนได้ 30% ของความสูงแถบ
  * ใส่ class ที่ <html> (CSS ใน globals.css) และ style opacity ที่ [data-hero-content] · ถอดทิ้งตอนออกจากหน้า
  */
@@ -13,18 +13,18 @@ export function HeroHeaderSync() {
     const root = document.documentElement;
     const band = document.querySelector<HTMLElement>('[data-hero-band]');
     const content = document.querySelector<HTMLElement>('[data-hero-content]');
-    if (!band || !content) return;
+    const header = document.querySelector<HTMLElement>('.site-header');
+    if (!band || !content || !header) return;
     let raf = 0;
     const update = () => {
       raf = 0;
       const rect = band.getBoundingClientRect();
+      const headerBottom = header.getBoundingClientRect().bottom;
       // จางหมดเมื่อเลื่อนได้ 30% ของความสูงแถบ (พี่ต่อสั่ง — เดิม 50%)
       const fadeDistance = Math.max(1, rect.height * 0.3);
-      const opacity = Math.max(0, 1 - window.scrollY / fadeDistance);
-      content.style.opacity = String(opacity);
-      // เส้น header โปร่งเฉพาะตอนที่ยังเห็นรูปสไลด์ (ยังไม่จางหมด) — พอจางหมดเส้นกลับมาทันที
-      // (เดิมรอจนขอบล่างแถบขึ้นมาถึง header → ระหว่างแอนิเมชันเกลี่ยไปหมวดหมู่ header ไม่มีเส้นอยู่พักหนึ่ง พี่ต่อทักว่าเส้นหาย)
-      root.classList.toggle('hero-at-top', opacity > 0);
+      content.style.opacity = String(Math.max(0, 1 - window.scrollY / fadeDistance));
+      // "เส้นเดียวกันหดขึ้นมา": เส้นล่างของแถบเลื่อนขึ้นจนถึง header แล้วเส้น header รับช่วงต่อ — ก่อนหน้านั้น header ไม่มีเส้น (พี่ต่อสั่งย้ำ 2026-09-15)
+      root.classList.toggle('hero-at-top', rect.bottom > headerBottom + 0.5);
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);

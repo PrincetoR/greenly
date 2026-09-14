@@ -49,7 +49,21 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   ok(Math.abs((await fade()) - 0.5) < 0.05 && (await hb()) === 'rgba(0, 0, 0, 0)', `เลื่อน 15% ของแถบ: จาง 50% · เส้น header ยังไม่โผล่ (opacity ${await fade()})`);
   await page.evaluate((y) => window.scrollTo(0, y), Math.round(bandH * 0.3) + 2);
   await page.waitForTimeout(150);
-  ok((await fade()) === 0 && (await hb()) !== 'rgba(0, 0, 0, 0)', 'เลื่อน 30%: จางหมด → เส้น header กลับมาทันที');
+  ok((await fade()) === 0 && (await hb()) === 'rgba(0, 0, 0, 0)', 'เลื่อน 30%: จางหมด · เส้น header ยังไม่โผล่ (เส้นล่างของแถบยังทำหน้าที่อยู่)');
+  // เส้นล่างของแถบขึ้นมาถึงขอบล่าง header sticky (สูง 65) เมื่อ scrollY = bandBottom(ตอนบนสุด) − 65 → header รับช่วงเส้นต่อ
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(100);
+  const reach = await page.evaluate(() => Math.round(document.querySelector('[data-hero-band]').getBoundingClientRect().bottom - document.querySelector('header').offsetHeight));
+  await page.evaluate((y) => window.scrollTo(0, y - 5), reach);
+  await page.waitForTimeout(150);
+  ok((await hb()) === 'rgba(0, 0, 0, 0)', 'ก่อนเส้นแถบถึง header 5px: เส้น header ยังโปร่ง');
+  await page.evaluate((y) => window.scrollTo(0, y + 2), reach);
+  await page.waitForTimeout(150);
+  ok((await hb()) !== 'rgba(0, 0, 0, 0)', 'เส้นแถบขึ้นมาถึง header → เส้น header รับช่วงต่อ');
+  // ตำแหน่ง snap ที่หมวดหมู่ (หัวข้อที่ 81): เส้นแถบอยู่ใต้ header แล้ว → เส้น header ต้องแสดง
+  await page.evaluate(() => { const s = document.querySelector('.snap-section'); window.scrollTo(0, s.getBoundingClientRect().top + scrollY - 81); });
+  await page.waitForTimeout(150);
+  ok((await hb()) !== 'rgba(0, 0, 0, 0)', 'snap ที่หมวดหมู่: เส้น header แสดง');
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(300);
   ok((await fade()) === 1 && (await hb()) === 'rgba(0, 0, 0, 0)', 'กลับบนสุด: ชัด 100% เส้นโปร่งอีกครั้ง');
