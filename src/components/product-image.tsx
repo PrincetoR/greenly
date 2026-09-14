@@ -11,6 +11,7 @@ export function ProductImage({
   className = 'w-full',
   priority,
   ratio = 'square',
+  fit = 'cover',
 }: {
   src: string | null | undefined;
   alt: string;
@@ -18,6 +19,8 @@ export function ProductImage({
   priority?: boolean;
   /** square = รูปย่อ/แกลเลอรี · landscape (4:3) = การ์ดในกริด ให้ส่วนรูปไม่สูงจนข่มชื่อ/ราคา */
   ratio?: 'square' | 'landscape';
+  /** cover = ครอปเต็มกรอบ (สินค้า) · contain = โชว์ทั้งรูปบนพื้นโปร่ง (รูปหมวด PNG ไม่มีพื้นหลัง — ไม่ถูกกรอบตัด) */
+  fit?: 'cover' | 'contain';
 }) {
   const aspect = ratio === 'landscape' ? 'aspect-[4/3]' : 'aspect-square';
   if (!src) {
@@ -34,7 +37,7 @@ export function ProductImage({
       alt={alt}
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"
-      className={cn('shrink-0 bg-surface-alt object-cover', aspect, className)}
+      className={cn('shrink-0', fit === 'contain' ? 'object-contain' : 'bg-surface-alt object-cover', aspect, className)}
     />
   );
 }

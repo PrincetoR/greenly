@@ -25,11 +25,11 @@ const daysFromNow = (n: number) => new Date(now.getTime() + n * 86_400_000);
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9ก-๙]+/g, '-').replace(/^-|-$/g, '');
 
 /* ---------- categories ---------- */
-// icon = ไอคอน lucide บนการ์ดหน้าแรก · withImage = สร้างรูป placeholder ให้ (โชว์ว่าหมวดใส่รูปแทนไอคอนได้)
+// icon = ไอคอน lucide บนการ์ดหน้าแรก · withImage = สร้างรูป placeholder ให้ — ข้อมูลสาธิตใช้ไอคอนล้วน (พี่ต่อ: สวยกว่า) แต่ตั้งค่ายังอัปโหลดรูปได้
 const categorySeed: { id: string; name: string; emoji: string; hue: number; icon: Category['icon']; withImage?: boolean }[] = [
-  { id: 'c-drinks', name: 'เครื่องดื่มสุขภาพ', emoji: '🥤', hue: 150, icon: 'cup-soda', withImage: true },
+  { id: 'c-drinks', name: 'เครื่องดื่มสุขภาพ', emoji: '🥤', hue: 150, icon: 'cup-soda' },
   { id: 'c-grains', name: 'ธัญพืชและถั่ว', emoji: '🌾', hue: 40, icon: 'wheat' },
-  { id: 'c-snacks', name: 'ขนมเพื่อสุขภาพ', emoji: '🍪', hue: 20, icon: 'cookie', withImage: true },
+  { id: 'c-snacks', name: 'ขนมเพื่อสุขภาพ', emoji: '🍪', hue: 20, icon: 'cookie' },
   { id: 'c-supplement', name: 'อาหารเสริม', emoji: '💊', hue: 200, icon: 'pill' },
   { id: 'c-kitchen', name: 'ของใช้ในครัว', emoji: '🍳', hue: 260, icon: 'cooking-pot' },
   { id: 'c-dried', name: 'ผลไม้อบแห้ง', emoji: '🍑', hue: 340, icon: 'cherry' },

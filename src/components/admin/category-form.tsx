@@ -78,6 +78,7 @@ export function CategoryForm({ category }: { category?: Category }) {
       </fieldset>
       <div className="sm:col-span-3">
         <p className="text-sm font-medium">รูปหมวด (ใช้แทนไอคอน)</p>
+        <p className="mt-0.5 text-xs text-muted">แสดงเป็นสี่เหลี่ยมเต็มรูป ไม่ครอปวงกลม — แนะนำ PNG พื้นโปร่ง หรือพื้นขาวเท่าการ์ด จะได้กลมกลืน</p>
         <div className="mt-2">
           <ImageUploader initial={category?.image ? [category.image] : []} max={1} name="image" />
         </div>

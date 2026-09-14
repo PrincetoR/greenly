@@ -60,7 +60,7 @@ export default async function CategoriesPage({ searchParams }: PageProps<'/admin
                 <Td className="font-medium">
                   <span className="flex items-center gap-3">
                     {c.image ? (
-                      <ProductImage src={c.image} alt="" className="size-9 rounded-md" />
+                      <ProductImage src={c.image} alt="" fit="contain" className="size-9" />
                     ) : (
                       <span className="flex size-9 items-center justify-center rounded-md bg-brand-soft text-brand" aria-hidden>
                         <CategoryIcon icon={c.icon} className="size-5" />

@@ -5,7 +5,7 @@
     "name": "เครื่องดื่มสุขภาพ",
     "sortOrder": 10,
     "active": true,
-    "image": "/uploads/seed/c-drinks.svg",
+    "image": null,
     "icon": "cup-soda"
   },
   {
@@ -23,7 +23,7 @@
     "name": "ขนมเพื่อสุขภาพ",
     "sortOrder": 30,
     "active": true,
-    "image": "/uploads/seed/c-snacks.svg",
+    "image": null,
     "icon": "cookie"
   },
   {

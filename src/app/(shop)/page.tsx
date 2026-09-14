@@ -158,8 +158,9 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
 function CategoryCard({ c }: { c: Category }) {
   return (
     <Link href={`/category/${c.slug}`} className="group card-hover flex h-full flex-col items-center gap-2 rounded-card bg-surface p-3 text-center border border-line">
+      {/* รูปหมวด = สี่เหลี่ยมธรรมดา ไม่มีกรอบวงกลม (พี่ต่อ: ให้อัปโหลด PNG ไม่มีพื้นหลัง/พื้นสีเดียวกับการ์ด จะได้ไม่ถูกตัด) · ไม่มีรูป = ไอคอนในวงกลม */}
       {c.image ? (
-        <ProductImage src={c.image} alt="" className="size-14 rounded-full" />
+        <ProductImage src={c.image} alt="" fit="contain" className="size-14" />
       ) : (
         <span className="flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand" aria-hidden>
           <CategoryIcon icon={c.icon} className="size-7" />
