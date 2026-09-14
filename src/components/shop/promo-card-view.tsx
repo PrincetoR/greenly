@@ -117,17 +117,18 @@ function PromoDialog({ data: d, onClose }: { data: PromoCardData; onClose: () =>
           <X className="size-5" aria-hidden />
         </button>
         <div className="overflow-y-auto p-5 sm:p-6">
+          {/* ไอคอนสูงเท่า 2 บรรทัดขวา (ชื่อ 28 + ช่อง 4 + ชิป 24 = 56) · บรรทัด 2 = ส่วนลดแล้วค่อยสถานะ — พี่ต่อสั่ง */}
           <div className="flex items-start gap-3 pr-10">
-            <span className={cn('flex size-12 shrink-0 items-center justify-center rounded-xl', accent)} aria-hidden>
-              <PromoTypeIcon type={d.type} className="size-6" />
+            <span className={cn('flex size-14 shrink-0 items-center justify-center rounded-xl', accent)} aria-hidden>
+              <PromoTypeIcon type={d.type} className="size-7" />
             </span>
             <div className="min-w-0 flex-1">
               <h2 id={`promo-dialog-${d.id}`} className="text-lg font-bold leading-7">
                 {d.name}
               </h2>
-              <div className="mt-1 flex flex-wrap items-center gap-2">
-                {d.live ? <Badge tone="ok">กำลังใช้งาน</Badge> : <Badge tone="info">เร็ว ๆ นี้</Badge>}
+              <div className="mt-1 flex h-6 flex-wrap items-center gap-2">
                 <span className={cn('rounded-lg px-2.5 py-0.5 text-sm font-bold', accent)}>{d.discount}</span>
+                {d.live ? <Badge tone="ok">กำลังใช้งาน</Badge> : <Badge tone="info">เร็ว ๆ นี้</Badge>}
               </div>
             </div>
           </div>
@@ -195,13 +196,14 @@ function PromoDialog({ data: d, onClose }: { data: PromoCardData; onClose: () =>
             </div>
           )}
         </div>
-        <div className="flex flex-wrap gap-2 border-t border-line p-4 sm:px-6">
-          <Link href={d.href} className={buttonStyles()}>
-            ดูสินค้าในโปร
-          </Link>
+        {/* ปุ่มชิดขวา · ปุ่มหลัก "ดูสินค้าในโปร" อยู่ขวาสุด (พี่ต่อสั่ง) */}
+        <div className="flex flex-wrap justify-end gap-2 border-t border-line p-4 sm:px-6">
           <button type="button" onClick={onClose} className={buttonStyles({ variant: 'secondary' })}>
             ปิด
           </button>
+          <Link href={d.href} className={buttonStyles()}>
+            ดูสินค้าในโปร
+          </Link>
         </div>
       </div>
     </div>

@@ -18,6 +18,20 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
   await card.click();
   await page.waitForSelector('[role=dialog]');
   ok((await page.locator('[role=dialog] code:has-text("SAVE100")').count()) === 1 && (await page.locator('[role=dialog] dt:has-text("ช่วงเวลา")').count()) === 1 && (await page.locator('[role=dialog] li:has-text("ยอดสั่งซื้อขั้นต่ำ")').count()) === 1, 'กดการ์ด → ป๊อปอัปรายละเอียดเต็ม (โค้ด ช่วงเวลา เงื่อนไข)');
+  // หัวป๊อปอัป: ไอคอนสูงเท่าบล็อก 2 บรรทัด (ชื่อ + ส่วนลด/สถานะ) · ส่วนลดมาก่อนสถานะ · ปุ่มชิดขวา "ดูสินค้าในโปร" ขวาสุด (พี่ต่อสั่ง 2026-09-15)
+  const head = await page.locator('[role=dialog] h2').evaluate((h) => {
+    const icon = h.parentElement.previousElementSibling.getBoundingClientRect();
+    const block = h.parentElement.getBoundingClientRect();
+    const row = h.nextElementSibling;
+    const [discount, status] = [row.children[0].getBoundingClientRect(), row.children[1].getBoundingClientRect()];
+    const dlg = h.closest('[role=dialog]');
+    const foot = dlg.lastElementChild;
+    const btns = [...foot.querySelectorAll('a,button')].map((b) => ({ t: b.textContent.trim(), r: b.getBoundingClientRect() }));
+    return { icon: icon.height, block: block.height, iconW: icon.width, discountLeft: discount.left, statusLeft: status.left, statusText: row.children[1].textContent, btns, footRight: foot.getBoundingClientRect().right - parseFloat(getComputedStyle(foot).paddingRight) };
+  });
+  ok(Math.abs(head.icon - head.block) < 0.5 && Math.abs(head.icon - head.iconW) < 0.5, `dialog: ไอคอนสูงเท่า 2 บรรทัด (${head.icon} vs ${head.block})`);
+  ok(head.discountLeft < head.statusLeft && head.statusText === 'กำลังใช้งาน', 'dialog: ส่วนลดก่อน แล้วสถานะ');
+  ok(head.btns.length === 2 && head.btns[1].t === 'ดูสินค้าในโปร' && Math.abs(head.btns[1].r.right - head.footRight) < 0.5 && head.btns[0].t === 'ปิด', 'dialog: ปุ่มชิดขวา ดูสินค้าในโปรขวาสุด');
   await page.keyboard.press('Escape');
   ok((await page.locator('[role=dialog]').count()) === 0, 'Esc ปิดป๊อปอัป');
   ok((await page.locator('text=เหลืออีก').count()) >= 3, 'home: countdown text');
