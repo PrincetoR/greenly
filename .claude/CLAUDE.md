@@ -83,6 +83,7 @@ src/app/(shop)/       หน้าร้าน · src/app/admin/(app)/ หลั
 - การ์ดสินค้า: แถวล่าง = ราคา · หัวใจ · ใส่ตะกร้า (QuickAddButton ใส่ 1 ชิ้นจากหน้ารายการได้เลย) — ปุ่มอยู่นอก `<Link>`
 - การ์ดโปรโมชัน (`promo-card.tsx`) **ไม่มีกล่อง "ใช้โค้ด … ตอนชำระเงิน"** (พี่ต่อเอาออก — ทำให้การ์ดอื่นในแถวสูงตาม) โค้ดคูปองอยู่ในประโยคสรุป `describePromotion` แล้ว · e2e จับการ์ดสินค้าด้วย `.group:has(h3)` (สไลด์หน้าแรกก็เป็น `.group`)
 - **hover ของการ์ดที่กดเข้าไปได้** = class `.card-hover` (globals.css: ขอบ `--brand` + พื้น brand-soft 40%) + `group` แล้วชื่อ/หัวข้อ `group-hover:text-brand` — ใช้กับการ์ดสินค้า/หมวดหน้าแรก/ประวัติสั่งซื้อ/โปรไฟล์/KPI/ออเดอร์มือถือ · **ไม่ใช้เงา** (พี่ต่อชอบแบบการ์ดหมวดหมู่ ให้เหมือนกันเฉพาะการ์ดที่คลิกได้ การ์ดข้อมูลเฉย ๆ ไม่ต้อง)
+- **ห้ามคลุมดำตัวหนังสือทั้งเว็บ** (`body { user-select: none }` ใน globals.css — พี่ต่อสั่ง 2026-09-15) ยกเว้น input/textarea/select/code/pre/kbd/[contenteditable]/`.selectable` · อยากให้ก๊อปได้ให้ใส่ `<code>` หรือ `.selectable`
 - **มุมมน 6px ทั้งระบบ** — `--radius: 6px` ใน globals.css และ override `--radius-md/lg/xl` ให้เท่ากัน (rounded-full สำหรับวงกลม/pill คงไว้) ห้ามใส่ radius เป็นตัวเลขตรง ๆ
 - สไตล์ input/select/textarea อยู่ใน `globals.css` — ไม่ใส่ class ซ้ำที่ element
 - comment ในโค้ดเป็นภาษาไทย อธิบาย "ทำไม" ไม่ใช่ "ทำอะไร"
