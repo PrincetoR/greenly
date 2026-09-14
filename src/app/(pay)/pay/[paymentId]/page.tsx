@@ -8,12 +8,12 @@ import { isExpired } from '@/lib/payments/service';
 import { formatBaht } from '@/lib/money';
 import { PAYMENT_STATUS_LABEL } from '@/lib/orders/labels';
 import { buttonStyles } from '@/components/ui/button';
-import { BeamCheckout } from '@/components/pay/beam-checkout';
+import { PaymentCheckout } from '@/components/pay/checkout';
 import { CheckCircle2, Clock, XCircle } from 'lucide-react';
 
-export const metadata = { title: 'ชำระเงิน · Beam (จำลอง)' };
+export const metadata = { title: 'ชำระเงิน' };
 
-/** หน้าชำระเงินที่ Beam โฮสต์ (จำลอง) — ลูกค้าเลือกช่องทาง แล้ว "จำลอง" ผลสำเร็จ/ไม่สำเร็จ */
+/** หน้าชำระเงินของแอป — ลูกค้าเลือกวิธีชำระ แล้ว "จำลอง" ผลสำเร็จ/ไม่สำเร็จ (ของจริงหลังบ้านเชื่อม API Beam เอง ไม่โชว์แบรนด์ให้ลูกค้าเห็น) */
 export default async function PayPage({ params, searchParams }: PageProps<'/pay/[paymentId]'>) {
   const { paymentId } = await params;
   const sp = await searchParams;
@@ -43,7 +43,7 @@ export default async function PayPage({ params, searchParams }: PageProps<'/pay/
   }
 
   return (
-    <BeamCheckout
+    <PaymentCheckout
       payment={{ id: payment.id, orderNo: payment.orderNo, amount: payment.amount, expiresAt: payment.expiresAt }}
       merchant={settings.storeName}
       channels={availableChannels(settings.payments, payment.amount)}

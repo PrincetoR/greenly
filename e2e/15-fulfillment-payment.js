@@ -30,16 +30,35 @@ async function checkout(page, method, clear = true) {
   const { browser, page } = await launch();
 
   // ---- ลูกค้า: ชำระผ่าน Beam ----
-  await checkout(page, 'ชำระออนไลน์ผ่าน Beam');
+  await checkout(page, 'ชำระออนไลน์');
   await page.waitForURL(/\/pay\/pay-/);
-  ok(await page.locator('h1:has-text("เลือกวิธีชำระเงิน")').isVisible(), 'ไปหน้า Beam (จำลอง) หลังยืนยันสั่งซื้อ');
+  // หน้าชำระเงิน "ของแอป" — ใช้ header ร้าน ไม่มีคำว่า Beam ให้ลูกค้าเห็น (พี่ต่อสั่ง 2026-09-15)
+  ok((await page.locator('h1:has-text("เลือกวิธีชำระเงิน")').isVisible()) && (await page.locator('header a[href="/cart"]').count()) === 1 && !(await page.evaluate(() => document.body.innerText)).includes('Beam'), 'ไปหน้าชำระเงินของแอปหลังยืนยันสั่งซื้อ (header ร้าน · ไม่มีคำว่า Beam)');
   const tabs = await page.locator('[role=tab]').allTextContents();
   ok(tabs.length >= 6 && tabs.some((t) => t.includes('PromptPay')) && tabs.some((t) => t.includes('บัตรเครดิต')) && tabs.some((t) => t.includes('Mobile Banking')), `ช่องทาง Beam: ${tabs.length} ช่อง`);
   ok(!tabs.some((t) => t.includes('ผ่อน')), 'ยอดต่ำกว่า 3,000 → ไม่มีผ่อนชำระ');
   ok(await page.locator('svg[aria-label="QR จำลอง"]').isVisible(), 'PromptPay แสดง QR');
   await page.click('[role=tab]:has-text("บัตรเครดิต")');
   ok(await page.locator('input[aria-label="หมายเลขบัตร (จำลอง)"]').isVisible(), 'บัตร: ฟอร์มบัตร');
-  await shot(page, 'p15-beam-card');
+  await shot(page, 'p15-pay-card');
+  // มือถือ: accordion — รายละเอียดกางใต้แถวที่เลือก · แถบ [ยอด · ชำระเงิน] ติดล่างจอ · ไม่ล้นจอ (พี่ต่อขอให้ใช้ง่ายขึ้น)
+  const payUrl = page.url();
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto(payUrl);
+  await page.waitForLoadState('networkidle');
+  await page.click('[role=tab]:has-text("Mobile Banking")');
+  await page.waitForTimeout(200);
+  const mob = await page.evaluate(() => {
+    const tab = [...document.querySelectorAll('[role=tab]')].find((t) => t.textContent.includes('Mobile Banking'));
+    const panel = tab.parentElement.querySelector('[role=tabpanel]');
+    const bar = document.querySelector('.fixed.bottom-0');
+    return { panelUnderTab: panel && panel.getBoundingClientRect().top >= tab.getBoundingClientRect().bottom, radios: panel?.querySelectorAll('input[type=radio]').length, bar: bar && bar.getBoundingClientRect().bottom === 800 && bar.textContent.includes('ชำระเงิน'), sw: document.documentElement.scrollWidth };
+  });
+  ok(mob.panelUnderTab && mob.radios >= 5 && mob.bar && mob.sw <= 375, `มือถือ: accordion ใต้แถว (ธนาคาร ${mob.radios}) · แถบชำระติดล่าง · ไม่ล้นจอ`);
+  await shot(page, 'p15-pay-mobile');
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(payUrl);
+  await page.waitForLoadState('networkidle');
   let orders = read('orders');
   const o1 = orders[orders.length - 1];
   ok(o1.status === 'pending' && o1.paymentMethod === 'beam' && o1.payment.status === 'pending' && read('payments').some((p) => p.orderId === o1.id), 'ออเดอร์รอชำระ + payment pending ใน ledger');

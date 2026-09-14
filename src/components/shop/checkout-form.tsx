@@ -11,12 +11,12 @@ import { cn } from '@/lib/cn';
 type PaymentValue = 'beam' | 'cod';
 
 /**
- * ฟอร์มสั่งซื้อ — วิธีชำระ: Beam (ชำระออนไลน์ เลือกช่องทางย่อยที่หน้า Beam หลังกดยืนยัน) · เก็บเงินปลายทาง
+ * ฟอร์มสั่งซื้อ — วิธีชำระ: ชำระออนไลน์ (เบื้องหลังเป็น Beam — เลือกช่องทางย่อยที่หน้าชำระเงินหลังกดยืนยัน ไม่โชว์แบรนด์ให้ลูกค้า) · เก็บเงินปลายทาง
  * beam = รายชื่อช่องทางที่เปิดรับตอนนี้ (null = ปิด Beam) · cod = เปิดรับ COD ไหม
  */
 export function CheckoutForm({ total, gifts, beam, cod }: { total: number; gifts: number; beam: string[] | null; cod: boolean }) {
   const PAYMENTS: { value: PaymentValue; title: string; desc: string }[] = [
-    ...(beam ? [{ value: 'beam' as const, title: 'ชำระออนไลน์ผ่าน Beam', desc: beam.join(' · ') || 'ไม่มีช่องทางที่รองรับยอดนี้' }] : []),
+    ...(beam ? [{ value: 'beam' as const, title: 'ชำระออนไลน์', desc: beam.join(' · ') || 'ไม่มีช่องทางที่รองรับยอดนี้' }] : []),
     ...(cod ? [{ value: 'cod' as const, title: 'เก็บเงินปลายทาง', desc: 'ชำระเงินสดกับพนักงานส่งของ' }] : []),
   ];
   const [state, action, pending] = useActionState<CheckoutState, FormData>(placeOrder, {});
@@ -100,7 +100,7 @@ export function CheckoutForm({ total, gifts, beam, cod }: { total: number; gifts
       <Button type="submit" size="lg" disabled={pending} className="w-full">
         {pending ? 'กำลังสั่งซื้อ…' : state.newTotal !== undefined ? `ยืนยันสั่งซื้อ ${formatBaht(state.newTotal)}` : `ยืนยันสั่งซื้อ ${formatBaht(total)}`}
       </Button>
-      <p className="text-center text-xs text-muted">{payment === 'beam' ? 'กดยืนยันแล้วจะไปหน้าชำระเงินของ Beam (จำลอง — ไม่มีการตัดเงินจริง)' : 'นี่คือระบบสาธิต — ไม่มีการตัดเงินจริง'}</p>
+      <p className="text-center text-xs text-muted">{payment === 'beam' ? 'กดยืนยันแล้วจะไปหน้าเลือกวิธีชำระเงิน (ระบบสาธิต — ไม่มีการตัดเงินจริง)' : 'นี่คือระบบสาธิต — ไม่มีการตัดเงินจริง'}</p>
     </form>
   );
 }

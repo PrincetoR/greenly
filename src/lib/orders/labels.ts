@@ -61,7 +61,8 @@ export const TRANSITION_LABEL: Record<OrderStatus, string> = {
 };
 
 export const PAYMENT_LABEL: Record<PaymentMethod, string> = {
-  beam: 'ชำระออนไลน์ (Beam)',
+  // ลูกค้าไม่ต้องรู้ว่าเบื้องหลังเป็น Beam (พี่ต่อสั่ง) — หลังบ้านดู provider จาก order.payment
+  beam: 'ชำระออนไลน์',
   cod: 'เก็บเงินปลายทาง',
 };
 

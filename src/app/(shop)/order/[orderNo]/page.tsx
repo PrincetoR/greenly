@@ -86,7 +86,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<'/or
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-warn">ยังไม่ได้ชำระเงิน</p>
             <p className="mt-1 text-muted">
-              ยอด <b className="text-ink">{formatBaht(order.total)}</b> — ชำระผ่าน Beam ได้ด้วย PromptPay บัตร Mobile Banking หรือ E-Wallet · ร้านจะแพ็คสินค้าหลังได้รับเงิน
+              ยอด <b className="text-ink">{formatBaht(order.total)}</b> — ชำระออนไลน์ได้ด้วย PromptPay บัตร Mobile Banking หรือ E-Wallet · ร้านจะแพ็คสินค้าหลังได้รับเงิน
             </p>
           </div>
           <form action={payOrder}>
