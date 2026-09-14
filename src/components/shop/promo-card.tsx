@@ -17,7 +17,7 @@ export function promoHref(promo: Promotion, categories: Category[]): string {
 
 /**
  * การ์ดโปรโมชัน (server): เตรียมข้อมูลที่ต้องใช้ (ประโยคสรุป · สิทธิ์เหลือ · สินค้า/หมวดในโปร · เงื่อนไข) แล้วส่งให้ PromoCardView (client)
- * ซึ่งวาดการ์ดแบบย่อ (ชื่อ 1 บรรทัด · สถานะ · คำอธิบาย 2 บรรทัด = ทำอะไร / ช่วงเวลา+เงื่อนไข) และเปิดป๊อปอัปรายละเอียดเต็มเมื่อกด (พี่ต่อสั่ง)
+ * ซึ่งวาดการ์ดแบบย่อ (ชื่อ 1 บรรทัด · สถานะ · คำอธิบาย 1 บรรทัด = ทำอะไร — ช่วงเวลา/เงื่อนไขอยู่ในป๊อปอัป) และเปิดป๊อปอัปรายละเอียดเต็มเมื่อกด (พี่ต่อสั่ง)
  */
 export function PromoCard({
   promo,
@@ -60,7 +60,6 @@ export function PromoCard({
     name: promo.name,
     description: describePromotion(promo, names),
     summary: parts.what,
-    terms: [parts.period, parts.limits].filter(Boolean).join(' · '),
     discount: shortDiscount(promo),
     live,
     startsAt: promo.startsAt,

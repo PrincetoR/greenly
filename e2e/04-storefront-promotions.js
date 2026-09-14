@@ -12,14 +12,14 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
   ok((await page.locator('h2:has-text("โปรโมชันตอนนี้")').count()) === 1, 'home: promo strip');
   ok((await page.locator('article').count()) === 4, 'home: 4 live promo cards (3 ต่อหน้า เลื่อนดูใบที่ 4)');
   ok(await page.locator('article', { hasText: 'SAVE100' }).first().isVisible() && (await page.locator('article code').count()) === 0, 'home: coupon code in summary sentence (ไม่มีกล่องใช้โค้ด)');
-  // การ์ดย่อ: ชื่อ 1 บรรทัด (truncate) · สถานะใต้ชื่อ · คำอธิบาย 2 บรรทัด = ทำอะไร / ช่วงเวลา · เงื่อนไข (ตัด … ทั้งคู่ — พี่ต่อสั่ง 2026-09-15) · กดแล้วเปิดป๊อปอัปรายละเอียดเต็ม
+  // การ์ดย่อ: ชื่อ 1 บรรทัด (truncate) · สถานะใต้ชื่อ · คำอธิบาย 1 บรรทัด = ทำอะไร (ช่วงเวลา/เงื่อนไขเอาออก — พี่ต่อ: การ์ดแน่นไป) · กดแล้วเปิดป๊อปอัปรายละเอียดเต็ม
   const card = page.locator('article', { hasText: 'SAVE100' }).first();
   const nowrap = (el) => getComputedStyle(el).textOverflow === 'ellipsis' && getComputedStyle(el).whiteSpace === 'nowrap';
-  const desc = card.locator(':scope > div:nth-child(2) > p');
-  ok((await card.locator('h3').evaluate(nowrap)) && (await desc.count()) === 2 && (await desc.nth(0).evaluate(nowrap)) && (await desc.nth(1).evaluate(nowrap)), 'card: ชื่อ 1 บรรทัด · คำอธิบาย 2 บรรทัดตัด … ทั้งคู่');
-  ok((await card.locator('h3 + div').textContent()) === 'กำลังใช้งาน' && (await desc.nth(0).textContent()) === 'โค้ด SAVE100 ลด ฿100 สินค้าทั้งร้าน เมื่อซื้อครบ ฿500' && /14 ก\.ย\. 69 – 15 ต\.ค\. 69 · จำกัด 50 สิทธิ์, 1 ครั้ง\/ลูกค้า/.test(await desc.nth(1).textContent()), 'card: สถานะใต้ชื่อ · บรรทัด 1 ทำอะไร · บรรทัด 2 ช่วงเวลา · จำกัด');
+  const desc = card.locator(':scope > p');
+  ok((await card.locator('h3').evaluate(nowrap)) && (await desc.count()) === 1 && (await desc.evaluate(nowrap)), 'card: ชื่อ 1 บรรทัด · คำอธิบาย 1 บรรทัดตัด …');
+  ok((await card.locator('h3 + div').textContent()) === 'กำลังใช้งาน' && (await desc.textContent()) === 'โค้ด SAVE100 ลด ฿100 สินค้าทั้งร้าน เมื่อซื้อครบ ฿500' && !(await card.textContent()).includes('จำกัด 50 สิทธิ์'), 'card: สถานะใต้ชื่อ · คำอธิบายทำอะไร · ไม่มีช่วงเวลา/เงื่อนไขบนการ์ด');
   // ไอคอนการ์ด 52 ใหญ่กว่าบล็อกชื่อ+สถานะ (48) นิดหน่อย (พี่ต่อ: ไม่ให้ข้อความดูล้น) · คำอธิบายเต็มความกว้าง ชิดซ้ายเท่าไอคอน เหมือนป๊อปอัป
-  const ic = await card.locator('h3').evaluate((h) => { const icon = h.parentElement.previousElementSibling.getBoundingClientRect(); const hr = h.getBoundingClientRect(); const p = h.closest('article').querySelector(':scope > div:nth-child(2)').getBoundingClientRect(); return { icon: icon.height, block: h.nextElementSibling.getBoundingClientRect().bottom - hr.top, descLeft: p.left - icon.left, descGap: p.top - icon.bottom }; });
+  const ic = await card.locator('h3').evaluate((h) => { const icon = h.parentElement.previousElementSibling.getBoundingClientRect(); const hr = h.getBoundingClientRect(); const p = h.closest('article').querySelector(':scope > p').getBoundingClientRect(); return { icon: icon.height, block: h.nextElementSibling.getBoundingClientRect().bottom - hr.top, descLeft: p.left - icon.left, descGap: p.top - icon.bottom }; });
   ok(ic.icon === 52 && ic.block === 48 && ic.descLeft === 0 && ic.descGap === 12, `card: ไอคอน ${ic.icon} > ชื่อ+สถานะ ${ic.block} · คำอธิบายชิดซ้าย (${ic.descLeft}) ห่างไอคอน ${ic.descGap}`);
   // นับถอยหลังแบบนาฬิกามีวินาทีเดิน "29 วัน 23:59:59" (พี่ต่อขอ)
   const cd = card.locator('.tabular-nums').first();

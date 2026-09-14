@@ -19,8 +19,6 @@ export interface PromoCardData {
   description: string;
   /** เฉพาะส่วน "ทำอะไร" — บรรทัดคำอธิบายบนการ์ด */
   summary: string;
-  /** ช่วงเวลา · เงื่อนไข — บรรทัด 2 ของคำอธิบายบนการ์ด */
-  terms: string;
   discount: string;
   live: boolean;
   startsAt: string;
@@ -71,15 +69,10 @@ export function PromoCardView({ data: d }: { data: PromoCardData }) {
           </div>
           <span className={cn('shrink-0 rounded-lg px-3 py-1.5 text-lg font-bold', accent)}>{d.discount}</span>
         </div>
-        {/* คำอธิบาย 2 บรรทัด ตัด … ทั้งคู่: บรรทัด 1 ทำอะไร · บรรทัด 2 ช่วงเวลา · เงื่อนไข — เต็มความกว้าง ชิดซ้ายเท่าไอคอน เหมือนในป๊อปอัป (พี่ต่อสั่ง) */}
-        <div className="min-w-0 text-sm leading-6 text-muted">
-          <p className="truncate" title={d.summary}>
-            {d.summary}
-          </p>
-          <p className="truncate" title={d.terms}>
-            {d.terms}
-          </p>
-        </div>
+        {/* คำอธิบาย 1 บรรทัด ตัด … (ทำอะไร) — ช่วงเวลา/เงื่อนไขไม่โชว์บนการ์ดแล้ว (พี่ต่อ: การ์ดแน่นไป) ดูในป๊อปอัป */}
+        <p className="min-w-0 truncate text-sm leading-6 text-muted" title={d.summary}>
+          {d.summary}
+        </p>
 
         <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
           {/* ไม่ซ้ำ "ถึง วันที่" — ช่วงเวลาอยู่บรรทัด 2 แล้ว */}
