@@ -32,8 +32,8 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
    * ข้างในจัดตามคอนเทนเนอร์ [สไลด์ใหญ่ 2 ส่วน | ภาพเล็ก 2 ช่องซ้อนแนวตั้ง 1 ส่วน] · สูงคงที่บนจอ md+ ให้ 2 ช่องขวารวมกันเท่าสไลด์พอดี
    * มือถือ: สไลด์เต็มแถว ภาพเล็กเรียง 2 คอลัมน์ข้างล่าง
    */
+  // will-change: opacity ให้ compositor แยกเลเยอร์ — จางตามการเลื่อนได้ลื่นโดยไม่วาดรูปใหม่ทุกเฟรม
   return (
-    {/* will-change: opacity ให้ compositor แยกเลเยอร์ — จางตามการเลื่อนได้ลื่นโดยไม่วาดรูปใหม่ทุกเฟรม */}
     <div data-hero-content className={cn('mx-auto grid max-w-6xl gap-3 px-4 pb-4 will-change-[opacity]', sides.length > 0 && 'md:h-[372px] md:grid-cols-[2fr_1fr]')}>
       <section
         // มุมบนไม่มน — ชิดเส้น header พอดี
