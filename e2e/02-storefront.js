@@ -101,7 +101,30 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
     ok(sw <= 375, `mobile no h-scroll ${path} (${sw})`);
   }
   ok(await page.locator('.fixed.bottom-0 button:has-text("ใส่ตะกร้า")').isVisible(), 'mobile sticky add-to-cart bar');
+  ok((await page.locator('nav[aria-label="เมนูมือถือ"]').count()) === 0, 'mobile: หน้าสินค้าไม่มีแถบเมนูล่าง (แถบใส่ตะกร้าแทน)');
   await page.screenshot({ path: SHOT + '/p3-mobile-product.png', caret: 'initial' });
+  await page.goto(`${BASE}/`);
+  await page.waitForLoadState('networkidle');
+  // แถบเมนูล่างมือถือ: ไอคอนล้วน 5 ปุ่ม · ค้นหาตรงกลางเป็นวงกลมนูนเหนือเส้นครึ่งวง (พี่ต่อสั่ง 2026-09-15)
+  const tab = await page.evaluate(() => {
+    const nav = document.querySelector('nav[aria-label="เมนูมือถือ"]');
+    const r = nav.getBoundingClientRect();
+    const items = [...nav.querySelectorAll('a,button')].map((el) => ({ label: el.getAttribute('aria-label'), text: el.textContent.trim(), current: el.getAttribute('aria-current'), r: el.getBoundingClientRect() }));
+    const search = items.find((i) => i.label === 'ค้นหา');
+    const footer = document.querySelector('footer').getBoundingClientRect();
+    return { bottom: r.bottom, top: r.top, h: r.height, items, protrude: r.top - search.r.top, circle: search.r.width === search.r.height, centered: Math.abs(search.r.left + search.r.width / 2 - innerWidth / 2), footerBottom: footer.bottom, scrollH: document.documentElement.scrollHeight, vh: innerHeight };
+  });
+  ok(tab.bottom === 800 && tab.h === 57 && tab.items.map((i) => i.label).join('|') === 'หน้าแรก|สินค้าทั้งหมด|ค้นหา|โปรโมชัน|โปรไฟล์' && tab.items.every((i) => i.text === ''), 'mobile: แถบเมนูล่าง 5 ปุ่ม ไอคอนล้วน ติดล่างสุด');
+  ok(tab.protrude === 27 && tab.circle && tab.centered < 0.5, `mobile: ปุ่มค้นหาวงกลมกลางจอ นูนเหนือเส้น ${tab.protrude}px`);
+  ok(tab.items[0].current === 'page' && tab.items[1].current === null, 'mobile: หน้าแรก active');
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(300);
+  ok((await page.evaluate(() => document.querySelector('footer').getBoundingClientRect().bottom)) <= 800 - 56 + 0.5, 'mobile: เลื่อนสุดแล้ว footer ไม่ถูกแถบเมนูทับ');
+  await page.screenshot({ path: SHOT + '/p3-mobile-tabbar.png', caret: 'initial' });
+  await page.click('nav[aria-label="เมนูมือถือ"] button[aria-label="ค้นหา"]');
+  await page.waitForURL(/\/products\?focus=1/);
+  await page.waitForLoadState('networkidle');
+  ok((await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))) === 'ค้นหา' && (await page.locator('nav[aria-label="เมนูมือถือ"] a[aria-current=page]').getAttribute('aria-label')) === 'สินค้าทั้งหมด', 'mobile: ปุ่มค้นหา → /products โฟกัสช่องค้นหา · แท็บสินค้า active');
   await page.goto(`${BASE}/`);
   await page.click('button[aria-label="เปิดเมนู"]');
   ok(await page.locator('#mobile-menu a[href="/promotions"]').isVisible(), 'mobile drawer nav');

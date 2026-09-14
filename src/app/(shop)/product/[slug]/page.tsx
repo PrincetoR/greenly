@@ -142,6 +142,7 @@ export default async function ProductPage({ params }: PageProps<'/product/[slug]
         </Section>
       )}
 
+      {/* หน้าสินค้าไม่มีแถบเมนูล่าง (MobileTabBar ซ่อนเอง) แถบนี้ติดล่างสุดแทน */}
       <div className="fixed inset-x-0 bottom-0 z-30 flex items-start gap-2 border-t border-line bg-surface/95 p-3 backdrop-blur md:hidden">
         <div className="flex-1">
           <AddToCart productId={product.id} stock={product.stock} />

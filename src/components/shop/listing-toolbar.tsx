@@ -43,6 +43,12 @@ export function ListingToolbar({
     start(() => router.replace(`${basePath}${s ? `?${s}` : ''}`, { scroll: false }));
   };
 
+  // ปุ่มค้นหาบนแถบเมนูล่างมือถือพามาที่ /products?focus=1 → โฟกัสช่องค้นหาให้เลย (อ่านจาก location ไม่ใช้ useSearchParams กัน suspense)
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('focus') === '1') inputRef.current?.focus();
+  }, []);
+
   // พิมพ์แล้วค้นทันที — หน่วงเล็กน้อยไม่ให้ยิงทุกตัวอักษร
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onType = (value: string) => {
@@ -83,6 +89,7 @@ export function ListingToolbar({
       <div className="relative min-w-0 flex-1 md:flex-none">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
         <input
+          ref={inputRef}
           type="search"
           value={term}
           onChange={(e) => onType(e.target.value)}
