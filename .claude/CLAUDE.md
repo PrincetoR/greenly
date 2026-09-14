@@ -13,7 +13,7 @@ Next.js 16 (App Router · Server Components · Server Actions · `proxy.ts` แ�
 ```bash
 npm run dev         # http://localhost:3000  · หลังบ้าน /admin
 npm run build && npm run lint && npm run typecheck
-npm run test        # node --test ผ่าน tsx — pricing engine 28 + analytics 13 tests
+npm run test        # node --test ผ่าน tsx — pricing engine 28 + analytics 13 + datetime 3 tests
 npm run seed        # reset ข้อมูลสาธิตทั้งหมด (ทับ orders+payments ด้วยประวัติสาธิต 24 เดือน ~625 ใบ deterministic — ทุกใบมี payment/shipment/history)
 npm run seed:clean  # orders ว่าง — e2e ใช้ (เทสต์นับออเดอร์/เลขที่ OD-…-0001) · รันไฟล์ e2e เดี่ยวต้อง seed:clean ก่อน · run-all จบแล้ว seed เต็มคืน
 npm run e2e         # Playwright + Chrome ในเครื่อง (channel chrome) · ต้องมี dev server · BASE=... เปลี่ยน port ได้
@@ -29,7 +29,7 @@ e2e/                  01–15 ไฟล์ทดสอบ + lib.js + run-all.js 
 src/proxy.ts          กัน /admin/* (ยกเว้น /admin/login, /admin/forbidden)
 src/lib/types.ts      domain types ทั้งหมด — pure, ไม่ import อะไร
 src/lib/money.ts      เงินเป็นสตางค์ integer · formatBaht/toSatang ที่เดียว
-src/lib/datetime.ts   เวลาไทย Asia/Bangkok · datetime-local ↔ ISO · humanCountdown
+src/lib/datetime.ts   เวลาไทย Asia/Bangkok · datetime-local ↔ ISO · humanCountdown ("13 วัน 23 ชม." หลังบ้าน) · clockCountdown ("13 วัน 23:59:59" หน้าร้าน — `Countdown` client เดินทุกวินาที พี่ต่อขอเห็นวินาที) · datetime.test.ts
 src/lib/db/           ชั้นเข้าถึงข้อมูลชั้นเดียว — UI/actions ห้ามอ่านไฟล์ตรง
 src/lib/auth/         password (scrypt) · token (HMAC, ใช้ใน proxy ได้) · session · roles + ADMIN_MENU
 src/lib/pricing/      quote() pure · status · usage (นับจาก orders) · quote.test.ts
@@ -82,7 +82,7 @@ src/app/(shop)/       หน้าร้าน · src/app/admin/(app)/ หลั
 - หน้าแรก: ลำดับ section = หมวดหมู่ (การ์ด) · โปรโมชันตอนนี้ · สินค้าแนะนำ · **สินค้าขายดี** (topProducts 30 วัน 8 ใบ ป้าย "ขายดี #n" · <4 ตัวใช้ทั้งหมด · ไม่มีออเดอร์ = ซ่อน) · สินค้าใหม่
 - หน้ารายการสินค้า: หมวดหมู่เป็น **card แถบข้างซ้ายอย่างเดียว** (พี่ต่อเอาแบบ chip/tag ออก) ขอบบน card ตรงกับช่องค้นหา · มือถือเป็น dropdown (`CategorySelect`)
 - การ์ดสินค้า: แถวล่าง = ราคา · หัวใจ · ใส่ตะกร้า (QuickAddButton ใส่ 1 ชิ้นจากหน้ารายการได้เลย) — ปุ่มอยู่นอก `<Link>`
-- การ์ดโปรโมชัน = `promo-card.tsx` (server เตรียม `PromoCardData`: ประโยคสรุป/สิทธิ์เหลือ/สินค้า-หมวดในโปร/เงื่อนไข) → `promo-card-view.tsx` (client): **ชื่อ 1 บรรทัด truncate · บรรทัด 2 สถานะ (แถว `flex h-5` คงที่) · คำอธิบาย line-clamp-2** · ไอคอน `size-13` (52) ใหญ่กว่าบล็อกชื่อ+สถานะ (24+4+20=48) นิดหน่อย · **คำอธิบายอยู่นอกคอลัมน์ เต็มความกว้าง ชิดซ้ายเท่าไอคอน** (gap 12 ใต้แถวหัว — เหมือนป๊อปอัป พี่ต่อเลือก) (พี่ต่อ: ไม่ให้ข้อความดูล้น — Badge ใน div เปล่าได้ line box 25.6 ไม่ใช่ 20 ต้องล็อกความสูงแถว) · กดทั้งการ์ด (role=button) เปิด **ป๊อปอัปรายละเอียดเต็ม** (ช่วงเวลา นับถอยหลัง สิทธิ์ เงื่อนไข โค้ด+ปุ่มคัดลอก สินค้า/หมวดในโปร ปุ่มชิดขวา [ปิด] [ดูสินค้าในโปร] ขวาสุด · หัว = ไอคอน `size-14` สูงเท่า 2 บรรทัด (ชื่อ leading-7 + mt-1 + แถว h-6 ชิปส่วนลด→สถานะ) Esc/คลิกนอก) — พี่ต่อสั่ง 2026-09-15 · **ไม่มีกล่อง "ใช้โค้ด" บนการ์ด** (ย้ายเข้าป๊อปอัป) · article ต้องมี `min-w-0` (grid track ถ่างจากชื่อ nowrap) · e2e จับการ์ดสินค้าด้วย `.group:has(h3)` (สไลด์หน้าแรกก็เป็น `.group`)
+- การ์ดโปรโมชัน = `promo-card.tsx` (server เตรียม `PromoCardData`: ประโยคสรุป/สิทธิ์เหลือ/สินค้า-หมวดในโปร/เงื่อนไข) → `promo-card-view.tsx` (client): **ชื่อ 1 บรรทัด truncate · บรรทัด 2 = ช่วงเวลา · จำกัด (`terms` text-xs leading-5 truncate — แทนสถานะ ไม่มีป้ายสถานะบนการ์ดแล้ว) · คำอธิบาย 1 บรรทัด truncate (`summary` = เฉพาะส่วน "ทำอะไร")** — `describePromotionParts()` ใน `lib/promotions/describe.ts` แยก what/period/limits (describePromotion = join) · แถวล่างไม่มี "ถึง วันที่" แล้ว (ซ้ำบรรทัด 2) · ไอคอน `size-13` (52) ใหญ่กว่าบล็อกชื่อ+สถานะ (24+4+20=48) นิดหน่อย · **คำอธิบายอยู่นอกคอลัมน์ เต็มความกว้าง ชิดซ้ายเท่าไอคอน** (gap 12 ใต้แถวหัว — เหมือนป๊อปอัป พี่ต่อเลือก) (พี่ต่อ: ไม่ให้ข้อความดูล้น — Badge ใน div เปล่าได้ line box 25.6 ไม่ใช่ 20 ต้องล็อกความสูงแถว) · กดทั้งการ์ด (role=button) เปิด **ป๊อปอัปรายละเอียดเต็ม** (ช่วงเวลา นับถอยหลัง สิทธิ์ เงื่อนไข โค้ด+ปุ่มคัดลอก สินค้า/หมวดในโปร ปุ่มชิดขวา [ปิด] [ดูสินค้าในโปร] ขวาสุด · หัว = ไอคอน `size-14` สูงเท่า 2 บรรทัด (ชื่อ leading-7 + mt-1 + แถว h-6 ชิปส่วนลด→สถานะ) Esc/คลิกนอก) — พี่ต่อสั่ง 2026-09-15 · **ไม่มีกล่อง "ใช้โค้ด" บนการ์ด** (ย้ายเข้าป๊อปอัป) · article ต้องมี `min-w-0` (grid track ถ่างจากชื่อ nowrap) · e2e จับการ์ดสินค้าด้วย `.group:has(h3)` (สไลด์หน้าแรกก็เป็น `.group`)
 - **hover ของการ์ดที่กดเข้าไปได้** = class `.card-hover` (globals.css: ขอบ `--brand` + พื้น brand-soft 40%) + `group` แล้วชื่อ/หัวข้อ `group-hover:text-brand` — ใช้กับการ์ดสินค้า/หมวดหน้าแรก/ประวัติสั่งซื้อ/โปรไฟล์/KPI/ออเดอร์มือถือ · **ไม่ใช้เงา** (พี่ต่อชอบแบบการ์ดหมวดหมู่ ให้เหมือนกันเฉพาะการ์ดที่คลิกได้ การ์ดข้อมูลเฉย ๆ ไม่ต้อง)
 - **ห้ามคลุมดำตัวหนังสือทั้งเว็บ** (`body { user-select: none }` ใน globals.css — พี่ต่อสั่ง 2026-09-15) ยกเว้น input/textarea/select/code/pre/kbd/[contenteditable]/`.selectable` · อยากให้ก๊อปได้ให้ใส่ `<code>` หรือ `.selectable`
 - **มุมมน 6px ทั้งระบบ** — `--radius: 6px` ใน globals.css และ override `--radius-md/lg/xl` ให้เท่ากัน (rounded-full สำหรับวงกลม/pill คงไว้) ห้ามใส่ radius เป็นตัวเลขตรง ๆ
