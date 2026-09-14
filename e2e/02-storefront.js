@@ -9,11 +9,22 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   // เส้นเขียว 2px ตรึงบนสุด + วิ่งตอนโหลดหน้า
   const topLine = await page.evaluate(() => { const el = document.querySelector('header')?.previousElementSibling?.previousElementSibling ?? document.querySelector('.fixed.top-0'); const r = el.getBoundingClientRect(); return { top: r.top, h: r.height, bg: getComputedStyle(el).backgroundColor }; });
   ok(topLine.top === 0 && topLine.h === 2 && topLine.bg === 'rgb(30, 138, 76)', `เส้นเขียว 2px ตรึงบนสุด (${JSON.stringify(topLine)})`);
-  const shown = await page.evaluate(async () => {
-    document.querySelector('header a[href="/promotions"]').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
-    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-    return document.querySelector('.top-line-sweep') !== null;
-  });
+  // จับด้วย MutationObserver ก่อนคลิก — หน้า prefetch ไว้แล้วเปลี่ยนเร็วมาก แถบอาจโผล่แค่ไม่กี่เฟรม
+  const shown = await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        const timer = setTimeout(() => resolve(false), 1500);
+        const mo = new MutationObserver(() => {
+          if (document.querySelector('.top-line-sweep')) {
+            clearTimeout(timer);
+            mo.disconnect();
+            resolve(true);
+          }
+        });
+        mo.observe(document.body, { childList: true, subtree: true });
+        document.querySelector('header a[href="/promotions"]').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
+      }),
+  );
   ok(shown, 'คลิกลิงก์ → แถบวิ่งบนเส้นเขียวขึ้นทันที');
   await page.waitForURL(/promotions/);
   await page.waitForTimeout(300);
