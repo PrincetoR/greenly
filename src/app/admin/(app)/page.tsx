@@ -56,11 +56,11 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
   const worstCat = shownCats.length === cats.length && cats.length > 1 && cats[cats.length - 1].revenue < (cats[0]?.revenue ?? 0) ? cats[cats.length - 1].category.id : null;
 
   return (
-    // ระยะทุกช่องเท่ากัน 16px (= gap คอลัมน์ซ้าย/ขวา และ gap การ์ดสินค้าหน้าร้าน) — พี่ต่อไม่เอา 12/24 ปนกัน
+    // ระยะระหว่างการ์ดทุกช่องเท่ากัน 12px (เท่าการ์ดหน้าร้าน — พี่ต่อสั่ง) · gap คอลัมน์ซ้าย/ขวายัง 16
     // เป็น flex คอลัมน์ ไม่ใช่ grid: track ของ grid จะถ่างตาม min-content ของตารางข้างใน (overflow-x-auto ไม่ช่วย) จนหน้าเลื่อนข้างได้
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {/* ไม่มีหัวข้อ/บรรทัดทักทาย (พี่ต่อเอาออก) — แถว KPI เริ่มที่ขอบบนเดียวกับ card "จัดการสินค้า" · ชื่อหน้าอยู่ใน metadata.title */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="ยอดขายวันนี้" value={formatBaht(revenueToday)} sub={`${today.length} ออเดอร์`} href={canOrders ? '/admin/orders' : undefined} />
         <Kpi label="รอยืนยัน/ชำระ" value={String(pending.length)} sub={`ออเดอร์ · รอแพ็ค/กำลังแพ็ค ${toShip}`} href={canOrders ? '/admin/orders?status=pending' : undefined} tone={pending.length > 0 ? 'warn' : undefined} />
         <Kpi label="สินค้าใกล้หมด" value={String(lowStock.length)} sub={`≤ ${settings.lowStockThreshold} ชิ้น`} href="/admin/products?status=low" tone={lowStock.length > 0 ? 'danger' : undefined} />
@@ -146,7 +146,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<'/admin
       </Card>
 
       {/* min-w-0 ที่ card: ไม่งั้น track ของ grid ถ่างตามชื่อหมวด/สินค้าที่ยาว (truncate ไม่ทำงาน) จนหน้าเลื่อนข้างได้บนมือถือ */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-3 lg:grid-cols-2">
         {/* หมวดหมู่ขายดี / ขายไม่ดี */}
         <Card className="min-w-0">
           <CardHeader

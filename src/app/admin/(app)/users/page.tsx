@@ -24,14 +24,14 @@ export default async function UsersPage({ searchParams }: PageProps<'/admin/user
       {sp.error === 'self' && <Alert tone="danger" className="mb-4">ปิดบัญชีตัวเองไม่ได้</Alert>}
       {sp.error === 'lastadmin' && <Alert tone="danger" className="mb-4">ต้องมี admin ที่ใช้งานได้อย่างน้อย 1 คน</Alert>}
 
-      <Card className="mb-4">
+      <Card className="mb-3">
         <CardHeader title="เพิ่มผู้ใช้ใหม่" />
         <div className="p-5">
           <AddUserForm />
         </div>
       </Card>
 
-      <ul className="flex flex-col gap-3 sm:gap-4">
+      <ul className="flex flex-col gap-3">
         {users.map((u) => (
           <li key={u.id} className="flex flex-wrap items-center gap-3 rounded-card bg-surface p-4 border border-line">
             <div className="min-w-0 flex-1">

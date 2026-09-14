@@ -43,7 +43,7 @@ export function AdminShell({ items, session, children }: { items: AdminMenuItem[
         </nav>
 
         {/* ผู้ใช้ที่ login อยู่ + ออกจากระบบ — แยกเป็น card ของตัวเองให้ card เมนูเหมือนหมวดหมู่สินค้าเป๊ะ */}
-        <div className="mt-4 rounded-card bg-surface p-3 border border-line">
+        <div className="mt-3 rounded-card bg-surface p-3 border border-line">
           <p className="truncate text-sm font-medium">{session.user.name}</p>
           <p className="text-xs text-muted">{ROLE_LABEL[session.role]}</p>
           <form action={logout} className="mt-2">

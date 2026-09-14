@@ -93,14 +93,14 @@ export default async function PaymentsPage({ searchParams }: PageProps<'/admin/p
       </nav>
 
       {tab === 'overview' && (
-        <div className="flex flex-col gap-4">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="flex flex-col gap-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Kpi label="รับชำระผ่าน Beam" value={formatBaht(gross)} sub={`${ok.length.toLocaleString('th-TH')} รายการสำเร็จ`} />
             <Kpi label="ค่าธรรมเนียม Beam" value={`-${formatBaht(fees)}`} sub={gross ? `${((fees / gross) * 100).toFixed(2)}% ของยอด` : '—'} tone="accent" />
             <Kpi label="คืนเงินแล้ว" value={formatBaht(refunded)} sub={`${payments.filter((p) => p.refunds.length).length} รายการ`} />
             <Kpi label="อัตราสำเร็จ" value={`${successRate.toFixed(1)}%`} sub={`${attempts.toLocaleString('th-TH')} ครั้งที่ลองจ่าย`} />
           </div>
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-3 lg:grid-cols-2">
             <Card>
               <CardHeader title="สัดส่วนช่องทาง" description="รายการที่สำเร็จ · ค่าธรรมเนียมตามอัตราตัวอย่างของแต่ละช่องทาง" />
               <ol className="flex flex-col gap-4 p-5">
@@ -121,7 +121,7 @@ export default async function PaymentsPage({ searchParams }: PageProps<'/admin/p
                 ))}
               </ol>
             </Card>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <Card>
                 <CardHeader title="เก็บเงินปลายทาง (COD)" description="ไม่ผ่าน Beam — เงินสดเข้าเมื่อขนส่งนำส่งสำเร็จ" />
                 <dl className="grid grid-cols-2 gap-4 p-5 text-sm">
@@ -250,8 +250,8 @@ export default async function PaymentsPage({ searchParams }: PageProps<'/admin/p
       )}
 
       {tab === 'settings' && (
-        <div className="grid gap-4 lg:grid-cols-[1fr_340px] lg:items-start">
-          <form action={updateBeamSettings} className="flex flex-col gap-4">
+        <div className="grid gap-3 lg:grid-cols-[1fr_340px] lg:items-start">
+          <form action={updateBeamSettings} className="flex flex-col gap-3">
             <Card>
               <CardHeader title="บัญชี Beam" description="ค่าจากแดชบอร์ด Beam (Developers › API keys) · Secret key ของจริงต้องเก็บใน environment ไม่ใช่ไฟล์ตั้งค่า" />
               <div className="grid gap-4 p-5 sm:grid-cols-2">

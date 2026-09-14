@@ -65,7 +65,7 @@ export default async function OrderDetailPage({ params, searchParams }: PageProp
       {typeof sp.error === 'string' && !['transition', 'tracking', 'reason'].includes(sp.error) && <Alert tone="danger" className="mb-4">{sp.error}</Alert>}
 
       {/* ขั้นตอน + ปุ่มดำเนินการ */}
-      <Card className="mb-4">
+      <Card className="mb-3">
         <div className="flex flex-wrap items-center gap-3 border-b border-line px-5 py-4">
           <Badge tone={ORDER_STATUS_TONE[order.status]} className="text-sm">
             {ORDER_STATUS_LABEL[order.status]}
@@ -80,8 +80,8 @@ export default async function OrderDetailPage({ params, searchParams }: PageProp
         </div>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_360px] lg:items-start">
-        <div className="flex flex-col gap-4">
+      <div className="grid gap-3 lg:grid-cols-[1fr_360px] lg:items-start">
+        <div className="flex flex-col gap-3">
           <Card>
             <CardHeader title="รายการสินค้า" description={`${order.lines.reduce((s, l) => s + l.qty, 0)} ชิ้น · ${order.lines.length} รายการ`} />
             <ul className="divide-y divide-line px-5">
@@ -189,7 +189,7 @@ export default async function OrderDetailPage({ params, searchParams }: PageProp
           </Card>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {/* ลูกค้า + ที่อยู่ (คัดลอกได้) */}
           <Card>
             <CardHeader title="ลูกค้า / ที่อยู่จัดส่ง" action={<CopyButton text={addressText} label="คัดลอกที่อยู่" />} />
