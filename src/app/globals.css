@@ -80,6 +80,24 @@
   body {
     overscroll-behavior: none;
   }
+  /*
+   * ห้ามลาก "คลุมดำ" ตัวหนังสือทั้งเว็บ (พี่ต่อสั่ง) — ยกเว้นช่องกรอกและตัวเลขที่ต้องก๊อป (เลขออเดอร์/พัสดุ/โค้ดที่เป็น <code>) และ .selectable
+   */
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  input,
+  textarea,
+  select,
+  code,
+  pre,
+  kbd,
+  [contenteditable],
+  .selectable {
+    -webkit-user-select: text;
+    user-select: text;
+  }
   body {
     background: var(--bg);
     color: var(--ink);
