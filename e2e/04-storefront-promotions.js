@@ -12,6 +12,14 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
   ok((await page.locator('h2:has-text("โปรโมชันตอนนี้")').count()) === 1, 'home: promo strip');
   ok((await page.locator('article').count()) === 4, 'home: 4 live promo cards (3 ต่อหน้า เลื่อนดูใบที่ 4)');
   ok(await page.locator('article', { hasText: 'SAVE100' }).first().isVisible() && (await page.locator('article code').count()) === 0, 'home: coupon code in summary sentence (ไม่มีกล่องใช้โค้ด)');
+  // การ์ดย่อ: ชื่อ 1 บรรทัด (truncate) · สถานะบรรทัด 2 · คำอธิบาย 2 บรรทัด (line-clamp-2) · กดแล้วเปิดป๊อปอัปรายละเอียดเต็ม
+  const card = page.locator('article', { hasText: 'SAVE100' }).first();
+  ok((await card.locator('h3').evaluate((h) => getComputedStyle(h).textOverflow === 'ellipsis' && getComputedStyle(h).whiteSpace === 'nowrap')) && (await card.locator('p').first().evaluate((p) => getComputedStyle(p).webkitLineClamp === '2')), 'card: ชื่อ 1 บรรทัด · คำอธิบาย 2 บรรทัด');
+  await card.click();
+  await page.waitForSelector('[role=dialog]');
+  ok((await page.locator('[role=dialog] code:has-text("SAVE100")').count()) === 1 && (await page.locator('[role=dialog] dt:has-text("ช่วงเวลา")').count()) === 1 && (await page.locator('[role=dialog] li:has-text("ยอดสั่งซื้อขั้นต่ำ")').count()) === 1, 'กดการ์ด → ป๊อปอัปรายละเอียดเต็ม (โค้ด ช่วงเวลา เงื่อนไข)');
+  await page.keyboard.press('Escape');
+  ok((await page.locator('[role=dialog]').count()) === 0, 'Esc ปิดป๊อปอัป');
   ok((await page.locator('text=เหลืออีก').count()) >= 3, 'home: countdown text');
   // drinks featured products show discounted price + badge
   const kombucha = page.locator('.group:has(h3)', { hasText: 'คอมบูชา' }).first(); // :has(h3) = การ์ดสินค้า (สไลด์ก็เป็น .group)

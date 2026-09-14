@@ -1,13 +1,10 @@
-import Link from 'next/link';
 import type { Category, Product, Promotion } from '@/lib/types';
 import { describePromotion, shortDiscount } from '@/lib/promotions/describe';
-import { PromoTypeIcon } from './promo-type-icon';
 import { promotionStatus, type PromotionStatus } from '@/lib/pricing/status';
 import type { PromotionUsageStats } from '@/lib/pricing/types';
-import { humanCountdown, formatDateTime } from '@/lib/datetime';
-import { cn } from '@/lib/cn';
-import { Badge } from '@/components/ui/badge';
-import { Countdown } from './countdown';
+import { humanCountdown } from '@/lib/datetime';
+import { formatBaht } from '@/lib/money';
+import { PromoCardView, type PromoCardData } from './promo-card-view';
 
 /** ลิงก์ที่พาไปดูสินค้าในโปร — หมวดเดียวใช้หน้าหมวด นอกนั้นใช้หน้ารวมกรองด้วย promo */
 export function promoHref(promo: Promotion, categories: Category[]): string {
@@ -18,6 +15,10 @@ export function promoHref(promo: Promotion, categories: Category[]): string {
   return `/products?promo=${promo.id}`;
 }
 
+/**
+ * การ์ดโปรโมชัน (server): เตรียมข้อมูลที่ต้องใช้ (ประโยคสรุป · สิทธิ์เหลือ · สินค้า/หมวดในโปร · เงื่อนไข) แล้วส่งให้ PromoCardView (client)
+ * ซึ่งวาดการ์ดแบบย่อ (ชื่อ 1 บรรทัด · สถานะ · คำอธิบาย 2 บรรทัด) และเปิดป๊อปอัปรายละเอียดเต็มเมื่อกด (พี่ต่อสั่ง)
+ */
 export function PromoCard({
   promo,
   status,
@@ -37,41 +38,39 @@ export function PromoCard({
   const left = promo.limits.totalUses !== null ? Math.max(0, promo.limits.totalUses - (usage?.totalUses ?? 0)) : null;
   const live = status === 'live';
 
-  return (
-    <article className={cn('flex h-full flex-col gap-3 rounded-card bg-surface p-5 border border-line', !live && 'opacity-80')}>
-      <div className="flex items-start gap-3">
-        <span className={cn('flex size-12 shrink-0 items-center justify-center rounded-xl', promo.type === 'bogo' ? 'bg-brand-soft text-brand' : 'bg-accent-soft text-accent')} aria-hidden>
-          <PromoTypeIcon type={promo.type} className="size-6" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-bold">{promo.name}</h3>
-            {live ? <Badge tone="ok">กำลังใช้งาน</Badge> : <Badge tone="info">เร็ว ๆ นี้</Badge>}
-          </div>
-          <p className="mt-0.5 text-sm text-muted">{describePromotion(promo, names)}</p>
-        </div>
-        <span className={cn('shrink-0 rounded-lg px-3 py-1.5 text-lg font-bold', promo.type === 'bogo' ? 'bg-brand-soft text-brand' : 'bg-accent-soft text-accent')}>
-          {shortDiscount(promo)}
-        </span>
-      </div>
+  // สินค้า/หมวดที่โปรครอบคลุม (โชว์ในป๊อปอัป) — ทั้งร้านไม่ต้องลิสต์
+  const scopeItems: PromoCardData['scopeItems'] =
+    promo.scope.kind === 'products'
+      ? promo.scope.ids.map((id) => products.find((p) => p.id === id)).filter((p): p is Product => Boolean(p)).map((p) => ({ label: p.name, sub: formatBaht(p.price), href: `/product/${p.slug}` }))
+      : promo.scope.kind === 'categories'
+        ? promo.scope.ids.map((id) => categories.find((c) => c.id === id)).filter((c): c is Category => Boolean(c)).map((c) => ({ label: c.name, sub: `${products.filter((p) => p.categoryId === c.id && p.active).length} สินค้า`, href: `/category/${c.slug}` }))
+        : [];
 
-      {/* ไม่มีกล่อง "ใช้โค้ด … ตอนชำระเงิน" แล้ว (พี่ต่อเอาออก — ทำให้การ์ดโปรอื่นในแถวเดียวกันสูงตาม) · โค้ดอยู่ในประโยคสรุปด้านบนอยู่แล้ว */}
-      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
-        {live ? (
-          <Countdown to={promo.endsAt} initial={humanCountdown(promo.endsAt, now)} />
-        ) : (
-          <Countdown to={promo.startsAt} initial={humanCountdown(promo.startsAt, now)} prefix="เริ่มใน" />
-        )}
-        <span>ถึง {formatDateTime(promo.endsAt)}</span>
-        {left !== null && <span className={cn(left <= 5 && 'font-semibold text-accent')}>เหลือ {left} สิทธิ์</span>}
-        {!promo.coupon && (
-          <Link href={promoHref(promo, categories)} className="ml-auto font-semibold text-brand hover:underline">
-            ดูสินค้าในโปร
-          </Link>
-        )}
-      </div>
-    </article>
-  );
+  const conditions: string[] = [];
+  if (promo.coupon?.minSubtotal) conditions.push(`ยอดสั่งซื้อขั้นต่ำ ${formatBaht(promo.coupon.minSubtotal)}`);
+  if (promo.coupon?.freeShipping) conditions.push('ส่งฟรี');
+  if (promo.limits.totalUses !== null) conditions.push(`จำกัด ${promo.limits.totalUses.toLocaleString('th-TH')} สิทธิ์ทั้งโปร`);
+  if (promo.limits.perProductQty !== null) conditions.push(`ลดได้สูงสุด ${promo.limits.perProductQty} ชิ้นต่อสินค้า`);
+  if (promo.limits.perCustomer !== null) conditions.push(`ใช้ได้ ${promo.limits.perCustomer} ครั้งต่อลูกค้า (นับจากเบอร์โทร)`);
+
+  const data: PromoCardData = {
+    id: promo.id,
+    type: promo.type,
+    name: promo.name,
+    description: describePromotion(promo, names),
+    discount: shortDiscount(promo),
+    live,
+    startsAt: promo.startsAt,
+    endsAt: promo.endsAt,
+    countdownInitial: live ? humanCountdown(promo.endsAt, now) : humanCountdown(promo.startsAt, now),
+    left,
+    couponCode: promo.coupon?.code ?? null,
+    scopeKind: promo.scope.kind,
+    scopeItems,
+    conditions,
+    href: promoHref(promo, categories),
+  };
+  return <PromoCardView data={data} />;
 }
 
 export { promotionStatus };
