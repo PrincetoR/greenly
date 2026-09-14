@@ -4,8 +4,8 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * เส้นเขียว 6px ตรึงบนสุดของจอ (พี่ต่อสั่ง — เดิม 2px):
- *  · อยู่บนสุดของหน้า = กลืนไปกับแถบสถานะสีเดียวกัน · เลื่อนลงแถบสถานะพ้นจอ → เหลือเส้นเขียว 6px คาดบน header
+ * เส้นเขียว 4px ตรึงบนสุดของจอ (พี่ต่อสั่ง — ลอง 2 และ 6 แล้วเอา 4):
+ *  · อยู่บนสุดของหน้า = กลืนไปกับแถบสถานะสีเดียวกัน · เลื่อนลงแถบสถานะพ้นจอ → เหลือเส้นเขียว 4px คาดบน header
  *  · ระหว่างเปลี่ยนหน้า (คลิกลิงก์ภายใน) แถบขาวโปร่งวิ่งซ้าย→ขวาบนเส้น บอกว่ากำลังโหลด · หยุดเมื่อ pathname เปลี่ยน (หรือ 8 วิ กันค้าง)
  * App Router ไม่มี router event → จับคลิก <a> ภายในเอง · ลิงก์ที่ pathname เดิม (เปลี่ยนแค่ query) โชว์สั้น ๆ 600ms
  */
@@ -53,7 +53,7 @@ export function TopLine() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-1.5 overflow-hidden bg-brand" aria-hidden data-loading={loading || undefined}>
+    <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-1 overflow-hidden bg-brand" aria-hidden data-loading={loading || undefined}>
       {loading && <div className="top-line-sweep h-full w-1/3 bg-gradient-to-r from-transparent via-white/90 to-transparent" />}
     </div>
   );
