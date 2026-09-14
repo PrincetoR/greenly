@@ -38,7 +38,7 @@ export function PromoCard({
   const live = status === 'live';
 
   return (
-    <article className={cn('flex flex-col gap-3 rounded-card bg-surface p-5 border border-line', !live && 'opacity-80')}>
+    <article className={cn('flex h-full flex-col gap-3 rounded-card bg-surface p-5 border border-line', !live && 'opacity-80')}>
       <div className="flex items-start gap-3">
         <span className={cn('flex size-12 shrink-0 items-center justify-center rounded-xl', promo.type === 'bogo' ? 'bg-brand-soft text-brand' : 'bg-accent-soft text-accent')} aria-hidden>
           <PromoTypeIcon type={promo.type} className="size-6" />
@@ -56,7 +56,7 @@ export function PromoCard({
       </div>
 
       {/* ไม่มีกล่อง "ใช้โค้ด … ตอนชำระเงิน" แล้ว (พี่ต่อเอาออก — ทำให้การ์ดโปรอื่นในแถวเดียวกันสูงตาม) · โค้ดอยู่ในประโยคสรุปด้านบนอยู่แล้ว */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
+      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
         {live ? (
           <Countdown to={promo.endsAt} initial={humanCountdown(promo.endsAt, now)} />
         ) : (

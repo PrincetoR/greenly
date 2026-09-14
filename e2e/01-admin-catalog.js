@@ -46,8 +46,9 @@ const read = (n) => JSON.parse(fs.readFileSync(`${DATA}/${n}.json`, 'utf8'));
   ok(typeof catImg === 'string' && catImg.startsWith('/uploads/'), `category image uploaded (${catImg})`);
   // หน้าแรก: การ์ดหมวดใช้รูปที่อัปโหลด
   await page.goto(`${BASE}/`);
-  ok((await page.locator(`main a[href="/category/ทดสอบหมวด"] img[src="${catImg}"]`).count()) === 1, 'home: category card shows uploaded image');
-  ok((await page.locator('main h2:has-text("หมวดหมู่")').locator('xpath=ancestor::section').locator('ul > li').count()) === 7, 'home: 7 category cards');
+  // หน้าแรกมี 2 ลิสต์ (มือถือแบบเลื่อนข้าง + จอใหญ่ grid) — นับเฉพาะที่มองเห็น
+  ok((await page.locator(`main a[href="/category/ทดสอบหมวด"]:visible img[src="${catImg}"]`).count()) === 1, 'home: category card shows uploaded image');
+  ok((await page.locator('main h2:has-text("หมวดหมู่")').locator('xpath=ancestor::section').locator('a[href^="/category/"]:visible').count()) === 9, 'home: 9 category cards');
   await page.goto(`${BASE}/admin/categories`);
   await shot(page, 'p2-categories');
 

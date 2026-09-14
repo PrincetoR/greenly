@@ -52,5 +52,23 @@
     "active": true,
     "image": null,
     "icon": "cherry"
+  },
+  {
+    "id": "c-tea",
+    "slug": "ชาและกาแฟ",
+    "name": "ชาและกาแฟ",
+    "sortOrder": 70,
+    "active": true,
+    "image": null,
+    "icon": "coffee"
+  },
+  {
+    "id": "c-beauty",
+    "slug": "ความงามและผิว",
+    "name": "ความงามและผิว",
+    "sortOrder": 80,
+    "active": true,
+    "image": null,
+    "icon": "sparkles"
   }
 ]

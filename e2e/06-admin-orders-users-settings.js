@@ -97,7 +97,7 @@ async function placeOrder(page, path, qty, phone, coupon) {
   const kpi = await page.locator('.grid > a, .grid > div').allTextContents();
   ok(kpi.some((t) => t.includes('ยอดขายวันนี้') && t.includes('฿520') && t.includes('1 ออเดอร์')), `dashboard revenue today ฿520 (1 order, cancelled excluded)`);
   ok(kpi.some((t) => t.includes('รอยืนยัน') && /0/.test(t)), 'dashboard pending 0');
-  ok(kpi.some((t) => t.includes('โปรที่กำลังใช้งาน') && t.includes('3')), 'dashboard live promos 3');
+  ok(kpi.some((t) => t.includes('โปรที่กำลังใช้งาน') && t.includes('4')), 'dashboard live promos 4');
   // แดชบอร์ดไม่มีรายการออเดอร์ล่าสุดแล้ว (เป็นสถิติแทน) — ออเดอร์วันนี้ 2 ใบ (1 ยกเลิก) อยู่ในกราฟรายวัน
   ok((await page.locator('h2:has-text("ออเดอร์ล่าสุด")').count()) === 0 && (await page.locator('ul[aria-label="ยอดขายต่อช่วง"] > li').last().getAttribute('title')).includes('฿520'), 'dashboard: กราฟรายวัน แท่งวันนี้ = ฿520');
   await shot(page, 'p7-dashboard');

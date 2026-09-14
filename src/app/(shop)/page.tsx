@@ -1,10 +1,12 @@
 import Link from 'next/link';
+import type { Category } from '@/lib/types';
 import { listCategories } from '@/lib/db/categories';
 import { listProducts } from '@/lib/db/products';
 import { listOrders } from '@/lib/db/orders';
 import { getHomepage } from '@/lib/db/homepage';
 import { HeroSlider } from '@/components/shop/hero-slider';
 import { HeroHeaderSync } from '@/components/shop/hero-header-sync';
+import { HScroller } from '@/components/shop/h-scroller';
 import { SnapWheel } from '@/components/shop/snap-wheel';
 import { WelcomePopup } from '@/components/shop/welcome-popup';
 import { topProducts } from '@/lib/analytics/categories';
@@ -81,21 +83,24 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
         </section>
       )}
 
-      {/* หมวดหมู่เป็นการ์ด แถวละ 8 (จอใหญ่) · มีรูปใช้รูป ไม่มีใช้ไอคอน (พี่ต่อสั่ง) */}
+      {/*
+       * หมวดหมู่เป็นการ์ด แถวละ 8 (จอใหญ่) · มีรูปใช้รูป ไม่มีใช้ไอคอน (พี่ต่อสั่ง)
+       * มือถือ: 3 คอลัมน์ × 2 แถวต่อหน้า แล้วเลื่อนไปทางข้าง (grid-flow-col · แต่ละคอลัมน์กว้าง 1/3 ของช่อง) มีจุด/ขอบจางบอกว่าเลื่อนได้
+       */}
       <Section title="หมวดหมู่" href="/products">
-        <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+        <HScroller ariaLabel="หมวดหมู่" className="lg:hidden">
+          <ul className="grid auto-cols-[calc((100%-24px)/3)] grid-flow-col grid-rows-2 gap-3 sm:auto-cols-[calc((100%-36px)/4)]">
+            {categories.map((c) => (
+              <li key={c.id} className="snap-start">
+                <CategoryCard c={c} />
+              </li>
+            ))}
+          </ul>
+        </HScroller>
+        <ul className="hidden grid-cols-8 gap-3 lg:grid">
           {categories.map((c) => (
             <li key={c.id}>
-              <Link href={`/category/${c.slug}`} className="group card-hover flex h-full flex-col items-center gap-2 rounded-card bg-surface p-3 text-center border border-line">
-                {c.image ? (
-                  <ProductImage src={c.image} alt="" className="size-14 rounded-full" />
-                ) : (
-                  <span className="flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand" aria-hidden>
-                    <CategoryIcon icon={c.icon} className="size-7" />
-                  </span>
-                )}
-                <span className="line-clamp-2 text-xs leading-5 font-medium group-hover:text-brand sm:text-sm">{c.name}</span>
-              </Link>
+              <CategoryCard c={c} />
             </li>
           ))}
         </ul>
@@ -104,11 +109,16 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
       {/* โปรที่กำลังใช้งาน — โผล่/หายเองตามเวลาและ quota */}
       {live.length > 0 && (
         <Section title="โปรโมชันตอนนี้" description="ราคาโปรมีผลอัตโนมัติ ไม่ต้องทำอะไรเพิ่ม" href="/promotions">
-          <div className="grid gap-3 md:grid-cols-2">
-            {live.slice(0, 4).map((p) => (
-              <PromoCard key={p.id} promo={p} status="live" usage={usage[p.id]} categories={categories} products={allProducts} now={now} />
-            ))}
-          </div>
+          {/* 3 ใบต่อหน้า (มือถือ 1 ใบ) เลื่อนข้างดูใบอื่น — มีจุด/ขอบจาง/ปุ่มบอกว่าเลื่อนได้ (พี่ต่อสั่ง) */}
+          <HScroller ariaLabel="โปรโมชันตอนนี้">
+            <div className="grid auto-cols-[100%] grid-flow-col gap-3 md:auto-cols-[calc((100%-24px)/3)]">
+              {live.map((p) => (
+                <div key={p.id} className="h-full snap-start">
+                  <PromoCard promo={p} status="live" usage={usage[p.id]} categories={categories} products={allProducts} now={now} />
+                </div>
+              ))}
+            </div>
+          </HScroller>
         </Section>
       )}
 
@@ -140,5 +150,20 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
         </ProductGrid>
       </Section>
     </div>
+  );
+}
+
+function CategoryCard({ c }: { c: Category }) {
+  return (
+    <Link href={`/category/${c.slug}`} className="group card-hover flex h-full flex-col items-center gap-2 rounded-card bg-surface p-3 text-center border border-line">
+      {c.image ? (
+        <ProductImage src={c.image} alt="" className="size-14 rounded-full" />
+      ) : (
+        <span className="flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand" aria-hidden>
+          <CategoryIcon icon={c.icon} className="size-7" />
+        </span>
+      )}
+      <span className="line-clamp-2 text-xs leading-5 font-medium group-hover:text-brand sm:text-sm">{c.name}</span>
+    </Link>
   );
 }

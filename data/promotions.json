@@ -4,8 +4,8 @@
     "name": "ลด 20% เครื่องดื่มสุขภาพ",
     "type": "discount",
     "active": true,
-    "startsAt": "2026-09-13T09:04:44.390Z",
-    "endsAt": "2026-09-28T09:04:44.390Z",
+    "startsAt": "2026-09-13T18:16:02.134Z",
+    "endsAt": "2026-09-28T18:16:02.134Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -23,16 +23,16 @@
       "perProductQty": 5,
       "perCustomer": null
     },
-    "createdAt": "2026-09-14T09:04:44.390Z",
-    "updatedAt": "2026-09-14T09:04:44.390Z"
+    "createdAt": "2026-09-14T18:16:02.134Z",
+    "updatedAt": "2026-09-14T18:16:02.134Z"
   },
   {
     "id": "promo-save100",
     "name": "คูปอง SAVE100 ลดทันที 100 บาท",
     "type": "coupon",
     "active": true,
-    "startsAt": "2026-09-13T09:04:44.390Z",
-    "endsAt": "2026-10-14T09:04:44.390Z",
+    "startsAt": "2026-09-13T18:16:02.134Z",
+    "endsAt": "2026-10-14T18:16:02.134Z",
     "scope": {
       "kind": "all",
       "ids": []
@@ -52,16 +52,16 @@
       "perProductQty": null,
       "perCustomer": 1
     },
-    "createdAt": "2026-09-14T09:04:44.390Z",
-    "updatedAt": "2026-09-14T09:04:44.390Z"
+    "createdAt": "2026-09-14T18:16:02.134Z",
+    "updatedAt": "2026-09-14T18:16:02.134Z"
   },
   {
     "id": "promo-snack-b2g1",
     "name": "ขนมสุขภาพ ซื้อ 2 แถม 1",
     "type": "bogo",
     "active": true,
-    "startsAt": "2026-09-13T09:04:44.390Z",
-    "endsAt": "2026-09-21T09:04:44.390Z",
+    "startsAt": "2026-09-13T18:16:02.134Z",
+    "endsAt": "2026-09-21T18:16:02.134Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -79,16 +79,47 @@
       "perProductQty": null,
       "perCustomer": 1
     },
-    "createdAt": "2026-09-14T09:04:44.390Z",
-    "updatedAt": "2026-09-14T09:04:44.390Z"
+    "createdAt": "2026-09-14T18:16:02.134Z",
+    "updatedAt": "2026-09-14T18:16:02.134Z"
+  },
+  {
+    "id": "promo-matcha50",
+    "name": "คูปอง MATCHA50 ลด 50 บาท มัทฉะ",
+    "type": "coupon",
+    "active": true,
+    "startsAt": "2026-09-13T18:16:02.134Z",
+    "endsAt": "2026-10-05T18:16:02.134Z",
+    "scope": {
+      "kind": "products",
+      "ids": [
+        "p-002"
+      ]
+    },
+    "discount": {
+      "mode": "fixed",
+      "value": 5000
+    },
+    "coupon": {
+      "code": "MATCHA50",
+      "minSubtotal": null,
+      "freeShipping": false
+    },
+    "bogo": null,
+    "limits": {
+      "totalUses": 100,
+      "perProductQty": null,
+      "perCustomer": 2
+    },
+    "createdAt": "2026-09-14T18:16:02.134Z",
+    "updatedAt": "2026-09-14T18:16:02.134Z"
   },
   {
     "id": "promo-upcoming",
     "name": "Flash Sale อาหารเสริม ลด 150 บาท",
     "type": "discount",
     "active": true,
-    "startsAt": "2026-09-17T09:04:44.390Z",
-    "endsAt": "2026-09-19T09:04:44.390Z",
+    "startsAt": "2026-09-17T18:16:02.134Z",
+    "endsAt": "2026-09-19T18:16:02.134Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -106,16 +137,16 @@
       "perProductQty": 2,
       "perCustomer": 1
     },
-    "createdAt": "2026-09-14T09:04:44.390Z",
-    "updatedAt": "2026-09-14T09:04:44.390Z"
+    "createdAt": "2026-09-14T18:16:02.134Z",
+    "updatedAt": "2026-09-14T18:16:02.134Z"
   },
   {
     "id": "promo-expired",
     "name": "ลด 10% ทั้งร้าน กลางเดือน",
     "type": "discount",
     "active": true,
-    "startsAt": "2026-08-15T09:04:44.390Z",
-    "endsAt": "2026-09-04T09:04:44.390Z",
+    "startsAt": "2026-08-15T18:16:02.134Z",
+    "endsAt": "2026-09-04T18:16:02.134Z",
     "scope": {
       "kind": "all",
       "ids": []
@@ -131,16 +162,16 @@
       "perProductQty": null,
       "perCustomer": null
     },
-    "createdAt": "2026-09-14T09:04:44.390Z",
-    "updatedAt": "2026-09-14T09:04:44.390Z"
+    "createdAt": "2026-09-14T18:16:02.134Z",
+    "updatedAt": "2026-09-14T18:16:02.134Z"
   },
   {
     "id": "promo-past-coupon",
     "name": "คูปอง SUMMER50 ลด 50 บาท",
     "type": "coupon",
     "active": true,
-    "startsAt": "2026-04-17T09:04:44.390Z",
-    "endsAt": "2026-05-17T09:04:44.390Z",
+    "startsAt": "2026-04-17T18:16:02.134Z",
+    "endsAt": "2026-05-17T18:16:02.134Z",
     "scope": {
       "kind": "all",
       "ids": []
@@ -160,16 +191,16 @@
       "perProductQty": null,
       "perCustomer": null
     },
-    "createdAt": "2026-09-14T09:04:44.390Z",
-    "updatedAt": "2026-09-14T09:04:44.390Z"
+    "createdAt": "2026-09-14T18:16:02.134Z",
+    "updatedAt": "2026-09-14T18:16:02.134Z"
   },
   {
     "id": "promo-past-anniv",
     "name": "ครบรอบร้าน ลด 15% ธัญพืชและขนม",
     "type": "discount",
     "active": true,
-    "startsAt": "2025-12-13T09:04:44.390Z",
-    "endsAt": "2026-01-02T09:04:44.390Z",
+    "startsAt": "2025-12-13T18:16:02.134Z",
+    "endsAt": "2026-01-02T18:16:02.134Z",
     "scope": {
       "kind": "categories",
       "ids": [
@@ -188,7 +219,7 @@
       "perProductQty": null,
       "perCustomer": null
     },
-    "createdAt": "2026-09-14T09:04:44.390Z",
-    "updatedAt": "2026-09-14T09:04:44.390Z"
+    "createdAt": "2026-09-14T18:16:02.134Z",
+    "updatedAt": "2026-09-14T18:16:02.134Z"
   }
 ]

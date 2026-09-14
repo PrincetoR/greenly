@@ -10,7 +10,7 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
   // home promo strip
   await page.goto(`${BASE}/`);
   ok((await page.locator('h2:has-text("โปรโมชันตอนนี้")').count()) === 1, 'home: promo strip');
-  ok((await page.locator('article').count()) === 3, 'home: 3 live promo cards');
+  ok((await page.locator('article').count()) === 4, 'home: 4 live promo cards (3 ต่อหน้า เลื่อนดูใบที่ 4)');
   ok(await page.locator('article', { hasText: 'SAVE100' }).first().isVisible() && (await page.locator('article code').count()) === 0, 'home: coupon code in summary sentence (ไม่มีกล่องใช้โค้ด)');
   ok((await page.locator('text=เหลืออีก').count()) >= 3, 'home: countdown text');
   // drinks featured products show discounted price + badge
@@ -23,7 +23,7 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
 
   // /promotions page
   await page.goto(`${BASE}/promotions`);
-  ok((await page.textContent('h2:has-text("กำลังใช้งาน")')).includes('(3)'), 'promotions: 3 live');
+  ok((await page.textContent('h2:has-text("กำลังใช้งาน")')).includes('(4)'), 'promotions: 4 live');
   ok((await page.textContent('h2:has-text("เร็ว ๆ นี้")')).includes('(1)'), 'promotions: 1 upcoming');
   ok((await page.locator('text=ลด 10% ทั้งร้าน กลางเดือน').count()) === 0 && (await page.locator('text=SUMMER50').count()) === 0, 'promotions: expired hidden');
   ok((await page.locator('text=เริ่มใน').count()) === 1, 'promotions: upcoming shows "เริ่มใน"');

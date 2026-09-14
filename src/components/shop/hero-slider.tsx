@@ -28,14 +28,14 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
   const sides = side.slice(0, 2);
 
   /*
-   * โครงแบบ Shopee: แถบพื้นขาวสุดจอ (ต่อจากเส้นขอบล่างของ header — ไม่มีเส้นบนของตัวเอง) มีเส้นขอบล่าง · เว้นบน 16 ให้เห็นขอบบน/มุมมนของรูป (ชิด header แล้วพี่ต่อบอกจม) เว้นล่าง 32
+   * โครงแบบ Shopee: แถบพื้นขาวสุดจอ (ต่อจากเส้นขอบล่างของ header — ไม่มีเส้นบนของตัวเอง) มีเส้นขอบล่าง · ไม่เว้นบน (รูปชิดเส้น header) เว้นล่าง 24 (พี่ต่อ: 32 มากไป 6 น้อยไป 2026-09-15)
    * ข้างในจัดตามคอนเทนเนอร์ [สไลด์ใหญ่ 2 ส่วน | ภาพเล็ก 2 ช่องซ้อนแนวตั้ง 1 ส่วน]
    * ความสูงแถวมาจากภาพเล็ก (aspect 2:1 พอดีรูป ไม่โดนครอปหัว/ท้าย — พี่ต่อเห็นหัวรูปจม 2px) · สไลด์ยืดเท่าแถวแล้วครอปข้างแทน
    * มือถือ: สไลด์เต็มแถว ภาพเล็กเรียง 2 คอลัมน์ข้างล่าง
    */
   // will-change: opacity ให้ compositor แยกเลเยอร์ — จางตามการเลื่อนได้ลื่นโดยไม่วาดรูปใหม่ทุกเฟรม
   return (
-    <div data-hero-content className={cn('mx-auto grid max-w-6xl gap-3 px-4 pt-4 pb-8 will-change-[opacity]', sides.length > 0 && 'md:grid-cols-[2fr_1fr]')}>
+    <div data-hero-content className={cn('mx-auto grid max-w-6xl gap-3 px-4 pb-6 will-change-[opacity]', sides.length > 0 && 'md:grid-cols-[2fr_1fr]')}>
       <section
         className={cn('group relative aspect-[16/9] overflow-hidden rounded-lg bg-ink md:aspect-auto', sides.length === 0 ? 'md:aspect-[8/3]' : 'md:h-full')}
         aria-roledescription="carousel"

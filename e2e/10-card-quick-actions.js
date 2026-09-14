@@ -8,6 +8,7 @@ const read = (n) => JSON.parse(fs.readFileSync(`${DATA}/${n}.json`, 'utf8'));
   fs.writeFileSync(`${DATA}/wishlists.json`, '{}\n');
   const { browser, page } = await launch();
   await page.goto(`${BASE}/`);
+  await page.waitForLoadState('networkidle'); // รอ hydrate — แถวเลื่อนข้างเพิ่มจุดบอกหน้าหลัง mount ทำให้ตำแหน่งขยับ
 
   // .group:has(h3) = การ์ดสินค้า (สไลด์หน้าแรกก็เป็น .group และมีคำว่ากราโนล่าในข้อความรอง)
   const card = page.locator('.group:has(h3)', { hasText: 'กราโนล่า' }).first();

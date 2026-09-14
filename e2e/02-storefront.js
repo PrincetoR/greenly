@@ -56,7 +56,7 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   const nums = await page.locator('main .group').evaluateAll((cards) =>
     cards.map((c) => Number((c.querySelector('.line-through') ?? c.querySelector('span.font-bold')).textContent.replace(/[^\d.]/g, ''))),
   );
-  ok(nums.length === 24 && nums.every((n, i) => i === 0 || n >= nums[i - 1]), `sort price asc (${nums.slice(0, 4).join(',')}…)`);
+  ok(nums.length === 30 && nums.every((n, i) => i === 0 || n >= nums[i - 1]), `sort price asc (${nums.slice(0, 4).join(',')}…)`);
 
   // category page + chip active
   await page.click('main a[href^="/category/"]:has-text("ธัญพืชและถั่ว")');

@@ -33,6 +33,8 @@ const categorySeed: { id: string; name: string; emoji: string; hue: number; icon
   { id: 'c-supplement', name: 'อาหารเสริม', emoji: '💊', hue: 200, icon: 'pill' },
   { id: 'c-kitchen', name: 'ของใช้ในครัว', emoji: '🍳', hue: 260, icon: 'cooking-pot' },
   { id: 'c-dried', name: 'ผลไม้อบแห้ง', emoji: '🍑', hue: 340, icon: 'cherry' },
+  { id: 'c-tea', name: 'ชาและกาแฟ', emoji: '☕', hue: 25, icon: 'coffee' },
+  { id: 'c-beauty', name: 'ความงามและผิว', emoji: '✨', hue: 300, icon: 'sparkles' },
 ];
 
 const categories: Category[] = categorySeed.map((c, i) => ({
@@ -83,6 +85,16 @@ const productSeed: Record<string, Seed[]> = {
     ['แครนเบอร์รี่อบแห้ง 250 กรัม', 165, 65, 'เปรี้ยวอมหวาน แหล่งสารต้านอนุมูลอิสระ ใส่สลัดหรือกราโนล่า'],
     ['กล้วยหอมอบกรอบ 100 กรัม', 59, 120, 'อบกรอบไม่ทอด ไม่ใส่น้ำมัน หวานจากผลไม้ล้วน'],
     ['ผลไม้รวมอบแห้ง 5 ชนิด 300 กรัม', 199, 50, 'มะม่วง สับปะรด มะละกอ แก้วมังกร กีวี ไม่ใส่สารกันบูด'],
+  ],
+  'c-tea': [
+    ['ชาอู่หลงออร์แกนิก 20 ซอง', 159, 70, 'ใบชาเต็มใบจากดอยแม่สลอง หอมละมุน ชงร้อนหรือเย็นได้'],
+    ['กาแฟดริปคั่วกลาง 10 ซอง', 219, 55, 'อาราบิก้าจากเชียงราย คั่วสดทุกสัปดาห์ ดริปแบ็กพร้อมชง', true],
+    ['ชาขิงผสมมะนาว 15 ซอง', 129, 90, 'ขิงแก่สกัด อุ่นท้อง ไม่ใส่น้ำตาล ชงดื่มก่อนนอน'],
+  ],
+  'c-beauty': [
+    ['เซรั่มวิตามินซี 30 มล.', 490, 40, 'วิตามินซีเข้มข้น 15% ผิวกระจ่างใส ไม่ระคายเคือง', true],
+    ['สบู่ธรรมชาติน้ำมันมะพร้าว 100 กรัม', 89, 150, 'ทำมือ ไม่ใส่สารกันเสีย เหมาะกับผิวแพ้ง่าย'],
+    ['ลิปบาล์มขี้ผึ้งแท้ 5 กรัม', 129, 120, 'ขี้ผึ้งธรรมชาติผสมน้ำมันอัลมอนด์ บำรุงริมฝีปากแห้งแตก'],
   ],
 };
 
@@ -177,6 +189,21 @@ const promotions: Promotion[] = [
     ...basePromo,
   },
   {
+    // คูปองลดเป็นบาท เฉพาะสินค้าที่ระบุ (พี่ต่อขอเพิ่ม) — ชาเขียวมัทฉะ p-002
+    id: 'promo-matcha50',
+    name: 'คูปอง MATCHA50 ลด 50 บาท มัทฉะ',
+    type: 'coupon',
+    active: true,
+    startsAt: iso(daysFromNow(-1)),
+    endsAt: iso(daysFromNow(21)),
+    scope: { kind: 'products', ids: ['p-002'] },
+    discount: { mode: 'fixed', value: 5000 },
+    coupon: { code: 'MATCHA50', minSubtotal: null, freeShipping: false },
+    bogo: null,
+    limits: { totalUses: 100, perProductQty: null, perCustomer: 2 },
+    ...basePromo,
+  },
+  {
     id: 'promo-upcoming',
     name: 'Flash Sale อาหารเสริม ลด 150 บาท',
     type: 'discount',
@@ -262,7 +289,7 @@ const customers = [
 ] as const;
 
 /** น้ำหนักต่อหมวด — ให้หมวดเครื่องดื่ม/ขนมขายดี ของใช้ในครัวขายน้อย แดชบอร์ดจะได้เห็นความต่าง */
-const categoryWeight: Record<string, number> = { 'c-drinks': 0.3, 'c-snacks': 0.22, 'c-grains': 0.18, 'c-dried': 0.12, 'c-supplement': 0.1, 'c-kitchen': 0.08 };
+const categoryWeight: Record<string, number> = { 'c-drinks': 0.26, 'c-snacks': 0.2, 'c-grains': 0.16, 'c-dried': 0.1, 'c-supplement': 0.09, 'c-tea': 0.08, 'c-beauty': 0.06, 'c-kitchen': 0.05 };
 
 /** ช่องทาง Beam ที่ลูกค้าสาธิตเลือก (น้ำหนักตามความนิยมในไทย) */
 const beamChannelWeight: [BeamChannelId, number][] = [
@@ -302,7 +329,9 @@ function demoOrders(): { orders: Order[]; payments: Payment[] } {
     // ร้านโตขึ้นเรื่อย ๆ · เสาร์-อาทิตย์ขายดีกว่า · ช่วงมีโปรออเดอร์เพิ่ม (ให้ "ก่อน/ระหว่างโปร" ต่างกันจริง)
     let rate = 0.2 + 0.85 * progress;
     if ([0, 6].includes(dayStart.getDay())) rate *= 1.35;
-    const livePromos = past.filter((p) => new Date(p.startsAt) <= dayStart && new Date(p.endsAt) > dayStart && p.id !== 'promo-drinks20' && p.id !== 'promo-save100' && p.id !== 'promo-snack-b2g1');
+    // โปรที่กำลังใช้อยู่ตอนนี้ไม่ให้ประวัติใช้ (quota ต้องว่างให้ลูกค้า/e2e) — ใช้เฉพาะโปรในอดีต
+    const LIVE_NOW = ['promo-drinks20', 'promo-save100', 'promo-snack-b2g1', 'promo-matcha50'];
+    const livePromos = past.filter((p) => new Date(p.startsAt) <= dayStart && new Date(p.endsAt) > dayStart && !LIVE_NOW.includes(p.id));
     if (livePromos.length) rate *= 1.6;
     let count = Math.floor(rate) + (rand() < rate % 1 ? 1 : 0) + (rand() < 0.12 ? 1 : 0);
     if (i === 0) count = Math.min(count, 2);
