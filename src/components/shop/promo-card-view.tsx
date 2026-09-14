@@ -19,7 +19,7 @@ export interface PromoCardData {
   description: string;
   /** เฉพาะส่วน "ทำอะไร" — บรรทัดคำอธิบายบนการ์ด */
   summary: string;
-  /** ช่วงเวลา · เงื่อนไข — บรรทัด 2 บนการ์ด */
+  /** ช่วงเวลา · เงื่อนไข — บรรทัด 2 ของคำอธิบายบนการ์ด */
   terms: string;
   discount: string;
   live: boolean;
@@ -67,17 +67,19 @@ export function PromoCardView({ data: d }: { data: PromoCardData }) {
             <h3 className="truncate leading-6 font-bold transition-colors group-hover:text-brand" title={d.name}>
               {d.name}
             </h3>
-            {/* บรรทัด 2 = ช่วงเวลา · เงื่อนไข (แทนสถานะ — สถานะดูจากป๊อปอัป/นับถอยหลัง) พี่ต่อสั่ง */}
-            <p className="mt-1 truncate text-xs leading-5 text-muted" title={d.terms}>
-              {d.terms}
-            </p>
+            <div className="mt-1 flex h-5 items-center">{d.live ? <Badge tone="ok">กำลังใช้งาน</Badge> : <Badge tone="info">เร็ว ๆ นี้</Badge>}</div>
           </div>
           <span className={cn('shrink-0 rounded-lg px-3 py-1.5 text-lg font-bold', accent)}>{d.discount}</span>
         </div>
-        {/* คำอธิบาย 1 บรรทัด ตัด … · เต็มความกว้าง ชิดซ้ายเท่าไอคอน เหมือนในป๊อปอัป (พี่ต่อสั่ง) */}
-        <p className="truncate text-sm leading-6 text-muted" title={d.summary}>
-          {d.summary}
-        </p>
+        {/* คำอธิบาย 2 บรรทัด ตัด … ทั้งคู่: บรรทัด 1 ทำอะไร · บรรทัด 2 ช่วงเวลา · เงื่อนไข — เต็มความกว้าง ชิดซ้ายเท่าไอคอน เหมือนในป๊อปอัป (พี่ต่อสั่ง) */}
+        <div className="min-w-0 text-sm leading-6 text-muted">
+          <p className="truncate" title={d.summary}>
+            {d.summary}
+          </p>
+          <p className="truncate" title={d.terms}>
+            {d.terms}
+          </p>
+        </div>
 
         <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
           {/* ไม่ซ้ำ "ถึง วันที่" — ช่วงเวลาอยู่บรรทัด 2 แล้ว */}
