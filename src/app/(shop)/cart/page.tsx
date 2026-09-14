@@ -10,7 +10,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { buttonStyles } from '@/components/ui/button';
-import { AutoSubmitSelect } from '@/components/ui/auto-submit-select';
+import { Select } from '@/components/ui/select';
 import { Gift, ShoppingCart, Tag, X } from 'lucide-react';
 
 export const metadata = { title: 'ตะกร้าสินค้า' };
@@ -89,14 +89,15 @@ export default async function CartPage() {
                     ) : (
                       <form action={updateCartQty} className="flex items-center gap-1">
                         <input type="hidden" name="productId" value={l.productId} />
-                        <AutoSubmitSelect name="qty" defaultValue={l.qty} aria-label="จำนวน" className="w-auto! py-1!">
-                          {Array.from({ length: Math.min(input.product.stock, 20) }, (_, k) => k + 1).map((n) => (
-                            <option key={n} value={n}>
-                              {n}
-                            </option>
-                          ))}
-                          {l.qty > 20 && <option value={l.qty}>{l.qty}</option>}
-                        </AutoSubmitSelect>
+                        <Select
+                          size="sm"
+                          autoSubmit
+                          name="qty"
+                          defaultValue={String(l.qty)}
+                          aria-label="จำนวน"
+                          className="shrink-0"
+                          options={[...Array.from({ length: Math.min(input.product.stock, 20) }, (_, k) => k + 1), ...(l.qty > 20 ? [l.qty] : [])].map((n) => ({ value: String(n), label: String(n) }))}
+                        />
                         <noscript>
                           <button type="submit" className="text-xs text-muted underline">
                             อัปเดต

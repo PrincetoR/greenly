@@ -11,6 +11,7 @@ import { Table, Td, Th } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Alert } from '@/components/ui/alert';
 import { Button, buttonStyles } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Package, Plus } from 'lucide-react';
 
@@ -53,20 +54,18 @@ export default async function ProductsPage({ searchParams }: PageProps<'/admin/p
 
       <form className="mb-4 grid gap-2 sm:grid-cols-[1fr_180px_160px_auto]">
         <input type="search" name="q" defaultValue={q} placeholder="ค้นหาชื่อ / SKU" aria-label="ค้นหาสินค้า" />
-        <select name="category" defaultValue={categoryId} aria-label="กรองหมวดหมู่">
-          <option value="">ทุกหมวดหมู่</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-        <select name="status" defaultValue={status} aria-label="กรองสถานะ">
-          <option value="">ทุกสถานะ</option>
-          <option value="active">เปิดขาย</option>
-          <option value="inactive">ปิดขาย</option>
-          <option value="low">ใกล้หมด (≤ {settings.lowStockThreshold})</option>
-        </select>
+        <Select name="category" defaultValue={categoryId} aria-label="กรองหมวดหมู่" options={[{ value: '', label: 'ทุกหมวดหมู่' }, ...categories.map((c) => ({ value: c.id, label: c.name }))]} />
+        <Select
+          name="status"
+          defaultValue={status}
+          aria-label="กรองสถานะ"
+          options={[
+            { value: '', label: 'ทุกสถานะ' },
+            { value: 'active', label: 'เปิดขาย' },
+            { value: 'inactive', label: 'ปิดขาย' },
+            { value: 'low', label: `ใกล้หมด (≤ ${settings.lowStockThreshold})` },
+          ]}
+        />
         <Button type="submit" variant="secondary">
           กรอง
         </Button>

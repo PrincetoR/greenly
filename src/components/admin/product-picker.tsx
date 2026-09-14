@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/cn';
+import { Select } from '@/components/ui/select';
 import { formatBaht } from '@/lib/money';
 import type { Category, Product } from '@/lib/types';
 import { ProductImage } from '@/components/product-image';
@@ -38,14 +39,7 @@ export function ProductPicker({
     <div className="rounded-lg border border-line">
       <div className="flex flex-wrap items-center gap-2 border-b border-line p-2">
         <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาชื่อ / SKU" aria-label="ค้นหาสินค้า" className="min-w-0 flex-1" />
-        <select value={cat} onChange={(e) => setCat(e.target.value)} aria-label="กรองหมวดหมู่" className="w-auto!">
-          <option value="">ทุกหมวด</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        <Select value={cat} onChange={setCat} aria-label="กรองหมวดหมู่" className="shrink-0" options={[{ value: '', label: 'ทุกหมวด' }, ...categories.map((c) => ({ value: c.id, label: c.name }))]} />
         <button
           type="button"
           onClick={() => onChange(allShownSelected ? selected.filter((id) => !shown.some((p) => p.id === id)) : [...new Set([...selected, ...shown.map((p) => p.id)])])}

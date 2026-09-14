@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from 'react';
 import { Building2, CreditCard, Globe, QrCode, Smartphone, Wallet } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { Select } from '@/components/ui/select';
 import { formatBaht } from '@/lib/money';
 import { BEAM_GROUP_LABEL, type BeamChannel, type BeamChannelId } from '@/lib/payments/beam';
 import { settleMockPaymentAction } from '@/lib/actions/payments';
@@ -193,11 +194,7 @@ export function BeamCheckout({
                   {current.options && (
                     <label className="text-xs font-medium">
                       ธนาคารผู้ออกบัตร
-                      <select value={option} onChange={(e) => setOption(e.target.value)} className="mt-1" aria-label="ธนาคาร">
-                        {current.options.map((b) => (
-                          <option key={b}>{b}</option>
-                        ))}
-                      </select>
+                      <Select value={option} onChange={setOption} className="mt-1 w-full" aria-label="ธนาคาร" options={current.options.map((b) => ({ value: b, label: b }))} />
                     </label>
                   )}
                   <div className="grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="จำนวนงวด">

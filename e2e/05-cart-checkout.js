@@ -1,4 +1,4 @@
-const { BASE, launch, login, shot, ok, DATA, SHOT } = require('./lib');
+const { BASE, launch, login, shot, ok, pick, DATA, SHOT } = require('./lib');
 const fs = require('fs');
 const read = (n) => JSON.parse(fs.readFileSync(`${DATA}/${n}.json`, 'utf8'));
 const KOMBUCHA = '/product/คอมบูชารสขิงมะนาว-330-มล-p-003';
@@ -49,7 +49,7 @@ async function add(page, path, qty) {
   ok((await page.locator('text=ประหยัดไป').count()) === 1, 'savings line');
 
   // qty change auto-submit: kombucha 7 → 3
-  await page.selectOption('select[name=qty] >> nth=0', '3');
+  await pick(page, '[role=combobox][aria-label="จำนวน"] >> nth=0', '3');
   await page.waitForFunction(() => !document.querySelector('[class*="line-through"]')?.textContent?.includes('฿665'));
   await page.waitForLoadState('networkidle');
   ok((await page.locator('text=(5/7 ชิ้น)').count()) === 0, 'qty updated → warning gone');

@@ -37,10 +37,18 @@ async function login(page, user = 'admin', pass = 'admin1234') {
   await page.waitForURL((u) => u.pathname === '/admin' || (u.pathname.startsWith('/admin/') && !u.pathname.startsWith('/admin/login')));
 }
 
+/** เลือกค่าใน dropdown `Select` ของเรา (ไม่ใช่ <select>): กดปุ่ม (combobox) แล้วกดตัวเลือกตามข้อความ */
+async function pick(page, selector, label) {
+  await page.locator(selector).click();
+  await page.locator('[role=listbox]').waitFor();
+  await page.getByRole('option', { name: label, exact: true }).click();
+  await page.locator('[role=listbox]').waitFor({ state: 'detached' });
+}
+
 const shot = (page, name) => page.screenshot({ path: `${SHOT}/${name}.png`, fullPage: true, caret: 'initial' });
 const ok = (cond, msg) => {
   console.log(`${cond ? '✅' : '❌'} ${msg}`);
   if (!cond) process.exitCode = 1;
 };
 
-module.exports = { BASE, DATA, PUBLIC, SHOT, UPLOAD_TMP, launch, login, shot, ok };
+module.exports = { BASE, DATA, PUBLIC, SHOT, UPLOAD_TMP, launch, login, shot, ok, pick };

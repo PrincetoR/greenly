@@ -1,5 +1,5 @@
 // ชำระผ่าน Beam (จำลอง) → คิวจัดส่ง (รอแพ็ค → แพ็ค → ส่ง เลขพัสดุ → ถึงมือ) · ตีกลับ · ใบปะหน้า · ลูกค้าติดตามพัสดุ · คืนเงิน · การชำระเงินหลังบ้าน
-const { BASE, DATA, launch, login, shot, ok } = require('./lib');
+const { BASE, DATA, launch, login, shot, ok, pick } = require('./lib');
 const fs = require('fs');
 const read = (n) => JSON.parse(fs.readFileSync(`${DATA}/${n}.json`, 'utf8'));
 const KOMBUCHA = '/product/คอมบูชารสขิงมะนาว-330-มล-p-003';
@@ -93,7 +93,7 @@ async function checkout(page, method, clear = true) {
   await page.waitForURL(/error=tracking/);
   ok(await page.locator('text=กรุณาเลือกขนส่งและกรอกเลขพัสดุ').isVisible(), 'เลขพัสดุสั้นเกิน → แจ้งเตือน');
   await act(page, o1.id, 'button:has-text("จัดส่ง")', async () => {
-    await page.selectOption('select[name=carrier]', 'flash');
+    await pick(page, '[role=combobox][aria-label="ขนส่ง"]', 'Flash Express');
     await page.fill('input[name=trackingNo]', 'th1234567890123');
     await page.fill('input[name=weightGrams]', '450');
   });
@@ -110,7 +110,7 @@ async function checkout(page, method, clear = true) {
   await act(page, o2.id, 'button:has-text("ยืนยันรับออเดอร์")');
   await act(page, o2.id, 'button:has-text("เริ่มแพ็ค")');
   await act(page, o2.id, 'button:has-text("จัดส่ง")', () => page.fill('input[name=trackingNo]', 'KEX0000000001'));
-  await act(page, o2.id, 'button:has-text("พัสดุตีกลับ")', () => page.selectOption('select[name=note]', 'ที่อยู่ไม่ชัดเจน'));
+  await act(page, o2.id, 'button:has-text("พัสดุตีกลับ")', () => pick(page, '[role=combobox][aria-label="เหตุผลตีกลับ"]', 'ที่อยู่ไม่ชัดเจน'));
   let r = read('orders').find((o) => o.id === o2.id);
   ok(r.status === 'returned' && r.shipment.returnReason === 'ที่อยู่ไม่ชัดเจน', 'ตีกลับพร้อมเหตุผล');
   await page.goto(`${BASE}/admin/shipping?tab=returned`);

@@ -17,6 +17,7 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Table, Td, Th } from '@/components/ui/table';
 import { Field } from '@/components/ui/field';
+import { Select } from '@/components/ui/select';
 import { cn } from '@/lib/cn';
 import { CheckCircle2, Circle } from 'lucide-react';
 
@@ -260,10 +261,7 @@ export default async function PaymentsPage({ searchParams }: PageProps<'/admin/p
                   เปิดรับชำระผ่าน Beam
                 </label>
                 <Field label="โหมด" htmlFor="mode" hint="sandbox = ทดสอบ ไม่ตัดเงินจริง">
-                  <select id="mode" name="mode" defaultValue={beam.mode}>
-                    <option value="sandbox">Sandbox (ทดสอบ)</option>
-                    <option value="live">Live (ใช้งานจริง)</option>
-                  </select>
+                  <Select id="mode" name="mode" defaultValue={beam.mode} options={[{ value: 'sandbox', label: 'Sandbox (ทดสอบ)' }, { value: 'live', label: 'Live (ใช้งานจริง)' }]} />
                 </Field>
                 <Field label="Merchant ID" htmlFor="merchantId">
                   <input id="merchantId" name="merchantId" defaultValue={beam.merchantId} placeholder="mch_xxxxxxxx" className="font-mono" />

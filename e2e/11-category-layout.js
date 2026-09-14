@@ -1,5 +1,5 @@
 // หมวดหมู่: จอใหญ่ = card แถบข้าง · มือถือ = dropdown · ไม่มี chip/tag แล้ว
-const { BASE, launch, ok, shot } = require('./lib');
+const { BASE, launch, ok, shot, pick } = require('./lib');
 
 (async () => {
   const { browser, page } = await launch();
@@ -15,18 +15,23 @@ const { BASE, launch, ok, shot } = require('./lib');
   await page.mouse.wheel(0, -800);
   await page.waitForTimeout(300);
   ok((await page.locator('main a.rounded-full').count()) === 0, 'desktop: ไม่มี chip/tag');
-  ok(!(await page.locator('main select[aria-label="หมวดหมู่"]').isVisible()), 'desktop: ซ่อน dropdown หมวด');
+  ok(!(await page.locator('main [role=combobox][aria-label="หมวดหมู่"]').isVisible()), 'desktop: ซ่อน dropdown หมวด');
+  // เรียงลำดับ = dropdown ของเราเอง 3 ตัวเลือก (ไม่มี ชื่อ ก–ฮ — พี่ต่อสั่ง) ไม่ใช่ <select> ของระบบ
+  ok((await page.locator('main select').count()) === 0, 'ไม่มี <select> ของเบราว์เซอร์');
+  await page.click('main [role=combobox][aria-label="เรียงลำดับ"]');
+  ok((await page.locator('[role=listbox] [role=option]').allTextContents()).join('|') === 'ใหม่ล่าสุด|ราคาต่ำไปสูง|ราคาสูงไปต่ำ', 'เรียงลำดับ 3 ตัวเลือก');
+  await page.keyboard.press('Escape');
   ok((await page.textContent('main aside nav p')).trim() === 'หมวดหมู่สินค้า', 'บรรทัดแรกของ card = หมวดหมู่สินค้า');
   ok(await page.locator('main h1:has-text("สินค้าทั้งหมด")').isVisible(), 'หัวข้อ "สินค้าทั้งหมด" อยู่ในแถวเดียวกับค้นหา/เรียงลำดับ');
   const h1Box = await page.locator('main h1').boundingBox();
-  const sortBox = await page.locator('main button[aria-haspopup=listbox]').boundingBox();
+  const sortBox = await page.locator('main [role=combobox][aria-label="เรียงลำดับ"]').boundingBox();
   ok(Math.abs(h1Box.y + h1Box.height / 2 - (sortBox.y + sortBox.height / 2)) <= 1, 'หัวข้อกับปุ่มเรียงลำดับอยู่แถวเดียวกัน');
   const searchBox = await page.locator('main input[aria-label="ค้นหา"]').boundingBox();
   ok(searchBox.x + searchBox.width < sortBox.x && sortBox.x - (searchBox.x + searchBox.width) <= 12, 'ช่องค้นหาติดกับเรียงลำดับ');
   // ค้นหา = ขอบซ้ายการ์ด 3 → กึ่งกลางการ์ด 4 · เรียงลำดับ = ครึ่งหลังการ์ด 4
   const row = (await page.locator('main .group').evaluateAll((cs) => cs.map((c) => c.getBoundingClientRect()))).slice(0, 4);
   ok(Math.abs(searchBox.x - row[2].x) < 0.5, `ขอบซ้ายช่องค้นหา = ขอบซ้ายการ์ด 3 (${searchBox.x} = ${row[2].x})`);
-  ok(await page.locator('main button[aria-haspopup=listbox]').evaluate((b) => [...b.querySelectorAll('span span')].every((s) => s.scrollWidth <= s.clientWidth + 1)), 'ข้อความเรียงลำดับไม่ถูกตัด (ปุ่มกว้างตามข้อความยาวสุด)');
+  ok(await page.locator('main [role=combobox][aria-label="เรียงลำดับ"]').evaluate((b) => [...b.querySelectorAll('span span')].every((s) => s.scrollWidth <= s.clientWidth + 1)), 'ข้อความเรียงลำดับไม่ถูกตัด (ปุ่มกว้างตามข้อความยาวสุด)');
   ok(Math.abs(sortBox.x + sortBox.width - (row[3].x + row[3].width)) < 0.5, 'ขอบขวาเรียงลำดับ = ขอบขวาการ์ด 4');
   const headerBottom = await page.locator('header').evaluate((h) => h.getBoundingClientRect().bottom);
   ok((await page.locator('main aside nav').boundingBox()).y - headerBottom === 16, 'ระยะ header → เนื้อหา 16px');
@@ -57,11 +62,14 @@ const { BASE, launch, ok, shot } = require('./lib');
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto(`${BASE}/products`);
   ok(!(await page.locator('main aside').isVisible()), 'มือถือ: ซ่อน aside');
-  const sel = page.locator('main select[aria-label="หมวดหมู่"]');
+  const sel = page.locator('main [role=combobox][aria-label="หมวดหมู่"]');
   ok(await sel.isVisible(), 'มือถือ: dropdown หมวดหมู่');
-  await sel.selectOption({ label: 'ขนมเพื่อสุขภาพ' });
+  // dropdown อยู่ใต้หัวข้อ (พี่ต่อสั่ง 2026-09-15) เหนือแถวค้นหา
+  const rows = await page.evaluate(() => ({ h1: document.querySelector('main h1').getBoundingClientRect().bottom, sel: document.querySelector('main [role=combobox][aria-label="หมวดหมู่"]').getBoundingClientRect(), search: document.querySelector('main input[aria-label="ค้นหา"]').getBoundingClientRect().top }));
+  ok(rows.sel.top >= rows.h1 && rows.sel.bottom <= rows.search && rows.sel.width > 300, `มือถือ: dropdown หมวดอยู่ใต้หัวข้อ เต็มแถว (${rows.h1} ≤ ${rows.sel.top})`);
+  await pick(page, 'main [role=combobox][aria-label="หมวดหมู่"]', 'ขนมเพื่อสุขภาพ');
   await page.waitForURL(/\/category\//);
-  ok((await sel.evaluate((s) => s.options[s.selectedIndex].text)) === 'ขนมเพื่อสุขภาพ' && (await page.locator('.group').count()) === 4, 'มือถือ: เลือกหมวดจาก dropdown → กรอง');
+  ok((await sel.textContent()) === 'ขนมเพื่อสุขภาพ' && (await page.locator('.group').count()) === 4, 'มือถือ: เลือกหมวดจาก dropdown → กรอง');
   ok((await page.evaluate(() => document.documentElement.scrollWidth)) <= 375, 'มือถือไม่ล้น');
   await page.screenshot({ path: `${require('./lib').SHOT}/p12-mobile.png`, caret: 'initial' });
   await browser.close();

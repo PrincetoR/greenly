@@ -18,6 +18,7 @@ import { Alert } from '@/components/ui/alert';
 import { Button, buttonStyles } from '@/components/ui/button';
 import { Table, Td, Th } from '@/components/ui/table';
 import { Field } from '@/components/ui/field';
+import { Select } from '@/components/ui/select';
 import { cn } from '@/lib/cn';
 import { ExternalLink, Printer, RefreshCw } from 'lucide-react';
 
@@ -219,13 +220,7 @@ function ShippingSettingsForm({ settings, canEdit }: { settings: Awaited<ReturnT
           </div>
         </fieldset>
         <Field label="ขนส่งเริ่มต้น" htmlFor="defaultCarrier">
-          <select id="defaultCarrier" name="defaultCarrier" defaultValue={settings.defaultCarrier} disabled={!canEdit}>
-            {CARRIERS.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <Select id="defaultCarrier" name="defaultCarrier" defaultValue={settings.defaultCarrier} disabled={!canEdit} options={CARRIERS.map((c) => ({ value: c.id, label: c.name }))} />
         </Field>
         <div className="flex items-end sm:col-span-2">
           {canEdit ? <Button type="submit">บันทึกการตั้งค่าจัดส่ง</Button> : <p className="text-sm text-muted">เฉพาะ admin แก้ไขได้</p>}

@@ -7,6 +7,7 @@ import type { FormState } from '@/lib/validation/common';
 import type { HeroSlide, HomePopup } from '@/lib/types';
 import { Button, buttonStyles } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
+import { Select } from '@/components/ui/select';
 import { ImageUploader } from '@/components/admin/image-uploader';
 
 /** ฟอร์มสไลด์ (เพิ่ม/แก้ไข) — key ที่ผู้เรียกเปลี่ยนตาม id เพื่อรีเซ็ต state ตอนสลับรายการ */
@@ -37,10 +38,7 @@ export function SlideForm({ slide }: { slide?: HeroSlide }) {
         <input id="slide-href" name="href" defaultValue={v.href ?? slide?.href ?? ''} placeholder="/promotions" />
       </Field>
       <Field label="ตำแหน่ง" htmlFor="slide-slot" error={errors.slot} hint="แบบ Shopee: ซ้ายเป็นสไลด์ใหญ่ ขวาเป็นภาพเล็ก 2 ช่อง (ใช้ 2 ภาพแรกตามลำดับ)">
-        <select id="slide-slot" name="slot" defaultValue={v.slot ?? slide?.slot ?? 'main'}>
-          <option value="main">สไลด์ใหญ่ด้านซ้าย (เลื่อน)</option>
-          <option value="side">ภาพเล็กด้านขวา (นิ่ง)</option>
-        </select>
+        <Select id="slide-slot" name="slot" defaultValue={v.slot ?? slide?.slot ?? 'main'} options={[{ value: 'main', label: 'สไลด์ใหญ่ด้านซ้าย (เลื่อน)' }, { value: 'side', label: 'ภาพเล็กด้านขวา (นิ่ง)' }]} />
       </Field>
       <Field label="ลำดับ" htmlFor="slide-order" error={errors.sortOrder}>
         <input id="slide-order" name="sortOrder" type="number" min={0} defaultValue={v.sortOrder ?? slide?.sortOrder ?? 10} />
@@ -100,23 +98,30 @@ export function PopupForm({ popup }: { popup: HomePopup }) {
       </Field>
       <Field label="ความกว้าง (px)" htmlFor="popup-width" error={errors.width} hint="จอเล็กกว่านี้จะย่อให้พอดีเอง · พิมพ์เองได้ 280–1200">
         <div className="flex gap-2">
-          <select aria-label="ความกว้างสำเร็จรูป" defaultValue={WIDTHS.some((w) => w.value === width) ? String(width) : ''} onChange={(e) => { const el = document.getElementById('popup-width') as HTMLInputElement | null; if (el && e.target.value) el.value = e.target.value; }} className="w-40!">
-            <option value="">กำหนดเอง</option>
-            {WIDTHS.map((w) => (
-              <option key={w.value} value={w.value}>
-                {w.label}
-              </option>
-            ))}
-          </select>
+          <Select
+            aria-label="ความกว้างสำเร็จรูป"
+            defaultValue={WIDTHS.some((w) => w.value === width) ? String(width) : ''}
+            onChange={(val) => {
+              const el = document.getElementById('popup-width') as HTMLInputElement | null;
+              if (el && val) el.value = val;
+            }}
+            className="w-40 shrink-0"
+            options={[{ value: '', label: 'กำหนดเอง' }, ...WIDTHS.map((w) => ({ value: String(w.value), label: w.label }))]}
+          />
           <input id="popup-width" name="width" type="number" min={280} max={1200} step={10} defaultValue={width} className="min-w-0 flex-1" />
         </div>
       </Field>
       <Field label="แสดงบ่อยแค่ไหน" htmlFor="popup-frequency" error={errors.frequency}>
-        <select id="popup-frequency" name="frequency" defaultValue={v.frequency ?? popup.frequency}>
-          <option value="once">ครั้งเดียว (จนกว่าจะแก้ป๊อปอัป)</option>
-          <option value="daily">วันละครั้ง</option>
-          <option value="always">ทุกครั้งที่เปิดหน้าแรก</option>
-        </select>
+        <Select
+          id="popup-frequency"
+          name="frequency"
+          defaultValue={v.frequency ?? popup.frequency}
+          options={[
+            { value: 'once', label: 'ครั้งเดียว (จนกว่าจะแก้ป๊อปอัป)' },
+            { value: 'daily', label: 'วันละครั้ง' },
+            { value: 'always', label: 'ทุกครั้งที่เปิดหน้าแรก' },
+          ]}
+        />
       </Field>
       <div className="flex flex-wrap items-center gap-2 sm:col-span-2">
         <Button type="submit" disabled={pending}>

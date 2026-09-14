@@ -6,6 +6,7 @@ import { ROLE_LABEL, ROLES } from '@/lib/auth/roles';
 import type { FormState } from '@/lib/validation/common';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
+import { Select } from '@/components/ui/select';
 
 export function AddUserForm() {
   const [state, action, pending] = useActionState<FormState, FormData>(addUser, {});
@@ -20,13 +21,7 @@ export function AddUserForm() {
         <input id="u-name" name="name" defaultValue={v.name} required aria-invalid={Boolean(errors.name)} />
       </Field>
       <Field label="สิทธิ์" htmlFor="u-role" error={errors.role} required>
-        <select id="u-role" name="role" defaultValue={v.role ?? 'staff'}>
-          {ROLES.map((r) => (
-            <option key={r} value={r}>
-              {ROLE_LABEL[r]}
-            </option>
-          ))}
-        </select>
+        <Select id="u-role" name="role" defaultValue={v.role ?? 'staff'} options={ROLES.map((r) => ({ value: r, label: ROLE_LABEL[r] }))} />
       </Field>
       <Field label="รหัสผ่าน" htmlFor="u-password" error={errors.password} required hint="อย่างน้อย 8 ตัวอักษร">
         <input id="u-password" name="password" type="password" autoComplete="new-password" required aria-invalid={Boolean(errors.password)} />

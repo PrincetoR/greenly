@@ -2,15 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { Check, ChevronDown, Search, X } from 'lucide-react';
-import { cn } from '@/lib/cn';
+import { Search, X } from 'lucide-react';
+import { Select } from '@/components/ui/select';
 import { SORT_OPTIONS, type SortValue } from './sort-options';
-import { CategorySelect } from './category-select';
 
 /**
  * แถบเครื่องมือหน้ารายการ: [หัวข้อว่ากำลังเปิดอะไร … ค้นหา · เรียงลำดับ] ในแถวเดียว
  * ค้นหาแบบพิมพ์แล้วมีผลทันที (หน่วง 300ms) ไม่มีปุ่มค้นหา
- * เรียงลำดับเป็น dropdown แบบเดียวกับเมนูบัญชี (ปุ่มมีพื้นหลังตอนเปิด) แทน <select> ของเบราว์เซอร์
+ * เรียงลำดับ/หมวดหมู่ (มือถือ) เป็น dropdown `Select` ของเราเอง (ปุ่มมีพื้นหลังตอนเปิด) แทน <select> ของเบราว์เซอร์
  * ทุกอย่างยังลงท้ายที่ URL query (q, sort) → แชร์ลิงก์/กด back ได้เหมือนเดิม
  */
 export function ListingToolbar({
@@ -63,10 +62,6 @@ export function ListingToolbar({
      * md: หัวข้อ = การ์ด 1 · [ค้นหา+เรียง] = การ์ด 2–3 แบ่งแบบเดียวกัน
      */
     <div className="flex flex-wrap items-center gap-2 md:grid md:grid-cols-3 md:gap-3 lg:grid-cols-4">
-      <div className="w-full md:hidden">
-        <CategorySelect options={categoryOptions} value={currentCategoryHref} />
-      </div>
-
       {/* หัวข้อ: กำลังเปิดอะไรอยู่ (ทั้งหมด / ชื่อหมวด / ผลค้นหา) + จำนวน */}
       {/* items-baseline: "24 รายการ" นั่งบนเส้นฐานเดียวกับหัวข้อ (ไม่ใช่กึ่งกลาง) */}
       <div className="flex h-10 min-w-0 basis-full items-baseline gap-2 md:col-span-1 md:basis-auto lg:col-span-2">
@@ -79,6 +74,11 @@ export function ListingToolbar({
         {description && <span className="hidden truncate text-sm text-muted lg:inline">· {description}</span>}
       </div>
 
+      {/* มือถือ: หมวดหมู่เป็น dropdown ใต้หัวข้อ (พี่ต่อสั่ง) — จอ md+ เป็นการ์ดแถบซ้าย */}
+      <div className="w-full md:hidden">
+        <Select size="bar" aria-label="หมวดหมู่" options={categoryOptions.map((o) => ({ value: o.href, label: o.label }))} value={currentCategoryHref} onChange={(href) => router.push(href)} />
+      </div>
+
       <div className="flex min-w-0 flex-1 basis-full items-center gap-2 md:col-span-2 md:grid md:grid-cols-[1fr_auto] md:gap-2">
       <div className="relative min-w-0 flex-1 md:flex-none">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" aria-hidden />
@@ -86,7 +86,7 @@ export function ListingToolbar({
           type="search"
           value={term}
           onChange={(e) => onType(e.target.value)}
-          placeholder="ค้นหาในรายการนี้"
+          placeholder="ค้นหาสินค้า"
           aria-label="ค้นหา"
           className="h-10 pr-9! pl-9! [&::-webkit-search-cancel-button]:hidden"
         />
@@ -106,82 +106,9 @@ export function ListingToolbar({
         )}
       </div>
 
-      <SortMenu value={sort} onChange={(v) => navigate(term, v)} />
+      {/* จองความกว้างเท่าข้อความยาวสุด ให้ปุ่มไม่เปลี่ยนขนาดตอนสลับตัวเลือก · เมนูชิดขวา */}
+      <Select fit size="bar" align="end" aria-label="เรียงลำดับ" options={SORT_OPTIONS} value={sort} onChange={(v) => navigate(term, v as SortValue)} className="shrink-0" menuClassName="w-44" />
       </div>
-    </div>
-  );
-}
-
-function SortMenu({ value, onChange }: { value: SortValue; onChange: (v: SortValue) => void }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const current = SORT_OPTIONS.find((o) => o.value === value) ?? SORT_OPTIONS[0];
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
-  return (
-    <div ref={ref} className="relative min-w-0">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-label={`เรียงลำดับ: ${current.label}`}
-        className={cn(
-          // ใช้ border จริง (อยู่ในกล่อง) ไม่ใช่ ring (วาดนอกกล่อง) ให้สูงเท่าช่องค้นหาเป๊ะ 40px
-          'flex h-10 w-full items-center gap-2 rounded-lg border border-line px-3 text-sm font-medium transition-colors hover:bg-surface-alt',
-          open ? 'bg-surface-alt' : 'bg-surface',
-        )}
-      >
-        {/* จองความกว้างเท่าข้อความยาวสุด (ซ่อนไว้) ให้ปุ่มไม่เปลี่ยนขนาดตอนสลับตัวเลือก */}
-        <span className="grid text-left">
-          {SORT_OPTIONS.map((o) => (
-            <span key={o.value} aria-hidden={o.value !== value} className={cn('col-start-1 row-start-1 whitespace-nowrap', o.value !== value && 'invisible')}>
-              {o.label}
-            </span>
-          ))}
-        </span>
-        <ChevronDown className={cn('size-4 text-muted transition-transform', open && 'rotate-180')} aria-hidden />
-      </button>
-
-      {open && (
-        <ul role="listbox" aria-label="เรียงลำดับ" className="absolute top-full right-0 z-30 mt-1 w-44 overflow-hidden rounded-card bg-surface p-1.5 shadow-lg border border-line">
-          {SORT_OPTIONS.map((o) => {
-            const on = o.value === value;
-            return (
-              <li key={o.value}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={on}
-                  onClick={() => {
-                    setOpen(false);
-                    onChange(o.value);
-                  }}
-                  className={cn('flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium hover:bg-surface-alt', on && 'text-brand')}
-                >
-                  <span className="flex-1">{o.label}</span>
-                  {on && <Check className="size-4" aria-hidden />}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { slugify, type FormState } from '@/lib/validation/common';
 import type { Category, Product } from '@/lib/types';
 import { Button, buttonStyles } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
+import { Select } from '@/components/ui/select';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Alert } from '@/components/ui/alert';
 import { ImageUploader } from './image-uploader';
@@ -91,16 +92,7 @@ export function ProductForm({ product, categories }: { product?: Product; catego
               <input id="stock" name="stock" type="number" min={0} defaultValue={v.stock ?? product?.stock ?? 0} aria-invalid={Boolean(errors.stock)} required />
             </Field>
             <Field label="หมวดหมู่" htmlFor="categoryId" error={errors.categoryId} required>
-              <select id="categoryId" name="categoryId" defaultValue={v.categoryId ?? product?.categoryId ?? ''} aria-invalid={Boolean(errors.categoryId)} required>
-                <option value="" disabled>
-                  เลือกหมวดหมู่
-                </option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <Select id="categoryId" name="categoryId" defaultValue={v.categoryId ?? product?.categoryId ?? ''} aria-invalid={Boolean(errors.categoryId)} placeholder="เลือกหมวดหมู่" options={categories.map((c) => ({ value: c.id, label: c.name }))} />
             </Field>
           </div>
         </Card>

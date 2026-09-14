@@ -2,6 +2,7 @@ import { changeOrderStatus } from '@/lib/actions/orders';
 import { NEXT_STATUS, TRANSITION_LABEL } from '@/lib/orders/labels';
 import { CARRIERS } from '@/lib/shipping/carriers';
 import type { Order, ShippingSettings } from '@/lib/types';
+import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { ConfirmButton } from '@/components/ui/confirm-button';
 
@@ -41,13 +42,7 @@ export function OrderActions({ order, shipping, back, compact = false }: { order
           <Hidden order={order} status="shipped" back={back} />
           <label className="text-xs font-medium">
             <span className={compact ? 'sr-only' : ''}>ขนส่ง</span>
-            <select name="carrier" defaultValue={order.shipment?.carrier ?? shipping.defaultCarrier} className={compact ? 'h-9! w-32!' : 'mt-1 h-9!'} aria-label="ขนส่ง">
-              {carriers.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            <Select size="sm" name="carrier" defaultValue={order.shipment?.carrier ?? shipping.defaultCarrier} className={compact ? 'w-32' : 'mt-1 w-full'} aria-label="ขนส่ง" options={carriers.map((c) => ({ value: c.id, label: c.name }))} />
           </label>
           <label className="text-xs font-medium">
             <span className={compact ? 'sr-only' : ''}>เลขพัสดุ</span>
@@ -61,12 +56,7 @@ export function OrderActions({ order, shipping, back, compact = false }: { order
               </label>
               <label className="text-xs font-medium">
                 ขนาดกล่อง
-                <select name="boxSize" defaultValue={order.shipment?.boxSize ?? ''} className="mt-1 h-9!">
-                  <option value="">ไม่ระบุ</option>
-                  {['A', 'B', 'C', 'D', 'E', 'ซองบับเบิล'].map((b) => (
-                    <option key={b}>{b}</option>
-                  ))}
-                </select>
+                <Select size="sm" name="boxSize" defaultValue={order.shipment?.boxSize ?? ''} className="mt-1 w-full" aria-label="ขนาดกล่อง" options={[{ value: '', label: 'ไม่ระบุ' }, ...['A', 'B', 'C', 'D', 'E', 'ซองบับเบิล'].map((b) => ({ value: b, label: b }))]} />
               </label>
             </>
           )}
@@ -88,11 +78,7 @@ export function OrderActions({ order, shipping, back, compact = false }: { order
           <Hidden order={order} status="returned" back={back} />
           <label className="text-xs font-medium">
             <span className={compact ? 'sr-only' : ''}>เหตุผลตีกลับ</span>
-            <select name="note" className={compact ? 'h-9! w-48!' : 'mt-1 h-9!'} aria-label="เหตุผลตีกลับ">
-              {RETURN_REASONS.map((r) => (
-                <option key={r}>{r}</option>
-              ))}
-            </select>
+            <Select size="sm" name="note" defaultValue={RETURN_REASONS[0]} className={compact ? 'w-48' : 'mt-1 w-full'} aria-label="เหตุผลตีกลับ" options={RETURN_REASONS.map((r) => ({ value: r, label: r }))} />
           </label>
           <Button type="submit" variant="secondary" size={size}>
             {TRANSITION_LABEL.returned}
