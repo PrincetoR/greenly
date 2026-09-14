@@ -28,14 +28,15 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
   const sides = side.slice(0, 2);
 
   /*
-   * โครงแบบ Shopee: แถบพื้นขาวสุดจอ (ต่อจากเส้นขอบล่างของ header — ไม่มีเส้นบนของตัวเอง) มีเส้นขอบล่าง
+   * โครงแบบ Shopee: แถบพื้นขาวสุดจอ (ต่อจากเส้นขอบล่างของ header — ไม่มีเส้นบนของตัวเอง) มีเส้นขอบล่าง · รูปชิดเส้น header เลยไม่เว้นบน (พี่ต่อสั่ง) เว้นล่าง 16
    * ข้างในจัดตามคอนเทนเนอร์ [สไลด์ใหญ่ 2 ส่วน | ภาพเล็ก 2 ช่องซ้อนแนวตั้ง 1 ส่วน] · สูงคงที่บนจอ md+ ให้ 2 ช่องขวารวมกันเท่าสไลด์พอดี
    * มือถือ: สไลด์เต็มแถว ภาพเล็กเรียง 2 คอลัมน์ข้างล่าง
    */
   return (
-    <div className={cn('mx-auto grid max-w-6xl gap-3 px-4 py-4', sides.length > 0 && 'md:h-[388px] md:grid-cols-[2fr_1fr]')}>
+    <div className={cn('mx-auto grid max-w-6xl gap-3 px-4 pb-4', sides.length > 0 && 'md:h-[372px] md:grid-cols-[2fr_1fr]')}>
       <section
-        className={cn('group relative aspect-[16/9] overflow-hidden rounded-lg bg-ink md:aspect-auto', sides.length === 0 ? 'md:aspect-[8/3]' : 'md:h-full')}
+        // มุมบนไม่มน — ชิดเส้น header พอดี
+        className={cn('group relative aspect-[16/9] overflow-hidden rounded-lg rounded-t-none bg-ink md:aspect-auto', sides.length === 0 ? 'md:aspect-[8/3]' : 'md:h-full')}
         aria-roledescription="carousel"
         aria-label="แบนเนอร์"
       onMouseEnter={() => setPaused(true)}
@@ -111,8 +112,8 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
 
       {sides.length > 0 && (
         <div className={cn('grid gap-3', sides.length === 2 ? 'grid-cols-2 md:grid-cols-1 md:grid-rows-2' : 'grid-cols-1')} aria-label="แบนเนอร์เล็ก">
-          {sides.map((b) => (
-            <SideBanner key={b.id} banner={b} />
+          {sides.map((b, i) => (
+            <SideBanner key={b.id} banner={b} flushTop={i === 0} />
           ))}
         </div>
       )}
@@ -121,7 +122,7 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
 }
 
 /** ภาพเล็กด้านขวา — นิ่ง คลิกได้ทั้งภาพ ข้อความ (ถ้ามี) ซ้อนมุมล่างซ้ายเหมือนสไลด์ */
-function SideBanner({ banner: b }: { banner: HeroSlide }) {
+function SideBanner({ banner: b, flushTop }: { banner: HeroSlide; flushTop: boolean }) {
   const body = (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -133,7 +134,8 @@ function SideBanner({ banner: b }: { banner: HeroSlide }) {
       </div>
     </>
   );
-  const cls = 'group/side relative block aspect-[2/1] overflow-hidden rounded-lg bg-ink md:aspect-auto md:h-full';
+  // ใบบนสุดชิดเส้น header → มุมบนไม่มน (เฉพาะจอ md+ ที่อยู่แถวเดียวกับสไลด์)
+  const cls = cn('group/side relative block aspect-[2/1] overflow-hidden rounded-lg bg-ink md:aspect-auto md:h-full', flushTop && 'md:rounded-t-none');
   if (!b.href) return <div className={cls}>{body}</div>;
   return b.href.startsWith('/') ? (
     <Link href={b.href} className={cls}>
