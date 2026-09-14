@@ -11,13 +11,13 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
   await page.goto(`${BASE}/`);
   ok((await page.locator('h2:has-text("โปรโมชันตอนนี้")').count()) === 1, 'home: promo strip');
   ok((await page.locator('article').count()) === 3, 'home: 3 live promo cards');
-  ok(await page.locator('code:has-text("SAVE100")').isVisible(), 'home: coupon code shown');
+  ok(await page.locator('article', { hasText: 'SAVE100' }).first().isVisible() && (await page.locator('article code').count()) === 0, 'home: coupon code in summary sentence (ไม่มีกล่องใช้โค้ด)');
   ok((await page.locator('text=เหลืออีก').count()) >= 3, 'home: countdown text');
   // drinks featured products show discounted price + badge
-  const kombucha = page.locator('.group', { hasText: 'คอมบูชา' }).first();
+  const kombucha = page.locator('.group:has(h3)', { hasText: 'คอมบูชา' }).first(); // :has(h3) = การ์ดสินค้า (สไลด์ก็เป็น .group)
   ok((await kombucha.locator('text=-20%').count()) === 1, 'card: -20% badge on drinks');
   ok((await kombucha.locator('text=฿76').count()) === 1 && (await kombucha.locator('text=฿95').count()) === 1, 'card: ฿95 → ฿76');
-  const granola = page.locator('.group', { hasText: 'กราโนล่า' }).first();
+  const granola = page.locator('.group:has(h3)', { hasText: 'กราโนล่า' }).first();
   ok((await granola.locator('text=ซื้อ 2 แถม 1').count()) === 1, 'card: bogo badge on snacks');
   await shot(page, 'p5-home');
 
@@ -73,7 +73,7 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
   }));
   fs.writeFileSync(ORDERS, JSON.stringify(fakeOrders, null, 2));
   await page.goto(`${BASE}/promotions`);
-  ok((await page.locator('code:has-text("SAVE100")').count()) === 0, 'coupon quota 50/50 → hidden from storefront');
+  ok((await page.locator('main article', { hasText: 'SAVE100' }).count()) === 0, 'coupon quota 50/50 → hidden from storefront');
   await login(page, 'admin');
   await page.goto(`${BASE}/admin/promotions`);
   ok(await page.locator('li', { hasText: 'SAVE100' }).locator('span:has-text("ครบสิทธิ์แล้ว")').first().isVisible(), 'admin: status ครบสิทธิ์แล้ว + progress');

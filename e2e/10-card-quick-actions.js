@@ -38,7 +38,7 @@ const read = (n) => JSON.parse(fs.readFileSync(`${DATA}/${n}.json`, 'utf8'));
   target.stock = 0;
   fs.writeFileSync(`${DATA}/products.json`, JSON.stringify(products, null, 2) + '\n');
   await page.goto(`${BASE}/products?q=น้ำผักผลไม้`);
-  const dead = page.locator('.group', { hasText: 'น้ำผักผลไม้' }).first().locator('button[aria-label="สินค้าหมด"]');
+  const dead = page.locator('.group:has(h3)', { hasText: 'น้ำผักผลไม้' }).first().locator('button[aria-label="สินค้าหมด"]');
   ok(await dead.isDisabled(), 'สินค้าหมด → ปุ่มใส่ตะกร้า disabled');
   target.stock = stock;
   fs.writeFileSync(`${DATA}/products.json`, JSON.stringify(products, null, 2) + '\n');

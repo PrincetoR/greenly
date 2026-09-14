@@ -55,14 +55,7 @@ export function PromoCard({
         </span>
       </div>
 
-      {promo.coupon && (
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-accent bg-accent-soft/50 px-3 py-2 text-sm">
-          <span className="text-muted">ใช้โค้ด</span>
-          <code className="rounded bg-surface px-2 py-0.5 font-mono text-base font-bold tracking-wider text-accent">{promo.coupon.code}</code>
-          <span className="text-muted">ตอนชำระเงิน</span>
-        </div>
-      )}
-
+      {/* ไม่มีกล่อง "ใช้โค้ด … ตอนชำระเงิน" แล้ว (พี่ต่อเอาออก — ทำให้การ์ดโปรอื่นในแถวเดียวกันสูงตาม) · โค้ดอยู่ในประโยคสรุปด้านบนอยู่แล้ว */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
         {live ? (
           <Countdown to={promo.endsAt} initial={humanCountdown(promo.endsAt, now)} />
