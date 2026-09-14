@@ -240,6 +240,26 @@
     border-color: var(--brand);
     background-color: color-mix(in srgb, var(--brand-soft) 40%, var(--surface));
   }
+  /*
+   * ช่องในแถวเลื่อนข้าง 2 แถว (หมวดหมู่/โปรโมชันหน้าแรก): วางตำแหน่งแถว/คอลัมน์ชัดเจนต่อ breakpoint (ตัวแปรจาก gridCell())
+   * ให้เรียง "ซ้ายไปขวาแล้วค่อยลงแถวล่าง" ทีละหน้า — ถ้าใช้ grid-flow-col จะเรียงลงคอลัมน์ก่อน (8 ใบได้ 4 คอลัมน์ ไม่ใช่แถวละ 8)
+   */
+  .hs-cell {
+    grid-row: var(--r-m);
+    grid-column: var(--c-m);
+  }
+  @media (min-width: 40rem) {
+    .hs-cell {
+      grid-row: var(--r-s);
+      grid-column: var(--c-s);
+    }
+  }
+  @media (min-width: 64rem) {
+    .hs-cell {
+      grid-row: var(--r-l);
+      grid-column: var(--c-l);
+    }
+  }
   /* แถบขาววิ่งบนเส้นเขียว 2px ตอนกำลังโหลดหน้า (TopLine) */
   .top-line-sweep {
     animation: top-line-sweep 1s linear infinite;

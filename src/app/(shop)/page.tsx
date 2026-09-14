@@ -7,6 +7,7 @@ import { getHomepage } from '@/lib/db/homepage';
 import { HeroSlider } from '@/components/shop/hero-slider';
 import { HeroHeaderSync } from '@/components/shop/hero-header-sync';
 import { HScroller } from '@/components/shop/h-scroller';
+import { gridCell } from '@/lib/grid-cell';
 import { SnapWheel } from '@/components/shop/snap-wheel';
 import { WelcomePopup } from '@/components/shop/welcome-popup';
 import { topProducts } from '@/lib/analytics/categories';
@@ -84,36 +85,30 @@ export default async function HomePage({ searchParams }: PageProps<'/'>) {
       )}
 
       {/*
-       * หมวดหมู่เป็นการ์ด แถวละ 8 (จอใหญ่) · มีรูปใช้รูป ไม่มีใช้ไอคอน (พี่ต่อสั่ง)
-       * มือถือ: 3 คอลัมน์ × 2 แถวต่อหน้า แล้วเลื่อนไปทางข้าง (grid-flow-col · แต่ละคอลัมน์กว้าง 1/3 ของช่อง) มีจุด/ขอบจางบอกว่าเลื่อนได้
+       * หมวดหมู่เป็นการ์ด 2 แถว เรียงซ้าย→ขวาแล้วลงแถวล่าง แล้วเลื่อนไปทางข้างทีละหน้า (พี่ต่อสั่ง): มือถือแถวละ 3 · แท็บเล็ต 4 · จอใหญ่ 8
+       * มีรูปใช้รูป ไม่มีใช้ไอคอน · HScroller ใส่จุดบอกหน้า/ขอบจาง/ปุ่มให้รู้ว่าเลื่อนได้
        */}
       <Section title="หมวดหมู่" href="/products">
-        <HScroller ariaLabel="หมวดหมู่" className="lg:hidden">
-          <ul className="grid auto-cols-[calc((100%-24px)/3)] grid-flow-col grid-rows-2 gap-3 sm:auto-cols-[calc((100%-36px)/4)]">
-            {categories.map((c) => (
-              <li key={c.id} className="snap-start">
+        <HScroller ariaLabel="หมวดหมู่">
+          {/* ไม่กำหนด grid-rows-2 — แถวที่ 2 เกิดเองเมื่อมีของ (ไม่งั้นแถวว่างกินที่เท่าแถวแรก) */}
+          <ul className="grid auto-cols-[calc((100%-24px)/3)] gap-3 sm:auto-cols-[calc((100%-36px)/4)] lg:auto-cols-[calc((100%-84px)/8)]">
+            {categories.map((c, i) => (
+              <li key={c.id} className="hs-cell snap-start" style={gridCell(i, { m: 3, s: 4, l: 8 })}>
                 <CategoryCard c={c} />
               </li>
             ))}
           </ul>
         </HScroller>
-        <ul className="hidden grid-cols-8 gap-3 lg:grid">
-          {categories.map((c) => (
-            <li key={c.id}>
-              <CategoryCard c={c} />
-            </li>
-          ))}
-        </ul>
       </Section>
 
       {/* โปรที่กำลังใช้งาน — โผล่/หายเองตามเวลาและ quota */}
       {live.length > 0 && (
         <Section title="โปรโมชันตอนนี้" description="ราคาโปรมีผลอัตโนมัติ ไม่ต้องทำอะไรเพิ่ม" href="/promotions">
-          {/* 3 ใบต่อหน้า (มือถือ 1 ใบ) เลื่อนข้างดูใบอื่น — มีจุด/ขอบจาง/ปุ่มบอกว่าเลื่อนได้ (พี่ต่อสั่ง) */}
+          {/* 2 แถว เรียงซ้าย→ขวาแล้วลงแถวล่าง: จอใหญ่ 2 ใบ/แถว (4 ใบ/หน้า) · มือถือ 1 ใบ/แถว (2 ใบ/หน้า) แล้วเลื่อนข้าง — มีจุด/ขอบจาง/ปุ่มบอกว่าเลื่อนได้ (พี่ต่อสั่ง) */}
           <HScroller ariaLabel="โปรโมชันตอนนี้">
-            <div className="grid auto-cols-[100%] grid-flow-col gap-3 md:auto-cols-[calc((100%-24px)/3)]">
-              {live.map((p) => (
-                <div key={p.id} className="h-full snap-start">
+            <div className="grid auto-cols-[100%] gap-3 sm:auto-cols-[calc((100%-12px)/2)]">
+              {live.map((p, i) => (
+                <div key={p.id} className="hs-cell h-full snap-start" style={gridCell(i, { m: 1, s: 2, l: 2 })}>
                   <PromoCard promo={p} status="live" usage={usage[p.id]} categories={categories} products={allProducts} now={now} />
                 </div>
               ))}
