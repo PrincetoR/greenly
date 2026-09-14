@@ -2,7 +2,7 @@
 
 ## TL;DR
 เว็บขายสินค้า + ระบบหลังบ้าน + โปรโมชันตั้งเวลา/จำกัดจำนวน · run local/demo · ข้อมูลเป็น JSON ใน `data/`
-Path: `~/Projects/e-commerce` · **build ครบ 8 phase แล้ว (2026-09-12)** · แผนเดิม: `~/.claude/plans/spicy-tumbling-frost.md`
+Path: `~/Projects/e-commerce` · GitHub: `PrincetoR/greenly` (main, push ด้วย `gh` ที่ login ไว้แล้ว) · **build ครบ 8 phase แล้ว (2026-09-12)** · แผนเดิม: `~/.claude/plans/spicy-tumbling-frost.md`
 Memory: `Brain/Memories/EcommercePrototype.md`
 
 ## Stack
