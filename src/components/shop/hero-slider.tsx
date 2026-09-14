@@ -101,8 +101,8 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
           <button type="button" onClick={() => go(index + 1)} aria-label="สไลด์ถัดไป" className="absolute top-1/2 right-3 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-ink opacity-0 transition-opacity hover:bg-white group-hover:opacity-100 focus-visible:opacity-100">
             <ChevronRight className="size-5" aria-hidden />
           </button>
-          {/* จุดบอกตำแหน่งอยู่มุมล่างขวา ไม่ทับข้อความที่อยู่ล่างซ้าย */}
-          <div className="absolute right-4 bottom-3 flex gap-1.5" role="tablist" aria-label="เลือกสไลด์">
+          {/* จุดบอกตำแหน่งกึ่งกลางด้านล่าง (พี่ต่อสั่ง) — ข้อความอยู่ล่างซ้าย เว้นที่ไว้แล้ว (pb-9/pb-10) */}
+          <div className="absolute inset-x-0 bottom-3 flex justify-center gap-1.5" role="tablist" aria-label="เลือกสไลด์">
             {slides.map((s, i) => (
               <button key={s.id} type="button" role="tab" aria-selected={i === index} aria-label={`สไลด์ ${i + 1}`} onClick={() => go(i)} className={cn('h-2 rounded-full transition-all', i === index ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/80')} />
             ))}
