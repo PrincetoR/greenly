@@ -40,8 +40,9 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   const hb = () => page.evaluate(() => getComputedStyle(document.querySelector('header')).borderBottomColor);
   const fade = () => page.evaluate(() => Number(document.querySelector('[data-hero-content]').style.opacity));
   ok((await hb()) === 'rgba(0, 0, 0, 0)' && (await fade()) === 1, 'อยู่บนสุด: เส้นล่าง header โปร่ง · แบนเนอร์ชัด 100%');
-  // ปิด snap ชั่วคราวเพื่อวัดค่ากลางทาง (ของจริงเห็นตอนลากทัชแพด/ระหว่างแอนิเมชัน snap)
+  // ปิด snap/การเกลี่ยชั่วคราวเพื่อวัดค่ากลางทาง (ของจริงเห็นตอนลากทัชแพด/ระหว่างแอนิเมชัน)
   await page.addStyleTag({ content: 'html{scroll-snap-type:none!important}' });
+  await page.evaluate(() => (document.documentElement.dataset.noSettle = ''));
   const bandH = await page.evaluate(() => document.querySelector('[data-hero-band]').getBoundingClientRect().height);
   await page.evaluate((y) => window.scrollTo(0, y), Math.round(bandH * 0.15));
   await page.waitForTimeout(150);
@@ -62,7 +63,7 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(300);
   ok((await fade()) === 1 && (await hb()) === 'rgba(0, 0, 0, 0)', 'กลับบนสุด: ชัด 100% เส้นโปร่งอีกครั้ง');
-  // ล้อเมาส์นิดเดียว (30px) → ไปกลุ่มถัดไปทันที · หมุนกลับ → กลุ่มก่อนหน้า
+  // ล้อเมาส์นิดเดียว (30px) → พอหยุดหมุน เกลี่ยไปกลุ่มถัดไป · หมุนกลับ → กลุ่มก่อนหน้า
   await page.reload();
   await page.waitForTimeout(900);
   await page.keyboard.press('Escape');

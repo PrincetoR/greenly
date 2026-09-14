@@ -31,7 +31,8 @@ export function SnapWheel() {
     };
 
     const settle = () => {
-      if (!active() || settling) return;
+      // data-no-settle ที่ <html> = ปิดการเกลี่ยชั่วคราว (e2e ใช้วัดตำแหน่งกลางทาง)
+      if (!active() || settling || root.dataset.noSettle !== undefined) return;
       const y = window.scrollY;
       const dir = Math.sign(y - lastY);
       lastY = y;
