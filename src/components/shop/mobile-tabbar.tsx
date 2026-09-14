@@ -21,7 +21,7 @@ const ADMIN_TAB: Tab = { href: '/admin', label: 'การจัดการ', i
  * แถบเมนูล่างบนมือถือ (พี่ต่อสั่ง 2026-09-15): หน้าแรก · สินค้าทั้งหมด · [ค้นหา] · โปรโมชัน · โปรไฟล์ — ไอคอนล้วนไม่มีชื่อ · แสดงทั้งหน้าร้านและหลังบ้าน (layout ทั้งสอง render)
  * ปุ่มค้นหาตรงกลาง = วงกลม 64 ลอยเหนือแถบ โผล่พ้นเส้น 40% (26px — พี่ต่อขยับจาก 30%) · พื้นแถบเจาะรูรอบวงกลมเว้นช่อง 6px (mask ใน globals `.tabbar-bg`)
  *   ให้ดูเหมือนวงกลมลอยไม่ติดกับแถบ (พี่ต่อสั่ง 2026-09-15) · กดแล้วไป /search (ช่องค้นหาทั้งเว็บ) · อยู่ /search แล้วโฟกัสช่องเลย
- * หน้า /search ซ่อนแถบนี้ (มีแค่ header + ช่องค้นหา — พี่ต่อสั่ง)
+ * หน้า /search ยังมีแถบนี้ (พี่ต่อขอ) — ซ่อน footer เว็บอย่างเดียว
  * ช่องขวาสุด: guest = โปรไฟล์ · login หลังบ้าน (staff/admin) = การจัดการ (/admin)
  * หน้าสินค้าไม่แสดง — มีแถบ [ใส่ตะกร้า · หัวใจ] ติดล่างแทน (แบบ Shopee/Lazada) ไม่งั้นวงกลมค้นหาทับปุ่ม
  * ตัวเว้นที่ (spacer) สูงเท่าแถบอยู่ท้าย layout ให้ footer ไม่ถูกทับ
@@ -29,9 +29,12 @@ const ADMIN_TAB: Tab = { href: '/admin', label: 'การจัดการ', i
 export function MobileTabBar({ staff = false }: { staff?: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
-  if (pathname.startsWith('/product/') || pathname === '/search') return null;
+  if (pathname.startsWith('/product/')) return null;
 
-  const search = () => router.push('/search');
+  const search = () => {
+    if (pathname === '/search') document.querySelector<HTMLInputElement>('input[aria-label="ค้นหาทั้งเว็บ"]')?.focus();
+    else router.push('/search');
+  };
 
   const item = (t: Tab) => {
     const on = t.active(pathname);

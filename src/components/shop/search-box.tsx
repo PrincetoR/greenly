@@ -2,11 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { ArrowLeft, Search, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 
 /**
  * ช่องค้นหาทั้งเว็บ (หน้า /search — พี่ต่อสั่ง 2026-09-15): text box เปล่า ๆ โฟกัสทันที พิมพ์แล้วผลขึ้นเอง (หน่วง 300ms → ?q= ให้ server render ผล)
- * ปุ่มย้อนกลับซ้าย (มือถือ — แถบเมนูล่างซ่อนอยู่ในหน้านี้) · กากบาทล้างคำค้น
+ * ไม่มีปุ่มย้อนกลับ — นำทางด้วยแถบเมนูล่าง (พี่ต่อสั่ง) · กากบาทล้างคำค้น
  */
 export function SearchBox({ q }: { q: string }) {
   const router = useRouter();
@@ -29,9 +29,6 @@ export function SearchBox({ q }: { q: string }) {
 
   return (
     <div className="flex items-center gap-2">
-      <button type="button" onClick={() => (window.history.length > 1 ? router.back() : router.push('/'))} aria-label="ย้อนกลับ" className="flex size-10 shrink-0 items-center justify-center rounded-full text-ink hover:bg-surface-alt md:hidden">
-        <ArrowLeft className="size-5" aria-hidden />
-      </button>
       <div className="relative min-w-0 flex-1">
         <Search className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted" aria-hidden />
         <input

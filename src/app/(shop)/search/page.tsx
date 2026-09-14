@@ -36,7 +36,7 @@ export default async function SearchPage({ searchParams }: PageProps<'/search'>)
   const none = q && promos.length === 0 && products.length === 0;
 
   return (
-    // data-search-page: globals.css ซ่อน footer เว็บ + แถบเมนูล่างซ่อนเอง — หน้ามีแค่ header กับช่องค้นหา (พี่ต่อสั่ง)
+    // data-search-page: globals.css ซ่อน footer เว็บ — หน้ามีแค่ header กับช่องค้นหา (+ แถบเมนูล่างมือถือ — พี่ต่อขอให้คงไว้)
     <div data-search-page className="mx-auto max-w-6xl px-4 py-4 pb-10">
       <SearchBox q={q} />
 

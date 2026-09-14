@@ -139,11 +139,11 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   await page.waitForTimeout(300);
   ok((await page.evaluate(() => document.querySelector('footer').getBoundingClientRect().bottom)) <= 800 - 56 + 0.5, 'mobile: เลื่อนสุดแล้ว footer ไม่ถูกแถบเมนูทับ');
   await page.screenshot({ path: SHOT + '/p3-mobile-tabbar.png', caret: 'initial' });
-  // ค้นหาทั้งเว็บ (พี่ต่อสั่ง 2026-09-15): ปุ่มค้นหา → /search มีแค่ header + ช่องค้นหา (ไม่มีแถบล่าง/footer) · พิมพ์แล้วโชว์ โปรโมชัน ก่อน สินค้า แยกหัวเรื่อง
+  // ค้นหาทั้งเว็บ (พี่ต่อสั่ง 2026-09-15): ปุ่มค้นหา → /search มีแค่ header + ช่องค้นหา (ไม่มี footer · ไม่มีลูกศรย้อนกลับ · แถบล่างยังอยู่) · พิมพ์แล้วโชว์ โปรโมชัน ก่อน สินค้า แยกหัวเรื่อง
   await page.click('nav[aria-label="เมนูมือถือ"] button[aria-label="ค้นหา"]');
   await page.waitForURL(/\/search$/);
   await page.waitForLoadState('networkidle');
-  ok((await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))) === 'ค้นหาทั้งเว็บ' && (await page.locator('nav[aria-label="เมนูมือถือ"]').count()) === 0 && !(await page.locator('footer').isVisible()) && (await page.locator('main h2').count()) === 0, 'mobile: /search = header + ช่องค้นหาเปล่า โฟกัสแล้ว ไม่มีแถบล่าง/footer');
+  ok((await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))) === 'ค้นหาทั้งเว็บ' && (await page.locator('nav[aria-label="เมนูมือถือ"]').isVisible()) && (await page.locator('main button[aria-label="ย้อนกลับ"]').count()) === 0 && !(await page.locator('footer').isVisible()) && (await page.locator('main h2').count()) === 0, 'mobile: /search = header + ช่องค้นหาเปล่า โฟกัสแล้ว · แถบล่างยังอยู่ · ไม่มีลูกศรย้อนกลับ/footer');
   await page.keyboard.type('ลด');
   await page.waitForURL(/q=/);
   await page.waitForLoadState('networkidle');
