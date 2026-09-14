@@ -14,7 +14,7 @@ Next.js 16 (App Router · Server Components · Server Actions · `proxy.ts` แ�
 npm run dev         # http://localhost:3000  · หลังบ้าน /admin
 npm run build && npm run lint && npm run typecheck
 npm run test        # node --test ผ่าน tsx — pricing engine 28 + analytics 13 tests
-npm run seed        # reset ข้อมูลสาธิตทั้งหมด (ทับ orders ด้วยประวัติสาธิต 24 เดือน ~640 ใบ deterministic)
+npm run seed        # reset ข้อมูลสาธิตทั้งหมด (ทับ orders+payments ด้วยประวัติสาธิต 24 เดือน ~625 ใบ deterministic — ทุกใบมี payment/shipment/history)
 npm run seed:clean  # orders ว่าง — e2e ใช้ (เทสต์นับออเดอร์/เลขที่ OD-…-0001) · รันไฟล์ e2e เดี่ยวต้อง seed:clean ก่อน · run-all จบแล้ว seed เต็มคืน
 npm run e2e         # Playwright + Chrome ในเครื่อง (channel chrome) · ต้องมี dev server · BASE=... เปลี่ยน port ได้
 ```
@@ -25,7 +25,7 @@ npm run e2e         # Playwright + Chrome ในเครื่อง (channel c
 data/                 JSON database (commit seed ไว้)
 public/uploads/       รูปที่อัปโหลด (gitignore) · seed/ = placeholder SVG (commit)
 scripts/seed.ts       สร้างข้อมูลสาธิต
-e2e/                  01–14 ไฟล์ทดสอบ + lib.js + run-all.js · shots/ ไม่ commit
+e2e/                  01–15 ไฟล์ทดสอบ + lib.js + run-all.js · shots/ ไม่ commit
 src/proxy.ts          กัน /admin/* (ยกเว้น /admin/login, /admin/forbidden)
 src/lib/types.ts      domain types ทั้งหมด — pure, ไม่ import อะไร
 src/lib/money.ts      เงินเป็นสตางค์ integer · formatBaht/toSatang ที่เดียว
@@ -35,6 +35,15 @@ src/lib/auth/         password (scrypt) · token (HMAC, ใช้ใน proxy �
 src/lib/pricing/      quote() pure · status · usage (นับจาก orders) · quote.test.ts
 src/lib/promotions/   describe (ประโยคสรุป) · service (loadPromotionContext)
 src/lib/analytics/    สถิติแดชบอร์ด pure: periods (ช่วง วัน/เดือน/ปี เวลาไทย) · sales · promotions (uplift) · categories (+topProducts) · analytics.test.ts
+src/lib/orders/labels ป้าย/สี/hint ของสถานะ · NEXT_STATUS (transition) · TRANSITION_LABEL (กริยาบนปุ่ม) · ป้ายช่องทาง/สถานะชำระ
+src/lib/shipping/     carriers (8 ขนส่ง + trackUrl + pattern เลขพัสดุ) · tracking (ไทม์ไลน์จำลองตามชั่วโมงหลังส่ง · isMockDelivered ≥ 44 ชม. · guessProvince)
+src/lib/payments/     beam.ts pure (10 ช่องทาง + ค่าธรรมเนียมตัวอย่าง + BEAM_FEATURES + beamFee/availableChannels) · service.ts server (startBeamPayment / settleMockPayment / refundPayment)
+src/lib/db/payments   ledger data/payments.json (1 ออเดอร์มีได้หลายรายการ: failed แล้วลองใหม่)
+src/app/(pay)/pay/[id]  hosted checkout ของ Beam (จำลอง) — layout แยกไม่มี header ร้าน · components/pay/beam-checkout.tsx
+src/app/api/payments/beam/webhook  POST รับ payment.succeeded/failed (mock — ยังไม่ตรวจลายเซ็น)
+src/app/admin/(app)/shipping   คิวจัดส่ง (tabs รอแพ็ค/กำลังแพ็ค/ระหว่างส่ง/ตีกลับ/ตั้งค่า) · components/admin/shipping-queue.tsx (เลือกหลายใบ) · order-actions.tsx (ฟอร์ม transition ใช้ร่วมกับหน้ารายละเอียด)
+src/app/admin/(print)/shipping/labels  ใบปะหน้ากล่อง ?ids=a,b (layout แยก ไม่มี chrome · @media print ใน globals.css)
+src/app/admin/(app)/payments   ledger Beam: ภาพรวม/รายการ+คืนเงิน/ตั้งค่า (permission payment.manage = admin)
 src/lib/cart/         storage (ตะกร้า+คูปองใน data/carts.json ผูก guest id) · service (loadCart → quote)
 src/lib/guest.ts      guest id cookie `ec_guest` 1 ปี — ตัวตนลูกค้าแบบไม่ต้อง login (readGuestId / ensureGuestId ใน action เท่านั้น)
 src/lib/wishlist/     รายการโปรดผูก guest id (data/wishlists.json) · WishlistButton optimistic
@@ -50,10 +59,13 @@ src/app/(shop)/       หน้าร้าน · src/app/admin/(app)/ หลั
 - ราคาเก็บเป็น **สตางค์** เสมอ แปลงตอนแสดงผลด้วย `formatBaht()`
 - **ราคาทุกที่ต้องมาจาก `quote()`/`displayPrice()`** ห้ามคิดส่วนลดเองใน component
 - usage ของโปรโมชัน **คำนวณจาก orders** (ไม่นับ cancelled) ไม่มี counter แยก
+- **วงจรออเดอร์** `pending → paid(รอแพ็ค) → packing → shipped → done` · `shipped → returned → packing(ส่งใหม่) | cancelled` · ยกเลิกได้ก่อนส่ง · **การคืนเงินอยู่ที่ payment ไม่ใช่สถานะออเดอร์** (ยกเลิกออเดอร์ที่จ่าย Beam แล้ว → refund อัตโนมัติ) · shipped ต้องมีขนส่ง+เลขพัสดุ · returned ต้องมีเหตุผล · done ปิด COD = เก็บเงินแล้ว · ทุกอย่างผ่าน `changeOrderStatus` + `order.history`
+- **payment**: `paymentMethod` = beam | cod (ไม่มี transfer แล้ว) · `order.payment` สรุป · Beam จริง = hosted checkout + webhook; mock = หน้า /pay ให้กด "จำลองสำเร็จ/ไม่สำเร็จ" · pending order ที่จ่าย Beam ล้มเหลว/หมดอายุ → ลูกค้ากด "ชำระเงินตอนนี้" สร้างรายการใหม่ (`payOrder`)
+- **แยกเมนู "จัดส่ง" ออกจาก "คำสั่งซื้อ"** (พี่ต่อถามว่าควรแยกไหม): คำสั่งซื้อ = มุมมองบริการลูกค้า/การเงิน (ทุกสถานะ ค้นหา รายละเอียด) · จัดส่ง = มุมมองคลัง (คิวงานเป็นขั้น + bulk) — ข้อมูลชุดเดียวกัน
 - "ลูกค้า 1 คน" = เบอร์โทรตอน checkout (`normalizeCustomerKey`) · **ตัวตนข้ามการเปิด/ปิด = guest id** (`order.guestIds` มีได้หลายเครื่องหลัง claim ด้วยเลขที่+เบอร์)
 - หน้า `/order/[no]` เปิดได้เฉพาะ guest ที่อยู่ใน `guestIds` ไม่งั้นต้องกรอกเบอร์ก่อน (กันเดาเลขดูที่อยู่)
 - ทุก server action ตรวจสิทธิ์เอง (proxy กันแค่ชั้นแรก)
-- ฟอร์มที่ใช้ `useActionState`: เมื่อ validation ไม่ผ่านต้องคืน `values: formValues(formData)` และ input ใช้ `defaultValue={v.x ?? ...}` — เพราะ React รีเซ็ตฟอร์มหลัง action จบ
+- ฟอร์มที่ใช้ `useActionState`: เมื่อ validation ไม่ผ่านต้องคืน `values: formValues(formData)` และ input ใช้ `defaultValue={v.x ?? ...}` — เพราะ React รีเซ็ตฟอร์มหลัง action จบ · **radio ที่ควบคุมด้วย state ก็หลุดหลังรีเซ็ต** (checked prop ไม่เปลี่ยนเลยไม่ถูกเขียนกลับ) → ส่งค่าจริงผ่าน hidden input + ref ซิงก์ `el.checked` (checkout-form วิธีชำระ)
 - client component ที่ใช้เวลาปัจจุบัน ให้รับ `serverNow`/`initial` จาก server เพื่อกัน hydration mismatch
 - **ห้ามใช้ emoji เป็นไอคอน** (พี่ต่อไม่เอา) ใช้ `lucide-react` · ไอคอนเมนูหลังบ้านเป็นชื่อใน roles.ts map ที่ `components/admin/icons.tsx` · ไอคอนประเภทโปรที่ `components/shop/promo-type-icon.tsx`
 - **ไม่ใส่ลูกศร →/← ท้ายหรือหน้าเมนู/ลิงก์/ปุ่ม** (พี่ต่อสั่งเอาออกทั้งหมด)
