@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { SearchX } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import type { Category, Product } from '@/lib/types';
+import { countActiveByCategory } from '@/lib/db/products';
 import { ProductCard, ProductGrid } from './product-card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { buttonStyles } from '@/components/ui/button';
@@ -13,9 +14,9 @@ export { SORT_OPTIONS, parseSort, type SortValue } from './sort-options';
 /**
  * หน้ารายการสินค้า ใช้ร่วมกันระหว่าง /products และ /category/[slug]
  * ตัวกรองทั้งหมดเป็น GET query → แชร์ลิงก์ได้ กด back ได้ ไม่ต้องมี client state
- * หมวดหมู่: จอ md+ เป็น card แถบข้างซ้าย · มือถือเป็น dropdown ในแถวเดียวกับช่องค้นหา
+ * หมวดหมู่: จอ md+ เป็น card แถบข้างซ้าย (ชื่อ + จำนวนสินค้าชิดขวา — พี่ต่อสั่ง 2026-09-15) · มือถือเป็น dropdown ใต้หัวข้อ
  */
-export function ProductListing({
+export async function ProductListing({
   title,
   description,
   products,
@@ -45,9 +46,11 @@ export function ProductListing({
     return s ? `?${s}` : '';
   };
 
+  // จำนวน = สินค้าที่เปิดขายทั้งหมดในหมวด (ไม่ใช่ผลค้นหา) ให้ตัวเลขนิ่งตอนพิมพ์ค้น
+  const counts = await countActiveByCategory();
   const links = [
-    { href: `/products${query({})}`, label: 'ทั้งหมด', active: !current },
-    ...categories.map((c) => ({ href: `/category/${c.slug}${query({})}`, label: c.name, active: current?.id === c.id })),
+    { href: `/products${query({})}`, label: 'ทั้งหมด', count: counts.all, active: !current },
+    ...categories.map((c) => ({ href: `/category/${c.slug}${query({})}`, label: c.name, count: counts.byCategory[c.id] ?? 0, active: current?.id === c.id })),
   ];
   const currentHref = links.find((l) => l.active)?.href ?? links[0].href;
 
@@ -73,9 +76,11 @@ export function ProductListing({
                 <Link
                   href={l.href}
                   aria-current={l.active ? 'page' : undefined}
-                  className={cn('block rounded-lg px-3 py-1.5 text-[15px] font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
+                  className={cn('flex items-center gap-2 rounded-lg px-3 py-1.5 text-[15px] font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
                 >
-                  {l.label}
+                  <span className="min-w-0 flex-1 truncate">{l.label}</span>
+                  {/* จำนวนสินค้าชิดขวาแถวเดียวกับชื่อ */}
+                  <span className={cn('shrink-0 text-xs tabular-nums', l.active ? 'text-brand/80' : 'text-muted')}>{l.count}</span>
                 </Link>
               </li>
             ))}

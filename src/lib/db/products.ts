@@ -41,6 +41,14 @@ export async function listProducts(query: ProductQuery = {}): Promise<Product[]>
   }
 }
 
+/** จำนวนสินค้าที่เปิดขายต่อหมวด (ตัวเลขท้ายชื่อหมวดใน card หมวดหมู่) · `all` = รวมทุกหมวด */
+export async function countActiveByCategory(): Promise<{ all: number; byCategory: Record<string, number> }> {
+  const items = (await readCollection<Product>(NAME)).filter((p) => p.active);
+  const byCategory: Record<string, number> = {};
+  for (const p of items) byCategory[p.categoryId] = (byCategory[p.categoryId] ?? 0) + 1;
+  return { all: items.length, byCategory };
+}
+
 export async function findProduct(id: string): Promise<Product | undefined> {
   return (await readCollection<Product>(NAME)).find((p) => p.id === id);
 }

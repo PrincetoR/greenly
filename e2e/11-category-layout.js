@@ -22,6 +22,9 @@ const { BASE, launch, ok, shot, pick } = require('./lib');
   ok((await page.locator('[role=listbox] [role=option]').allTextContents()).join('|') === 'ใหม่ล่าสุด|ราคาต่ำไปสูง|ราคาสูงไปต่ำ', 'เรียงลำดับ 3 ตัวเลือก');
   await page.keyboard.press('Escape');
   ok((await page.textContent('main aside nav p')).trim() === 'หมวดหมู่สินค้า', 'บรรทัดแรกของ card = หมวดหมู่สินค้า');
+  // จำนวนสินค้าชิดขวาแถวเดียวกับชื่อหมวด สีจางกว่าชื่อ (พี่ต่อสั่ง 2026-09-15) · ทั้งหมด = 30 (seed)
+  const cnt = await page.evaluate(() => [...document.querySelectorAll('main aside nav ul a')].map((a) => { const [n, c] = a.querySelectorAll('span'); const ar = a.getBoundingClientRect(); return { label: n.textContent, count: c.textContent, sameRow: Math.abs(n.getBoundingClientRect().top - c.getBoundingClientRect().top) < 8, right: ar.right - c.getBoundingClientRect().right, lighter: getComputedStyle(c).color !== getComputedStyle(n).color }; }));
+  ok(cnt[0].label === 'ทั้งหมด' && cnt[0].count === '30' && cnt.every((r) => r.sameRow && Math.abs(r.right - 12) < 0.5 && r.lighter && /^\d+$/.test(r.count)), `card หมวด: จำนวนชิดขวาแถวเดียวกับชื่อ สีจาง (ทั้งหมด ${cnt[0].count})`);
   ok(await page.locator('main h1:has-text("สินค้าทั้งหมด")').isVisible(), 'หัวข้อ "สินค้าทั้งหมด" อยู่ในแถวเดียวกับค้นหา/เรียงลำดับ');
   const h1Box = await page.locator('main h1').boundingBox();
   const sortBox = await page.locator('main [role=combobox][aria-label="เรียงลำดับ"]').boundingBox();
