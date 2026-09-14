@@ -57,5 +57,6 @@ export function ProductCard({
 
 export function ProductGrid({ children, snap = false }: { children: React.ReactNode; snap?: boolean }) {
   // snap: ให้ scroll หยุดตรงขอบบนของแถวการ์ดพอดี (ใช้ในหน้ารายการที่มีแถบ sticky)
-  return <div className={`grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4${snap ? ' snap-rows' : ''}`}>{children}</div>;
+  // gap 12px ทุกจอ (พี่ต่อสั่ง: ระหว่างการ์ดด้วยกันทั้งหมด 12) — แถบเครื่องมือหน้ารายการใช้ gap เดียวกันให้คอลัมน์ตรง
+  return <div className={`grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4${snap ? ' snap-rows' : ''}`}>{children}</div>;
 }

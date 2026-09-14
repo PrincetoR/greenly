@@ -58,7 +58,7 @@ export default async function HomePage() {
 
       {/* หมวดหมู่เป็นการ์ด แถวละ 8 (จอใหญ่) · มีรูปใช้รูป ไม่มีใช้ไอคอน (พี่ต่อสั่ง) */}
       <Section title="หมวดหมู่" href="/products">
-        <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-8">
+        <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-8">
           {categories.map((c) => (
             <li key={c.id}>
               <Link href={`/category/${c.slug}`} className="group flex h-full flex-col items-center gap-2 rounded-card bg-surface p-3 text-center border border-line transition-colors hover:border-brand hover:bg-brand-soft/40">

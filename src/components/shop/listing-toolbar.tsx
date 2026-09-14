@@ -57,12 +57,12 @@ export function ListingToolbar({
 
   return (
     /*
-     * จอ md+: ใช้ grid คอลัมน์เดียวกับกริดสินค้า (md 3 / lg 4 คอลัมน์ gap 16) ให้ทุกขอบตรงกับการ์ด
+     * จอ md+: ใช้ grid คอลัมน์เดียวกับกริดสินค้า (md 3 / lg 4 คอลัมน์ gap 12) ให้ทุกขอบตรงกับการ์ด
      * lg: หัวข้อ = การ์ด 1–2 · [ค้นหา+เรียง] = การ์ด 3–4: เรียงลำดับกว้างตามข้อความที่ยาวสุด (ไม่ตัดคำ)
      *     ค้นหากินที่เหลือ เริ่มขอบซ้ายการ์ด 3 · ขอบขวาเรียงลำดับ = ขอบขวาการ์ด 4
      * md: หัวข้อ = การ์ด 1 · [ค้นหา+เรียง] = การ์ด 2–3 แบ่งแบบเดียวกัน
      */
-    <div className="flex flex-wrap items-center gap-2 md:grid md:grid-cols-3 md:gap-4 lg:grid-cols-4">
+    <div className="flex flex-wrap items-center gap-2 md:grid md:grid-cols-3 md:gap-3 lg:grid-cols-4">
       <div className="w-full md:hidden">
         <CategorySelect options={categoryOptions} value={currentCategoryHref} />
       </div>
