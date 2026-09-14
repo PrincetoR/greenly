@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { Alert } from '@/components/ui/alert';
 
-export function LoginForm({ next }: { next?: string }) {
+export function LoginForm({ next, autoFocus = true }: { next?: string; autoFocus?: boolean }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(login, {});
 
   return (
@@ -14,7 +14,7 @@ export function LoginForm({ next }: { next?: string }) {
       {next && <input type="hidden" name="next" value={next} />}
       {state.error && <Alert tone="danger">{state.error}</Alert>}
       <Field label="ชื่อผู้ใช้" htmlFor="username">
-        <input id="username" name="username" autoComplete="username" required autoFocus />
+        <input id="username" name="username" defaultValue={state.username ?? ''} autoComplete="username" required autoFocus={autoFocus} />
       </Field>
       <Field label="รหัสผ่าน" htmlFor="password">
         <input id="password" name="password" type="password" autoComplete="current-password" required />

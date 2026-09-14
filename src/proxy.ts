@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { canAccessPath } from '@/lib/auth/roles';
+import { canAccessPath, isStaffRole } from '@/lib/auth/roles';
 import { decodeToken } from '@/lib/auth/token';
 
 const SESSION_COOKIE = 'ec_session';
@@ -20,6 +20,8 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // ลูกค้าที่ login (หน้าโปรไฟล์) หลงเข้า /admin → ส่งกลับโปรไฟล์ ไม่ใช่หน้า forbidden
+  if (!isStaffRole(session.role)) return NextResponse.redirect(new URL('/account', request.url));
   if (!canAccessPath(session.role, pathname)) {
     return NextResponse.redirect(new URL('/admin/forbidden', request.url));
   }

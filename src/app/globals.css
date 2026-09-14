@@ -81,6 +81,18 @@
     overscroll-behavior: none;
   }
   /*
+   * พื้นแถบเมนูล่างมือถือ: เจาะรูวงกลมรอบปุ่มค้นหา — ปุ่ม 64px อยู่ที่ -26px (โผล่ 40%) → จุดศูนย์กลางอยู่ 6px ใต้ขอบบน
+   * รัศมีรู = 32 + ช่องว่าง 6 = 38 ให้วงกลมดูลอย ไม่ติดแถบ (พี่ต่อสั่ง)
+   */
+  /* หน้า /search มีแค่ header + ช่องค้นหา — ซ่อน footer เว็บ (page เป็น server component ไม่รู้ pathname เลยใช้ :has) */
+  body:has([data-search-page]) footer {
+    display: none;
+  }
+  .tabbar-bg {
+    -webkit-mask: radial-gradient(circle at 50% 6px, transparent 38px, #000 38.5px);
+    mask: radial-gradient(circle at 50% 6px, transparent 38px, #000 38.5px);
+  }
+  /*
    * ห้ามลาก "คลุมดำ" ตัวหนังสือทั้งเว็บ (พี่ต่อสั่ง) — ยกเว้นช่องกรอกและตัวเลขที่ต้องก๊อป (เลขออเดอร์/พัสดุ/โค้ดที่เป็น <code>) และ .selectable
    */
   body {

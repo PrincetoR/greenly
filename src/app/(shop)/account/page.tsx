@@ -1,38 +1,39 @@
 import Link from 'next/link';
-import { Heart, Package, ShoppingCart, User } from 'lucide-react';
+import { Heart, LayoutDashboard, LogOut, Package, ShoppingCart } from 'lucide-react';
 import { readGuestId } from '@/lib/guest';
+import { getSession } from '@/lib/auth/session';
+import { ROLE_LABEL, isStaffRole } from '@/lib/auth/roles';
+import { logoutToAccount } from '@/lib/actions/auth';
+import { AccountPanel } from '@/components/shop/account-panel';
 import { listOrdersByGuest } from '@/lib/db/orders';
 import { readMyWishlist } from '@/lib/wishlist/storage';
 import { readCart, cartCount } from '@/lib/cart/storage';
 import { formatBaht } from '@/lib/money';
 import { formatDate } from '@/lib/datetime';
 import { Card, CardHeader } from '@/components/ui/card';
-import { buttonStyles } from '@/components/ui/button';
+import { Button, buttonStyles } from '@/components/ui/button';
 
 export const metadata = { title: 'โปรไฟล์' };
 
 /**
- * หน้าโปรไฟล์ของลูกค้าแบบไม่ต้อง login — สรุปสิ่งที่ระบบจำไว้ให้เครื่องนี้
- * ข้อมูลผู้รับดึงจากออเดอร์ล่าสุด (ไม่มีฟอร์มแก้ เพราะยังไม่มีบัญชีจริง)
+ * หน้าโปรไฟล์ — guest: สรุปสิ่งที่ระบบจำไว้ให้เครื่องนี้ + ปุ่มเข้าสู่ระบบ (เลื่อนไปฟอร์ม login ในหน้าเดียวกัน)
+ * login เป็นลูกค้า: ชื่อบัญชี + ปุ่มออกจากระบบล่างสุด · พนักงาน: ลิงก์ไปการจัดการ (ออกจากระบบอยู่ใน hamburger เหมือนเดิม — พี่ต่อสั่ง)
+ * ตะกร้า/รายการโปรด/ออเดอร์ยังผูกกับ guest id ของเครื่อง (บัญชีลูกค้ายังไม่รวมประวัติข้ามเครื่อง)
  */
 export default async function AccountPage() {
-  const guestId = await readGuestId();
+  const [guestId, session] = await Promise.all([readGuestId(), getSession()]);
   const [orders, wishlist, cart] = await Promise.all([guestId ? listOrdersByGuest(guestId) : [], readMyWishlist(), readCart()]);
   const latest = orders[0];
   const spent = orders.filter((o) => o.status !== 'cancelled').reduce((s, o) => s + o.total, 0);
+  const staff = isStaffRole(session?.role);
+  const name = session ? session.user.name : latest ? latest.customer.name : 'ลูกค้าทั่วไป';
+  const sub = session
+    ? `${ROLE_LABEL[session.role]} · ${session.user.username}`
+    : `${latest ? latest.customer.phone : 'ยังไม่เคยสั่งซื้อจากเครื่องนี้'} · ระบบจำเครื่องนี้ไว้ให้โดยไม่ต้องสมัครสมาชิก`;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <div className="flex items-center gap-4">
-        <span className="flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand" aria-hidden>
-          <User className="size-7" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold sm:text-3xl">{latest ? latest.customer.name : 'ลูกค้าทั่วไป'}</h1>
-          <p className="text-sm text-muted">{latest ? latest.customer.phone : 'ยังไม่เคยสั่งซื้อจากเครื่องนี้'} · ระบบจำเครื่องนี้ไว้ให้โดยไม่ต้องสมัครสมาชิก</p>
-        </div>
-      </div>
-
+      <AccountPanel name={name} sub={sub} guest={!session}>
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <Stat href="/orders" Icon={Package} label="ประวัติการสั่งซื้อ" value={`${orders.length} รายการ`} sub={spent > 0 ? `ยอดรวม ${formatBaht(spent)}` : undefined} />
         <Stat href="/wishlist" Icon={Heart} label="รายการโปรด" value={`${wishlist.length} รายการ`} />
@@ -73,6 +74,23 @@ export default async function AccountPage() {
           </Link>
         </div>
       </Card>
+
+      {staff && (
+        <Link href="/admin" className={buttonStyles({ variant: 'secondary', className: 'mt-6 w-full' })}>
+          <LayoutDashboard className="size-4" aria-hidden />
+          ไปหน้าการจัดการ
+        </Link>
+      )}
+      {/* ลูกค้า: ออกจากระบบล่างสุดของโปรไฟล์ (พนักงานใช้ hamburger) */}
+      {session && !staff && (
+        <form action={logoutToAccount} className="mt-6">
+          <Button type="submit" variant="secondary" className="w-full text-danger">
+            <LogOut className="size-4" aria-hidden />
+            ออกจากระบบ
+          </Button>
+        </form>
+      )}
+      </AccountPanel>
     </div>
   );
 }

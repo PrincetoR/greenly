@@ -4,12 +4,18 @@ import type { Role } from '@/lib/types';
  * แกนของระบบสิทธิ์ — pure module (ห้าม import next/headers หรือ fs)
  * เพราะ proxy.ts, server component และ client component ใช้ร่วมกัน
  */
-export const ROLES = ['admin', 'staff'] as const satisfies readonly Role[];
+export const ROLES = ['admin', 'staff', 'customer'] as const satisfies readonly Role[];
 
 export const ROLE_LABEL: Record<Role, string> = {
   admin: 'ผู้ดูแลระบบ',
   staff: 'พนักงาน',
+  customer: 'ลูกค้า',
 };
+
+/** พนักงานร้าน (เข้าหลังบ้านได้) — ลูกค้าที่ login ไม่นับ */
+export function isStaffRole(role: Role | null | undefined): boolean {
+  return role === 'admin' || role === 'staff';
+}
 
 export const PERMISSIONS = [
   'catalog.manage', // สินค้า + หมวดหมู่
@@ -25,6 +31,7 @@ export type Permission = (typeof PERMISSIONS)[number];
 const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   admin: PERMISSIONS,
   staff: ['catalog.manage', 'order.manage'],
+  customer: [],
 };
 
 export function roleCan(role: Role, permission: Permission): boolean {
@@ -71,6 +78,7 @@ export function isAdminMenuActive(href: string, pathname: string): boolean {
 }
 
 export function visibleMenu(role: Role): AdminMenuItem[] {
+  if (!isStaffRole(role)) return [];
   return ADMIN_MENU.filter((m) => m.permission === null || roleCan(role, m.permission));
 }
 
@@ -83,6 +91,8 @@ export function menuItemForPath(pathname: string): AdminMenuItem | undefined {
 
 /** path ใต้ /admin ที่ไม่มีในเมนู = ปิดไว้ก่อน ปลอดภัยกว่าเปิดโดยลืม */
 export function canAccessPath(role: Role, pathname: string): boolean {
+  // ลูกค้าเข้าหลังบ้านไม่ได้เลย แม้แดชบอร์ดที่ permission = null
+  if (!isStaffRole(role)) return false;
   const item = menuItemForPath(pathname);
   if (!item) return false;
   return item.permission === null || roleCan(role, item.permission);

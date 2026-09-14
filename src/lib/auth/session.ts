@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { findUser } from '@/lib/db/users';
 import type { Role, User } from '@/lib/types';
-import { roleCan, type Permission } from './roles';
+import { isStaffRole, roleCan, type Permission } from './roles';
 import { SESSION_TTL_SEC, decodeToken, encodeToken } from './token';
 
 export const SESSION_COOKIE = 'ec_session';
@@ -43,10 +43,11 @@ export async function destroySession(): Promise<void> {
   (await cookies()).delete(SESSION_COOKIE);
 }
 
-/** ใช้บนสุดของ layout/page หลังบ้าน — ยังไม่ล็อกอินให้เด้งไปหน้า login */
+/** ใช้บนสุดของ layout/page หลังบ้าน — ยังไม่ล็อกอินให้เด้งไปหน้า login · ลูกค้าที่ login ไม่ใช่พนักงาน → กลับโปรไฟล์ */
 export async function requireSession(): Promise<Session> {
   const session = await getSession();
   if (!session) redirect('/admin/login');
+  if (!isStaffRole(session.role)) redirect('/account');
   return session;
 }
 

@@ -8,6 +8,7 @@ import { formatBaht } from '@/lib/money';
 import { clockCountdown } from '@/lib/datetime';
 import { decodeSlug } from '@/lib/validation/common';
 import { Gallery } from '@/components/shop/gallery';
+import { BackButton } from '@/components/shop/back-button';
 import { AddToCart } from '@/components/shop/add-to-cart';
 import { ProductGrid } from '@/components/shop/product-card';
 import { PromoProductCard } from '@/components/shop/promo-product-card';
@@ -46,24 +47,20 @@ export default async function ProductPage({ params }: PageProps<'/product/[slug]
   const bogoLeft = remaining(d.bogo?.id, d.bogo?.limits.perProductQty);
 
   return (
+    // แบบ Shopee (พี่ต่อสั่ง 2026-09-15): ไม่มี breadcrumb · มือถือรูปเต็มความกว้างจอ ปุ่มย้อนกลับลอยมุมซ้ายบนของรูป · จอใหญ่มีปุ่ม "กลับ" เหนือกริด
     <div className="pb-28 md:pb-8">
-      <div className="mx-auto max-w-6xl px-4 py-6">
-        <nav aria-label="breadcrumb" className="mb-4 flex flex-wrap items-center gap-1 text-sm text-muted">
-          <Link href="/" className="hover:text-ink">หน้าแรก</Link>
-          <span aria-hidden>›</span>
-          <Link href="/products" className="hover:text-ink">สินค้า</Link>
-          {category && (
-            <>
-              <span aria-hidden>›</span>
-              <Link href={`/category/${category.slug}`} className="hover:text-ink">{category.name}</Link>
-            </>
-          )}
-        </nav>
+      <div className="mx-auto max-w-6xl md:px-4 md:py-6">
+        <div className="mb-4 hidden md:block">
+          <BackButton fallback={category ? `/category/${category.slug}` : '/products'} />
+        </div>
 
-        <div className="grid gap-6 md:grid-cols-2 md:gap-10">
-          <Gallery images={product.images} alt={product.name} />
+        <div className="grid gap-4 md:grid-cols-2 md:gap-10">
+          <div className="relative">
+            <Gallery images={product.images} alt={product.name} />
+            <BackButton variant="overlay" className="md:hidden" fallback={category ? `/category/${category.slug}` : '/products'} />
+          </div>
 
-          <div>
+          <div className="px-4 md:px-0">
             {category && (
               <Link href={`/category/${category.slug}`} className="text-sm font-medium text-brand hover:underline">
                 {category.name}

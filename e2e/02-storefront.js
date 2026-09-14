@@ -102,6 +102,20 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   }
   ok(await page.locator('.fixed.bottom-0 button:has-text("ใส่ตะกร้า")').isVisible(), 'mobile sticky add-to-cart bar');
   ok((await page.locator('nav[aria-label="เมนูมือถือ"]').count()) === 0, 'mobile: หน้าสินค้าไม่มีแถบเมนูล่าง (แถบใส่ตะกร้าแทน)');
+  // หน้าสินค้าแบบ Shopee (พี่ต่อสั่ง 2026-09-15): ไม่มี breadcrumb · รูปเต็มความกว้างจอ ปัดดูได้ (snap) · ปุ่มย้อนกลับลอยมุมซ้ายบนของรูป · ตัวนับ 1/3
+  const pd = await page.evaluate(() => {
+    const g = document.querySelector('[aria-roledescription=carousel]');
+    const r = g.getBoundingClientRect();
+    // มี 2 ปุ่ม (จอใหญ่ซ่อน) — เอาตัวที่มองเห็น
+    const back = [...document.querySelectorAll('button[aria-label="ย้อนกลับ"]')].find((el) => el.getBoundingClientRect().width > 0);
+    const b = back.getBoundingClientRect();
+    return { breadcrumb: !!document.querySelector('nav[aria-label=breadcrumb]'), left: r.left, width: r.width, imgs: g.children.length, snap: getComputedStyle(g).scrollSnapType, counter: document.querySelector('[aria-live=polite]')?.textContent, backVisible: b.width > 0 && b.left < 24 && b.top > r.top && b.top < r.top + 24, backOnImage: b.top >= r.top };
+  });
+  ok(!pd.breadcrumb && pd.left === 0 && pd.width === 375, 'mobile: ไม่มี breadcrumb · รูปเต็มความกว้างจอ');
+  ok(pd.imgs === 3 && pd.snap.startsWith('x') && pd.counter === '1/3' && pd.backVisible, `mobile: ปัดดูรูปได้ ${pd.imgs} รูป · ตัวนับ ${pd.counter} · ปุ่มย้อนกลับมุมซ้ายบนของรูป`);
+  await page.locator('[aria-roledescription=carousel]').evaluate((g) => g.scrollTo({ left: g.clientWidth, behavior: 'instant' }));
+  await page.waitForTimeout(200);
+  ok((await page.locator('[aria-live=polite]').textContent()) === '2/3', 'mobile: ปัดไปรูปที่ 2 → ตัวนับ 2/3');
   await page.screenshot({ path: SHOT + '/p3-mobile-product.png', caret: 'initial' });
   await page.goto(`${BASE}/`);
   await page.waitForLoadState('networkidle');
@@ -114,17 +128,32 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
     const footer = document.querySelector('footer').getBoundingClientRect();
     return { bottom: r.bottom, top: r.top, h: r.height, items, protrude: r.top - search.r.top, circle: search.r.width === search.r.height, centered: Math.abs(search.r.left + search.r.width / 2 - innerWidth / 2), footerBottom: footer.bottom, scrollH: document.documentElement.scrollHeight, vh: innerHeight };
   });
-  ok(tab.bottom === 800 && tab.h === 57 && tab.items.map((i) => i.label).join('|') === 'หน้าแรก|สินค้าทั้งหมด|ค้นหา|โปรโมชัน|โปรไฟล์' && tab.items.every((i) => i.text === ''), 'mobile: แถบเมนูล่าง 5 ปุ่ม ไอคอนล้วน ติดล่างสุด');
-  ok(tab.protrude === 27 && tab.circle && tab.centered < 0.5, `mobile: ปุ่มค้นหาวงกลมกลางจอ นูนเหนือเส้น ${tab.protrude}px`);
+  ok(tab.bottom === 800 && tab.h === 56 && tab.items.map((i) => i.label).join('|') === 'หน้าแรก|สินค้าทั้งหมด|ค้นหา|โปรโมชัน|โปรไฟล์' && tab.items.every((i) => i.text === ''), 'mobile: แถบเมนูล่าง 5 ปุ่ม ไอคอนล้วน ติดล่างสุด');
+  // วงกลม 64 โผล่พ้นแถบ 40% (26px) ไอคอน 28 · พื้นแถบเจาะรูรอบวงกลม (mask) ให้ดูลอย — พี่ต่อสั่ง 2026-09-15
+  const srch = tab.items.find((i) => i.label === 'ค้นหา');
+  const maskOk = await page.evaluate(() => getComputedStyle(document.querySelector('nav[aria-label="เมนูมือถือ"] .tabbar-bg')).maskImage.includes('radial-gradient'));
+  ok(tab.protrude === 26 && srch.r.width === 64 && tab.circle && tab.centered < 0.5 && maskOk, `mobile: ปุ่มค้นหาวงกลม 64 กลางจอ โผล่พ้นเส้น ${tab.protrude}px (40%) · พื้นแถบเจาะรูรอบวงกลม`);
+  ok((await page.locator('nav[aria-label="เมนูมือถือ"] button[aria-label="ค้นหา"] svg').evaluate((s) => s.getBoundingClientRect().width)) === 28, 'mobile: ไอคอนค้นหา 28px');
   ok(tab.items[0].current === 'page' && tab.items[1].current === null, 'mobile: หน้าแรก active');
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(300);
   ok((await page.evaluate(() => document.querySelector('footer').getBoundingClientRect().bottom)) <= 800 - 56 + 0.5, 'mobile: เลื่อนสุดแล้ว footer ไม่ถูกแถบเมนูทับ');
   await page.screenshot({ path: SHOT + '/p3-mobile-tabbar.png', caret: 'initial' });
+  // ค้นหาทั้งเว็บ (พี่ต่อสั่ง 2026-09-15): ปุ่มค้นหา → /search มีแค่ header + ช่องค้นหา (ไม่มีแถบล่าง/footer) · พิมพ์แล้วโชว์ โปรโมชัน ก่อน สินค้า แยกหัวเรื่อง
   await page.click('nav[aria-label="เมนูมือถือ"] button[aria-label="ค้นหา"]');
-  await page.waitForURL(/\/products\?focus=1/);
+  await page.waitForURL(/\/search$/);
   await page.waitForLoadState('networkidle');
-  ok((await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))) === 'ค้นหา' && (await page.locator('nav[aria-label="เมนูมือถือ"] a[aria-current=page]').getAttribute('aria-label')) === 'สินค้าทั้งหมด', 'mobile: ปุ่มค้นหา → /products โฟกัสช่องค้นหา · แท็บสินค้า active');
+  ok((await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))) === 'ค้นหาทั้งเว็บ' && (await page.locator('nav[aria-label="เมนูมือถือ"]').count()) === 0 && !(await page.locator('footer').isVisible()) && (await page.locator('main h2').count()) === 0, 'mobile: /search = header + ช่องค้นหาเปล่า โฟกัสแล้ว ไม่มีแถบล่าง/footer');
+  await page.keyboard.type('ลด');
+  await page.waitForURL(/q=/);
+  await page.waitForLoadState('networkidle');
+  const heads = await page.locator('main h2').allTextContents();
+  ok(heads.length === 2 && heads[0].startsWith('โปรโมชัน') && heads[1].startsWith('สินค้า') && (await page.locator('main article').count()) >= 3 && (await page.locator('main .group:has(h3)').count()) >= 1, `search "ลด": ${heads.join(' → ')} (โปรก่อน แยกหัวเรื่อง)`);
+  await page.keyboard.press('Backspace'); await page.keyboard.press('Backspace');
+  await page.keyboard.type('zzzz');
+  await page.waitForURL(/q=zzzz/);
+  await page.waitForLoadState('networkidle');
+  ok((await page.locator('text=ไม่พบ "zzzz"').count()) === 1, 'search ไม่เจอ → ข้อความไม่พบ');
   await page.goto(`${BASE}/`);
   // มือถือหน้าร้าน: header มีแค่ตะกร้า ไม่มี hamburger (นำทางด้วยแถบเมนูล่าง) — พี่ต่อสั่ง 2026-09-15
   ok((await page.locator('header a[href="/cart"]').isVisible()) && !(await page.locator('button[aria-label="เปิดเมนู"]').isVisible()), 'mobile: header หน้าร้าน = ตะกร้าอย่างเดียว ไม่มี hamburger');

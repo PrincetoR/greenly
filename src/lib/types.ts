@@ -6,7 +6,8 @@
  * เวลาเป็น ISO string เสมอ
  */
 
-export type Role = 'admin' | 'staff';
+/** customer = ลูกค้าที่ login จากหน้าโปรไฟล์ — ไม่มีสิทธิ์หลังบ้านเลย (พี่ต่อสั่ง 2026-09-15) */
+export type Role = 'admin' | 'staff' | 'customer';
 
 export interface User {
   id: string;

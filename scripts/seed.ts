@@ -114,7 +114,8 @@ for (const [categoryId, seeds] of Object.entries(productSeed)) {
       categoryId,
       price: baht * 100,
       stock,
-      images: [`/uploads/seed/${id}.svg`],
+      // 6 ตัวแรกมี 3 รูป (มุมต่าง ๆ จำลองด้วยเฉดสีต่างกัน) ให้ปัดดูแกลเลอรีได้ (พี่ต่อขอเลื่อนดูรูปแบบ Shopee)
+      images: sku <= 6 ? [`/uploads/seed/${id}.svg`, `/uploads/seed/${id}-2.svg`, `/uploads/seed/${id}-3.svg`] : [`/uploads/seed/${id}.svg`],
       active: true,
       featured: Boolean(featured),
       createdAt,
@@ -581,6 +582,16 @@ async function main() {
       active: true,
       createdAt: iso(daysFromNow(-59)),
     },
+    // ลูกค้าสาธิต — login จากหน้าโปรไฟล์ (ไม่มีสิทธิ์หลังบ้าน)
+    {
+      id: 'u-customer',
+      username: 'customer',
+      passwordHash: await hashPassword('customer1234'),
+      name: 'สมชาย ใจดี',
+      role: 'customer',
+      active: true,
+      createdAt: iso(daysFromNow(-30)),
+    },
   ];
   const { orders, payments } = WITH_HISTORY ? demoOrders() : { orders: [] as Order[], payments: [] as Payment[] };
 
@@ -602,9 +613,10 @@ async function main() {
     write('wishlists', {}),
     write('users', users),
     write('settings', settings),
-    ...products.map((p) => {
+    ...products.flatMap((p) => {
       const cat = categorySeed.find((c) => c.id === p.categoryId)!;
-      return writeFile(path.join(SEED_IMG, `${p.id}.svg`), placeholderSvg(p.name, cat.emoji, cat.hue));
+      // รูปที่ 2/3 = เฉดสีเลื่อนไป 30°/60° ให้เห็นว่าเป็นคนละรูปตอนปัด
+      return p.images.map((img, i) => writeFile(path.join(SEED_IMG, path.basename(img)), placeholderSvg(p.name, cat.emoji, (cat.hue + i * 30) % 360)));
     }),
     ...categorySeed.filter((c) => c.withImage).map((c) => writeFile(path.join(SEED_IMG, `${c.id}.svg`), placeholderSvg(c.name, c.emoji, c.hue))),
     ...bannerSeed.map((b) => writeFile(path.join(SEED_IMG, `${b.file}.svg`), bannerSvg(b.title, b.subtitle, b.hue, b.emoji, false, 800))),
@@ -612,7 +624,7 @@ async function main() {
   ]);
 
   console.log(
-    `seeded: ${categories.length} categories · ${products.length} products · ${promotions.length} promotions · ${orders.length} orders · ${payments.length} payments · ${users.length} users (admin/admin1234, staff/staff1234)`,
+    `seeded: ${categories.length} categories · ${products.length} products · ${promotions.length} promotions · ${orders.length} orders · ${payments.length} payments · ${users.length} users (admin/admin1234, staff/staff1234, customer/customer1234)`,
   );
 }
 
