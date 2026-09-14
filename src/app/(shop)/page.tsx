@@ -54,17 +54,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* โปรที่กำลังใช้งาน — โผล่/หายเองตามเวลาและ quota */}
-      {live.length > 0 && (
-        <Section title="โปรโมชันตอนนี้" description="ราคาโปรมีผลอัตโนมัติ ไม่ต้องทำอะไรเพิ่ม" href="/promotions">
-          <div className="grid gap-3 md:grid-cols-2">
-            {live.slice(0, 4).map((p) => (
-              <PromoCard key={p.id} promo={p} status="live" usage={usage[p.id]} categories={categories} products={allProducts} now={now} />
-            ))}
-          </div>
-        </Section>
-      )}
-
       <Section title="หมวดหมู่">
         <ul className="-mx-4 -my-1 flex gap-2 overflow-x-auto px-4 py-1 scrollbar-none sm:-mx-1 sm:flex-wrap sm:px-1">
           {categories.map((c) => (
@@ -76,6 +65,17 @@ export default async function HomePage() {
           ))}
         </ul>
       </Section>
+
+      {/* โปรที่กำลังใช้งาน — โผล่/หายเองตามเวลาและ quota */}
+      {live.length > 0 && (
+        <Section title="โปรโมชันตอนนี้" description="ราคาโปรมีผลอัตโนมัติ ไม่ต้องทำอะไรเพิ่ม" href="/promotions">
+          <div className="grid gap-3 md:grid-cols-2">
+            {live.slice(0, 4).map((p) => (
+              <PromoCard key={p.id} promo={p} status="live" usage={usage[p.id]} categories={categories} products={allProducts} now={now} />
+            ))}
+          </div>
+        </Section>
+      )}
 
       {featured.length > 0 && (
         <Section title="สินค้าแนะนำ" href="/products">

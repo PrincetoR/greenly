@@ -13,7 +13,7 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   // หน้าแรก: สินค้าขายดีอยู่ระหว่างสินค้าแนะนำกับสินค้าใหม่ (จัดอันดับจากออเดอร์จริง)
   await page.goto(`${BASE}/`);
   const homeH2 = (await page.locator('main h2').allTextContents()).map((t) => t.trim());
-  ok(homeH2.indexOf('สินค้าขายดี') === homeH2.indexOf('สินค้าแนะนำ') + 1 && homeH2.indexOf('สินค้าใหม่') === homeH2.indexOf('สินค้าขายดี') + 1, `หน้าแรก: สินค้าขายดี อยู่ระหว่างสินค้าแนะนำกับสินค้าใหม่ (${homeH2.join(' · ')})`);
+  ok(JSON.stringify(homeH2) === JSON.stringify(['หมวดหมู่', 'โปรโมชันตอนนี้', 'สินค้าแนะนำ', 'สินค้าขายดี', 'สินค้าใหม่']), `หน้าแรก: ลำดับ หมวดหมู่ · โปรโมชันตอนนี้ · สินค้าแนะนำ · สินค้าขายดี · สินค้าใหม่ (${homeH2.join(' · ')})`);
   ok((await page.locator('span:has-text("ขายดี #1")').count()) === 1 && (await page.locator('span:has-text("ขายดี #8")').count()) === 1, 'หน้าแรก: การ์ดขายดี 8 ใบมีป้ายอันดับ');
 
   await login(page, 'admin', 'admin1234');
