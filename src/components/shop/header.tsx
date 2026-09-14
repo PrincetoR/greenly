@@ -40,7 +40,7 @@ export function ShopHeader({
   wishlistCount: number;
   /** login หลังบ้านอยู่ → แสดงเมนู "การจัดการ" */
   isStaff?: boolean;
-  /** ชื่อ login หลังบ้าน (เช่น admin) · ไม่มี = guest */
+  /** ชื่อที่แสดงของบัญชีที่ login (เช่น ผู้ดูแลระบบ) · ไม่มี = ยังไม่ login → "เข้าสู่ระบบ" พาไปบาน login ในโปรไฟล์ */
   userName?: string | null;
   /** หน้าหลังบ้านส่งเมนู (กรองสิทธิ์แล้ว) มาใส่ drawer มือถือ — จอใหญ่เมนูอยู่ใน card ซ้ายของ AdminShell */
   adminItems?: AdminMenuItem[];
@@ -77,9 +77,9 @@ export function ShopHeader({
               <Package className="size-3.5" aria-hidden />
               ประวัติการสั่งซื้อ
             </Link>
-            <Link href="/account" className="flex items-center gap-1 font-medium text-white">
+            <Link href={userName ? '/account' : '/account?login=1'} className="flex items-center gap-1 font-medium text-white">
               <User className="size-3.5" aria-hidden />
-              {userName ?? 'guest'}
+              {userName ?? 'เข้าสู่ระบบ'}
             </Link>
           </nav>
         </div>

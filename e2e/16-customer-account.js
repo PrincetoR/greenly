@@ -8,12 +8,12 @@ const { BASE, launch, ok, shot } = require('./lib');
   const { browser, page } = await launch({ width: 375, height: 800 });
   await page.goto(`${BASE}/account`);
   await page.waitForLoadState('networkidle');
-  ok((await page.locator('h1').textContent()) === 'ลูกค้าทั่วไป' && (await page.locator('button:has-text("เข้าสู่ระบบ")').isVisible()), 'guest: โปรไฟล์มีปุ่มเข้าสู่ระบบ');
+  ok((await page.locator('h1').textContent()) === 'ลูกค้าทั่วไป' && (await page.locator('section:first-child button:has-text("เข้าสู่ระบบ")').isVisible()), 'guest: โปรไฟล์มีปุ่มเข้าสู่ระบบ');
   ok((await page.locator('form button:has-text("ออกจากระบบ")').count()) === 0, 'guest: ไม่มีปุ่มออกจากระบบ');
 
   // กดแล้วเลื่อนไปทางซ้าย — URL เดิม header/แถบล่างอยู่ครบ
   const before = await page.locator('h1').evaluate((h) => h.getBoundingClientRect().left);
-  await page.click('button:has-text("เข้าสู่ระบบ")');
+  await page.click('section:first-child button:has-text("เข้าสู่ระบบ")');
   await page.waitForTimeout(450);
   const slid = await page.evaluate(() => {
     const track = document.querySelector('.overflow-hidden > div');
@@ -52,10 +52,10 @@ const { BASE, launch, ok, shot } = require('./lib');
   await page.click('form button:has-text("ออกจากระบบ")');
   await page.waitForURL((u) => u.pathname === '/');
   await page.goto(`${BASE}/account`);
-  ok((await page.locator('h1').textContent()) === 'ลูกค้าทั่วไป' && (await page.locator('button:has-text("เข้าสู่ระบบ")').isVisible()), 'ออกจากระบบ → หน้าแรก · โปรไฟล์กลับเป็น guest');
+  ok((await page.locator('h1').textContent()) === 'ลูกค้าทั่วไป' && (await page.locator('section:first-child button:has-text("เข้าสู่ระบบ")').isVisible()), 'ออกจากระบบ → หน้าแรก · โปรไฟล์กลับเป็น guest');
 
   // พนักงาน login ทางเดียวกัน → ไปหน้าการจัดการ · โปรไฟล์ของพนักงานมีลิงก์การจัดการ ไม่มีปุ่มออกจากระบบ (อยู่ใน hamburger หลังบ้าน)
-  await page.click('button:has-text("เข้าสู่ระบบ")');
+  await page.click('section:first-child button:has-text("เข้าสู่ระบบ")');
   await page.waitForTimeout(400);
   await page.fill('#username', 'staff');
   await page.fill('#password', 'staff1234');

@@ -20,8 +20,8 @@ export const metadata = { title: 'โปรไฟล์' };
  * login เป็นลูกค้า: ชื่อบัญชี + ปุ่มออกจากระบบล่างสุด · พนักงาน: ลิงก์ไปการจัดการ (ออกจากระบบอยู่ใน hamburger เหมือนเดิม — พี่ต่อสั่ง)
  * ตะกร้า/รายการโปรด/ออเดอร์ยังผูกกับ guest id ของเครื่อง (บัญชีลูกค้ายังไม่รวมประวัติข้ามเครื่อง)
  */
-export default async function AccountPage() {
-  const [guestId, session] = await Promise.all([readGuestId(), getSession()]);
+export default async function AccountPage({ searchParams }: PageProps<'/account'>) {
+  const [guestId, session, sp] = await Promise.all([readGuestId(), getSession(), searchParams]);
   const [orders, wishlist, cart] = await Promise.all([guestId ? listOrdersByGuest(guestId) : [], readMyWishlist(), readCart()]);
   const latest = orders[0];
   const spent = orders.filter((o) => o.status !== 'cancelled').reduce((s, o) => s + o.total, 0);
@@ -33,7 +33,8 @@ export default async function AccountPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <AccountPanel name={name} sub={sub} guest={!session}>
+      {/* ?login=1 (จากแถบสถานะ "เข้าสู่ระบบ") = เปิดบาน login ทันที */}
+      <AccountPanel name={name} sub={sub} guest={!session} initialOpen={sp.login === '1'}>
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <Stat href="/orders" Icon={Package} label="ประวัติการสั่งซื้อ" value={`${orders.length} รายการ`} sub={spent > 0 ? `ยอดรวม ${formatBaht(spent)}` : undefined} />
         <Stat href="/wishlist" Icon={Heart} label="รายการโปรด" value={`${wishlist.length} รายการ`} />

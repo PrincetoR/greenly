@@ -14,11 +14,16 @@ const GRANOLA = '/product/กราโนล่าน้ำผึ้งอัล
   ok((await page.locator('header a[title]').count()) === 1 && (await page.locator('header a[title="ตะกร้า"]').isVisible()), 'header icon: มีแค่ตะกร้า');
   const status = page.locator('nav[aria-label="แถบสถานะ"]');
   const items = (await status.locator('a').allTextContents()).map((t) => t.trim());
-  ok(JSON.stringify(items) === JSON.stringify(['รายการโปรด', 'ประวัติการสั่งซื้อ', 'guest']), `แถบสถานะ: ${items.join(' · ')}`);
-  ok((await status.locator('a[href="/account"]').boundingBox()).x + (await status.locator('a[href="/account"]').boundingBox()).width === 1200, 'ชื่อผู้ใช้อยู่ขวาสุด ตรงขอบขวาตะกร้า');
-  await status.locator('a[href="/account"]').click();
-  await page.waitForURL(/\/account$/);
-  ok(await page.locator('h1').isVisible(), 'guest → /account');
+  // ยังไม่ login = "เข้าสู่ระบบ" (พี่ต่อเปลี่ยนจาก guest 2026-09-15) พาไป /account?login=1 เปิดบาน login เลย
+  ok(JSON.stringify(items) === JSON.stringify(['รายการโปรด', 'ประวัติการสั่งซื้อ', 'เข้าสู่ระบบ']), `แถบสถานะ: ${items.join(' · ')}`);
+  const acc = status.locator('a[href="/account?login=1"]');
+  ok((await acc.boundingBox()).x + (await acc.boundingBox()).width === 1200, 'เข้าสู่ระบบอยู่ขวาสุด ตรงขอบขวาตะกร้า');
+  await acc.click();
+  await page.waitForURL(/\/account\?login=1/);
+  await page.waitForTimeout(400);
+  ok((await page.locator('form #username').count()) === 1 && (await page.locator('button:has-text("สมัครสมาชิก")').isVisible()) && (await page.locator('button[aria-label^="เข้าสู่ระบบด้วย"]').count()) === 3, 'เข้าสู่ระบบ → บาน login เปิดทันที · ปุ่มสมัครสมาชิก + Facebook/Google/Apple (หลอก)');
+  await page.click('button[aria-label="เข้าสู่ระบบด้วย Google"]');
+  ok((await page.locator('[role=status]').textContent()).includes('สาธิต') && page.url().includes('/account'), 'ปุ่ม Google หลอก → แจ้งว่ายังไม่เชื่อมต่อ');
   await page.goto(`${BASE}/`);
   ok((await page.locator('header svg').count()) >= 2, 'header uses svg icons');
   const headerText = await page.textContent('header');

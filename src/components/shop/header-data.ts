@@ -26,7 +26,8 @@ export async function loadShopHeaderProps() {
       wishlistCount: wishlist.length,
       // ลูกค้าที่ login จากโปรไฟล์ไม่ใช่พนักงาน — ไม่เห็นเมนูการจัดการ
       isStaff: isStaffRole(session?.role),
-      userName: session?.user.username ?? null,
+      // ชื่อที่แสดง (เช่น ผู้ดูแลระบบ) ไม่ใช่ username · ไม่ได้ login = null → แถบสถานะโชว์ "เข้าสู่ระบบ" (พี่ต่อสั่ง 2026-09-15)
+      userName: session?.user.name ?? null,
     },
   };
 }

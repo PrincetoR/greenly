@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ArrowLeft, LogIn, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, LogIn, User, UserPlus } from 'lucide-react';
 import { LoginForm } from '@/components/admin/login-form';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
@@ -11,10 +12,15 @@ import { cn } from '@/lib/cn';
  * เลื่อนไปทางซ้ายเผยบานขวา = ฟอร์ม login — header/แถบเมนูล่างอยู่ที่เดิม ไม่พาไปหน้าอื่น
  * login สำเร็จ: ลูกค้า → กลับ /account (server render ใหม่เป็นโหมด customer) · พนักงาน → /admin · บานที่ซ่อนใส่ inert กันโฟกัสหลง
  * โฟกัสช่องชื่อผู้ใช้เองด้วย preventScroll — autoFocus ธรรมดาจะทำให้ container overflow-hidden เลื่อน scrollLeft ไปอีก 1 บาน (เลื่อนซ้อนกับ translate → จอว่าง)
+ * ปุ่ม "สมัครสมาชิก" บนสุด + login ด้วย Facebook/Google/Apple = **ปุ่มหลอก** (พี่ต่อสั่ง 2026-09-15 — สาธิตว่าไม่ต้องสมัครก็เข้าได้) กดแล้วแค่แจ้งว่ายังไม่เปิดใช้
+ * `initialOpen` (?login=1 จากแถบสถานะ) = เปิดบาน login ทันที
  */
-export function AccountPanel({ name, sub, guest, children }: { name: string; sub: string; guest: boolean; children: ReactNode }) {
-  const [open, setOpen] = useState(false);
+export function AccountPanel({ name, sub, guest, initialOpen = false, children }: { name: string; sub: string; guest: boolean; initialOpen?: boolean; children: ReactNode }) {
+  const [open, setOpen] = useState(guest && initialOpen);
+  const [note, setNote] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const fake = (what: string) => setNote(`${what} — ปุ่มสาธิต ยังไม่เชื่อมต่อ ใช้บัญชีสาธิตด้านล่างได้เลย`);
 
   useEffect(() => {
     if (!open) return;
@@ -48,13 +54,49 @@ export function AccountPanel({ name, sub, guest, children }: { name: string; sub
         </section>
 
         <section className="w-1/2 shrink-0" aria-hidden={!open} inert={!open} aria-label="เข้าสู่ระบบ">
-          <button type="button" onClick={() => setOpen(false)} className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-ink">
-            <ArrowLeft className="size-4" aria-hidden />
-            กลับไปโปรไฟล์
-          </button>
+          <div className="flex items-center justify-between gap-3 sm:max-w-sm">
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                if (initialOpen) router.replace('/account');
+              }}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted hover:text-ink"
+            >
+              <ArrowLeft className="size-4" aria-hidden />
+              กลับไปโปรไฟล์
+            </button>
+            {/* ปุ่มหลอก: สมัครสมาชิก (บนสุด) */}
+            <Button variant="secondary" size="sm" onClick={() => fake('สมัครสมาชิก')}>
+              <UserPlus className="size-4" aria-hidden />
+              สมัครสมาชิก
+            </Button>
+          </div>
           <div className="mt-4 rounded-card bg-surface p-5 border border-line sm:max-w-sm">
             <h2 className="text-lg font-bold">เข้าสู่ระบบ</h2>
-            <p className="mt-0.5 mb-4 text-sm text-muted">ใช้บัญชีลูกค้า — พนักงานร้านเข้าตรงนี้ได้เหมือนกัน จะพาไปหน้าการจัดการ</p>
+            <p className="mt-0.5 mb-4 text-sm text-muted">เข้าได้เลยไม่ต้องสมัครสมาชิก</p>
+            {/* ปุ่มหลอก: login ด้วยบัญชีอื่น */}
+            <div className="grid gap-2" role="group" aria-label="เข้าสู่ระบบด้วยบัญชีอื่น (สาธิต)">
+              <SocialButton label="เข้าสู่ระบบด้วย Facebook" onClick={() => fake('เข้าสู่ระบบด้วย Facebook')}>
+                <svg viewBox="0 0 24 24" className="size-5 text-[#1877F2]" aria-hidden><path fill="currentColor" d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0 0 24 12" /></svg>
+              </SocialButton>
+              <SocialButton label="เข้าสู่ระบบด้วย Google" onClick={() => fake('เข้าสู่ระบบด้วย Google')}>
+                <svg viewBox="0 0 24 24" className="size-5" aria-hidden><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8" /><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3a7.2 7.2 0 0 1-10.7-3.8H1.4v3.1A12 12 0 0 0 12 24" /><path fill="#FBBC04" d="M5.4 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.4a12 12 0 0 0 0 10.8z" /><path fill="#EA4335" d="M12 4.8c1.8 0 3.4.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1A7.2 7.2 0 0 1 12 4.8" /></svg>
+              </SocialButton>
+              <SocialButton label="เข้าสู่ระบบด้วย Apple" onClick={() => fake('เข้าสู่ระบบด้วย Apple')}>
+                <svg viewBox="0 0 24 24" className="size-5" aria-hidden><path fill="currentColor" d="M16.4 12.7c0-2.5 2-3.7 2.1-3.7-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.2 2.5-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.3.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.8-1-2.8-4.2M14 5.4c.7-.8 1.2-2 1-3.2-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.5 2.9-1.3" /></svg>
+              </SocialButton>
+            </div>
+            {note && (
+              <p role="status" className="mt-3 rounded-lg bg-surface-alt px-3 py-2 text-xs text-muted">
+                {note}
+              </p>
+            )}
+            <div className="my-4 flex items-center gap-3 text-xs text-muted">
+              <span className="h-px flex-1 bg-line" aria-hidden />
+              หรือใช้ชื่อผู้ใช้
+              <span className="h-px flex-1 bg-line" aria-hidden />
+            </div>
             {/* mount เฉพาะตอนเปิด — ฟอร์มสั้น ไม่ต้องอยู่ใน DOM ตลอด */}
             {open && <LoginForm autoFocus={false} />}
           </div>
@@ -70,5 +112,17 @@ export function AccountPanel({ name, sub, guest, children }: { name: string; sub
         </section>
       </div>
     </div>
+  );
+}
+
+/** ปุ่ม login ด้วยบัญชีอื่น (สาธิต) — ไอคอนซ้าย ข้อความกึ่งกลาง */
+function SocialButton({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
+  return (
+    <button type="button" onClick={onClick} aria-label={label} className="relative flex h-11 w-full items-center justify-center rounded-lg bg-surface px-4 text-sm font-medium border border-line transition-colors hover:bg-surface-alt">
+      <span className="absolute left-4 flex items-center" aria-hidden>
+        {children}
+      </span>
+      {label}
+    </button>
   );
 }
