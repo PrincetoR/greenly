@@ -10,7 +10,7 @@
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { hashPassword } from '../src/lib/auth/password';
-import type { Category, Order, Payment, Product, Promotion, Settings, User } from '../src/lib/types';
+import type { Category, Homepage, Order, Payment, Product, Promotion, Settings, User } from '../src/lib/types';
 import { CARRIERS } from '../src/lib/shipping/carriers';
 import { beamFee, mockReference, type BeamChannelId } from '../src/lib/payments/beam';
 
@@ -458,6 +458,48 @@ function demoOrders(): { orders: Order[]; payments: Payment[] } {
   return { orders, payments };
 }
 
+/* ---------- หน้าแรก: สไลด์ + ป๊อปอัป (รูปเป็น SVG placeholder แนวนอน) ---------- */
+// withText = ฝังข้อความในรูป (ป๊อปอัป) · สไลด์ไม่ฝัง เพราะข้อความซ้อนบนรูปจากตั้งค่าอยู่แล้ว
+function bannerSvg(title: string, sub: string, hue: number, emoji: string, withText = false): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" width="1600" height="600">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="hsl(${hue} 60% 88%)"/>
+      <stop offset="1" stop-color="hsl(${hue + 40} 55% 70%)"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="600" fill="url(#g)"/>
+  <circle cx="1250" cy="300" r="230" fill="hsl(${hue} 60% 96% / .6)"/>
+  <text x="1250" y="330" font-size="260" text-anchor="middle" dominant-baseline="middle">${emoji}</text>
+  ${withText ? `<text x="120" y="290" font-size="72" font-family="system-ui, sans-serif" font-weight="700" fill="hsl(${hue} 40% 20%)">${title}</text>
+  <text x="120" y="360" font-size="36" font-family="system-ui, sans-serif" fill="hsl(${hue} 30% 30%)">${sub}</text>` : ''}
+</svg>
+`;
+}
+
+const bannerSeed = [
+  { id: 'slide-promo', file: 'banner-promo', title: 'ลด 20% เครื่องดื่มสุขภาพ', subtitle: 'สกัดเย็น คอมบูชา มัทฉะ — โปรถึงสิ้นเดือนนี้', href: '/promotions', buttonLabel: 'ดูโปรโมชัน', hue: 150, emoji: '🥤' },
+  { id: 'slide-new', file: 'banner-new', title: 'สินค้าใหม่ประจำสัปดาห์', subtitle: 'กราโนล่า โปรตีนบาร์ ขนมสุขภาพ ส่งฟรีเมื่อครบ 1,000 บาท', href: '/products?sort=newest', buttonLabel: 'เลือกซื้อ', hue: 30, emoji: '🍪' },
+  { id: 'slide-brand', file: 'banner-brand', title: 'Greenly', subtitle: 'อาหารสุขภาพ ส่งตรงถึงบ้าน', href: '/products', buttonLabel: '', hue: 200, emoji: '🌿' },
+];
+
+const homepage: Homepage = {
+  slides: bannerSeed.map((b, i) => ({ id: b.id, image: `/uploads/seed/${b.file}.svg`, title: b.title, subtitle: b.subtitle, href: b.href, buttonLabel: b.buttonLabel, active: true, sortOrder: (i + 1) * 10 })),
+  autoplaySeconds: 5,
+  // ป๊อปอัปเปิดเฉพาะ seed สาธิต — e2e (seed:clean) ปิดไว้ ไม่งั้นบังปุ่มที่เทสต์กด
+  popup: {
+    enabled: WITH_HISTORY,
+    image: '/uploads/seed/popup-welcome.svg',
+    title: 'ลูกค้าใหม่รับส่วนลด 100 บาท',
+    body: 'ใส่โค้ด SAVE100 ที่หน้าตะกร้า เมื่อสั่งซื้อครบ 500 บาท · ใช้ได้ 1 ครั้งต่อลูกค้า',
+    href: '/promotions',
+    buttonLabel: 'ดูโปรโมชัน',
+    width: 480,
+    frequency: 'daily',
+    version: iso(now),
+  },
+};
+
 /* ---------- settings ---------- */
 const settings: Settings = {
   storeName: 'Greenly',
@@ -524,6 +566,7 @@ async function main() {
     write('promotions', promotions),
     write('orders', orders),
     write('payments', payments),
+    write('homepage', homepage),
     write('carts', {}),
     write('wishlists', {}),
     write('users', users),
@@ -533,6 +576,8 @@ async function main() {
       return writeFile(path.join(SEED_IMG, `${p.id}.svg`), placeholderSvg(p.name, cat.emoji, cat.hue));
     }),
     ...categorySeed.filter((c) => c.withImage).map((c) => writeFile(path.join(SEED_IMG, `${c.id}.svg`), placeholderSvg(c.name, c.emoji, c.hue))),
+    ...bannerSeed.map((b) => writeFile(path.join(SEED_IMG, `${b.file}.svg`), bannerSvg(b.title, b.subtitle, b.hue, b.emoji))),
+    writeFile(path.join(SEED_IMG, 'popup-welcome.svg'), bannerSvg('ส่วนลด 100 บาท', 'สำหรับลูกค้าใหม่', 340, '🎁', true)),
   ]);
 
   console.log(

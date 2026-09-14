@@ -16,7 +16,7 @@ const near = (a, b) => Math.abs(a - b) < 0.5;
   ok(await page.locator('header nav[aria-label="เมนูหลัก"] a[href="/admin"][class*="bg-brand-soft"]').isVisible(), 'หลังบ้านใช้ header หน้าร้าน · เมนูการจัดการ active');
   ok((await page.textContent('main aside nav p')).trim() === 'จัดการสินค้า', 'บรรทัดแรกของ card = จัดการสินค้า');
   const labels = await page.locator('main aside nav ul a').allTextContents();
-  ok(JSON.stringify(labels.map((t) => t.trim())) === JSON.stringify(['แดชบอร์ด', 'สินค้า', 'หมวดหมู่', 'โปรโมชัน', 'คำสั่งซื้อ', 'จัดส่ง', 'การชำระเงิน', 'ผู้ใช้', 'ตั้งค่าร้าน']), `เมนู: ${labels.join(' · ')}`);
+  ok(JSON.stringify(labels.map((t) => t.trim())) === JSON.stringify(['แดชบอร์ด', 'สินค้า', 'หมวดหมู่', 'โปรโมชัน', 'หน้าแรก', 'คำสั่งซื้อ', 'จัดส่ง', 'การชำระเงิน', 'ผู้ใช้', 'ตั้งค่าร้าน']), `เมนู: ${labels.join(' · ')}`);
   ok((await page.getAttribute('main aside nav ul a[aria-current=page]', 'href')) === '/admin', 'แดชบอร์ด active');
 
   const card = await box(page, 'main aside nav');

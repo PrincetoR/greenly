@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { listCategories } from '@/lib/db/categories';
 import { listProducts } from '@/lib/db/products';
 import { listOrders } from '@/lib/db/orders';
+import { getHomepage } from '@/lib/db/homepage';
+import { HeroSlider } from '@/components/shop/hero-slider';
+import { WelcomePopup } from '@/components/shop/welcome-popup';
 import { topProducts } from '@/lib/analytics/categories';
 import { loadPromotionContext } from '@/lib/promotions/service';
 import { promotionStatus } from '@/lib/pricing/status';
@@ -13,15 +16,18 @@ import { buttonStyles } from '@/components/ui/button';
 import { CategoryIcon } from '@/components/category-icon';
 import { ProductImage } from '@/components/product-image';
 
-export default async function HomePage() {
-  const [ctx, categories, featured, newest, allProducts, orders] = await Promise.all([
+export default async function HomePage({ searchParams }: PageProps<'/'>) {
+  const [ctx, categories, featured, newest, allProducts, orders, home, sp] = await Promise.all([
     loadPromotionContext(),
     listCategories({ activeOnly: true }),
     listProducts({ activeOnly: true, featuredOnly: true, sort: 'newest' }),
     listProducts({ activeOnly: true, sort: 'newest' }),
     listProducts(),
     listOrders(),
+    getHomepage(),
+    searchParams,
   ]);
+  const slides = home.slides.filter((s) => s.active);
   const { settings, promotions, usage, now } = ctx;
   const live = promotions.filter((p) => promotionStatus(p, now, usage[p.id]) === 'live');
 
@@ -42,20 +48,31 @@ export default async function HomePage() {
   return (
     // snap-sections: จอ md+ เลื่อนแล้วหยุดทีละกลุ่ม (พี่ต่อสั่ง) — กฎอยู่ใน globals.css
     <div className="snap-sections pb-8">
-      <section className="bg-gradient-to-br from-brand-soft via-page to-accent-soft">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-14 sm:py-20">
-          <h1 className="text-3xl font-bold sm:text-5xl">{settings.storeName}</h1>
-          <p className="max-w-lg text-lg text-muted">{settings.tagline}</p>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/products" className={buttonStyles({ size: 'lg' })}>
-              เลือกซื้อสินค้า
-            </Link>
-            <Link href="/promotions" className={buttonStyles({ size: 'lg', variant: 'secondary' })}>
-              ดูโปรโมชัน{live.length > 0 && ` (${live.length})`}
-            </Link>
+      {/* ป๊อปอัปตอนเข้าเว็บ (ตั้งค่าที่หลังบ้าน › หน้าแรก) · ?popup=1 บังคับโชว์เพื่อดูตัวอย่าง */}
+      <WelcomePopup popup={home.popup} force={sp.popup === '1'} />
+
+      {/* แบนเนอร์: สไลด์จากหลังบ้าน · ไม่มีสไลด์ = ชื่อร้าน + สโลแกนแบบเดิม · h1 ซ่อนไว้ให้ SEO/screen reader */}
+      {slides.length > 0 ? (
+        <>
+          <h1 className="sr-only">{settings.storeName}</h1>
+          <HeroSlider slides={slides} autoplaySeconds={home.autoplaySeconds} />
+        </>
+      ) : (
+        <section className="bg-gradient-to-br from-brand-soft via-page to-accent-soft">
+          <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-4 py-14 sm:py-20">
+            <h1 className="text-3xl font-bold sm:text-5xl">{settings.storeName}</h1>
+            <p className="max-w-lg text-lg text-muted">{settings.tagline}</p>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/products" className={buttonStyles({ size: 'lg' })}>
+                เลือกซื้อสินค้า
+              </Link>
+              <Link href="/promotions" className={buttonStyles({ size: 'lg', variant: 'secondary' })}>
+                ดูโปรโมชัน{live.length > 0 && ` (${live.length})`}
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* หมวดหมู่เป็นการ์ด แถวละ 8 (จอใหญ่) · มีรูปใช้รูป ไม่มีใช้ไอคอน (พี่ต่อสั่ง) */}
       <Section title="หมวดหมู่" href="/products">

@@ -39,7 +39,7 @@ export function isRole(value: unknown): value is Role {
  * เมนูหลังบ้าน = แหล่งความจริงเดียวของ "หน้าไหนต้องใช้สิทธิ์อะไร"
  * sidebar, proxy และ layout อ่านจากตรงนี้ทั้งหมด — เมนูที่เห็นกับหน้าที่เข้าได้จึงตรงกันเสมอ
  */
-export type AdminIconName = 'dashboard' | 'products' | 'categories' | 'promotions' | 'orders' | 'shipping' | 'payments' | 'users' | 'settings';
+export type AdminIconName = 'dashboard' | 'products' | 'categories' | 'promotions' | 'homepage' | 'orders' | 'shipping' | 'payments' | 'users' | 'settings';
 
 export interface AdminMenuItem {
   href: string;
@@ -55,6 +55,8 @@ export const ADMIN_MENU: AdminMenuItem[] = [
   { href: '/admin/products', label: 'สินค้า', icon: 'products', permission: 'catalog.manage' },
   { href: '/admin/categories', label: 'หมวดหมู่', icon: 'categories', permission: 'catalog.manage' },
   { href: '/admin/promotions', label: 'โปรโมชัน', icon: 'promotions', permission: 'promotion.manage' },
+  // หน้าแรก = สไลด์แบนเนอร์ + ป๊อปอัปตอนเข้าเว็บ (เนื้อหาการตลาด) — ให้ admin เหมือนตั้งค่าร้าน
+  { href: '/admin/homepage', label: 'หน้าแรก', icon: 'homepage', permission: 'settings.manage' },
   { href: '/admin/orders', label: 'คำสั่งซื้อ', icon: 'orders', permission: 'order.manage' },
   // จัดส่ง = มุมมองคลัง (คิวแพ็ค · ใบปะหน้า · เลขพัสดุ · ตีกลับ) แยกจากคำสั่งซื้อที่เป็นมุมมองบริการลูกค้า/การเงิน — ข้อมูลชุดเดียวกัน
   { href: '/admin/shipping', label: 'จัดส่ง', icon: 'shipping', permission: 'order.manage' },

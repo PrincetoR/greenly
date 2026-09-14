@@ -1,0 +1,46 @@
+{
+  "slides": [
+    {
+      "id": "slide-promo",
+      "image": "/uploads/seed/banner-promo.svg",
+      "title": "ลด 20% เครื่องดื่มสุขภาพ",
+      "subtitle": "สกัดเย็น คอมบูชา มัทฉะ — โปรถึงสิ้นเดือนนี้",
+      "href": "/promotions",
+      "buttonLabel": "ดูโปรโมชัน",
+      "active": true,
+      "sortOrder": 10
+    },
+    {
+      "id": "slide-new",
+      "image": "/uploads/seed/banner-new.svg",
+      "title": "สินค้าใหม่ประจำสัปดาห์",
+      "subtitle": "กราโนล่า โปรตีนบาร์ ขนมสุขภาพ ส่งฟรีเมื่อครบ 1,000 บาท",
+      "href": "/products?sort=newest",
+      "buttonLabel": "เลือกซื้อ",
+      "active": true,
+      "sortOrder": 20
+    },
+    {
+      "id": "slide-brand",
+      "image": "/uploads/seed/banner-brand.svg",
+      "title": "Greenly",
+      "subtitle": "อาหารสุขภาพ ส่งตรงถึงบ้าน",
+      "href": "/products",
+      "buttonLabel": "",
+      "active": true,
+      "sortOrder": 30
+    }
+  ],
+  "autoplaySeconds": 5,
+  "popup": {
+    "enabled": true,
+    "image": "/uploads/seed/popup-welcome.svg",
+    "title": "ลูกค้าใหม่รับส่วนลด 100 บาท",
+    "body": "ใส่โค้ด SAVE100 ที่หน้าตะกร้า เมื่อสั่งซื้อครบ 500 บาท · ใช้ได้ 1 ครั้งต่อลูกค้า",
+    "href": "/promotions",
+    "buttonLabel": "ดูโปรโมชัน",
+    "width": 480,
+    "frequency": "daily",
+    "version": "2026-09-14T09:57:20.564Z"
+  }
+}

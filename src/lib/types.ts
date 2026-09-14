@@ -290,3 +290,41 @@ export interface DashboardRanks {
   topProducts: number;
 }
 export type DashboardRankKey = keyof DashboardRanks;
+
+/* ---------- หน้าแรก: สไลด์ + ป๊อปอัป (data/homepage.json) ---------- */
+export interface HeroSlide {
+  id: string;
+  /** รูปแบนเนอร์ (อัปโหลด) แนะนำ 1600×600 */
+  image: string;
+  title: string;
+  subtitle: string;
+  /** คลิกแล้วไปไหน — path ในเว็บ (/promotions, /category/…, /product/…) หรือ URL เต็ม · ว่าง = คลิกไม่ได้ */
+  href: string;
+  buttonLabel: string;
+  active: boolean;
+  sortOrder: number;
+}
+
+export type PopupFrequency = 'once' | 'daily' | 'always';
+
+export interface HomePopup {
+  enabled: boolean;
+  image: string | null;
+  title: string;
+  body: string;
+  href: string;
+  buttonLabel: string;
+  /** ความกว้างสูงสุด (px) — จอเล็กจะย่อให้พอดีเอง */
+  width: number;
+  /** แสดงบ่อยแค่ไหน: once = ครั้งเดียวต่อเบราว์เซอร์ · daily = วันละครั้ง · always = ทุกครั้งที่เปิดหน้าแรก */
+  frequency: PopupFrequency;
+  /** เปลี่ยนทุกครั้งที่บันทึก → ลูกค้าที่เคยปิดแล้วเห็นป๊อปอัปใหม่ */
+  version: string;
+}
+
+export interface Homepage {
+  slides: HeroSlide[];
+  /** เปลี่ยนสไลด์ทุกกี่วินาที · 0 = ไม่เลื่อนเอง */
+  autoplaySeconds: number;
+  popup: HomePopup;
+}

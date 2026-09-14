@@ -10,6 +10,31 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
 
   const { browser, page } = await launch();
 
+  // หน้าแรก: ป๊อปอัปเด้งครั้งแรก (seed เต็มเปิดไว้) → ปิด → โหลดใหม่ไม่เด้ง (วันละครั้ง) → ?popup=1 บังคับโชว์
+  await page.goto(`${BASE}/`);
+  await page.waitForSelector('[role=dialog][aria-labelledby=welcome-popup-title]');
+  ok((await page.locator('#welcome-popup-title').textContent()).includes('ลูกค้าใหม่'), 'ป๊อปอัปตอนเข้าเว็บเด้งครั้งแรก');
+  ok(Math.round((await page.locator('[role=dialog]').boundingBox()).width) === 480, 'ป๊อปอัปกว้าง 480 ตามตั้งค่า');
+  await page.click('[role=dialog] button[aria-label="ปิด"]');
+  await page.reload();
+  await page.waitForTimeout(800);
+  ok((await page.locator('[role=dialog]').count()) === 0, 'ปิดแล้วโหลดใหม่ไม่เด้ง (วันละครั้ง)');
+  await page.goto(`${BASE}/?popup=1`);
+  await page.waitForSelector('[role=dialog]');
+  ok(true, '?popup=1 บังคับโชว์ (ดูตัวอย่างจากหลังบ้าน)');
+  await page.keyboard.press('Escape');
+  ok((await page.locator('[role=dialog]').count()) === 0, 'Esc ปิดป๊อปอัป');
+
+  // สไลด์: 3 สไลด์ กดถัดไปแล้วจุดที่ 2 active · คลิกสไลด์ไปตามลิงก์
+  await page.goto(`${BASE}/`);
+  ok((await page.locator('[aria-roledescription=slide]').count()) === 3 && (await page.locator('[role=tab][aria-label^="สไลด์"]').count()) === 3, 'สไลด์แบนเนอร์ 3 ใบ + จุด 3 จุด');
+  await page.hover('[aria-roledescription=carousel]');
+  await page.click('button[aria-label="สไลด์ถัดไป"]');
+  await page.waitForTimeout(800);
+  ok((await page.getAttribute('[role=tab][aria-label="สไลด์ 2"]', 'aria-selected')) === 'true', 'กดถัดไป → สไลด์ 2');
+  ok((await page.locator('[aria-roledescription=slide]').nth(1).locator('a[href="/products?sort=newest"]').count()) === 1, 'สไลด์ 2 คลิกไป /products?sort=newest');
+  ok((await page.locator('h1').count()) === 1, 'หน้าแรกยังมี h1 (ซ่อนไว้)');
+
   // หน้าแรก: สินค้าขายดีอยู่ระหว่างสินค้าแนะนำกับสินค้าใหม่ (จัดอันดับจากออเดอร์จริง)
   await page.goto(`${BASE}/`);
   const homeH2 = (await page.locator('main h2').allTextContents()).map((t) => t.trim());
@@ -17,6 +42,21 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   ok((await page.locator('span:has-text("ขายดี #1")').count()) === 1 && (await page.locator('span:has-text("ขายดี #8")').count()) === 1, 'หน้าแรก: การ์ดขายดี 8 ใบมีป้ายอันดับ');
 
   await login(page, 'admin', 'admin1234');
+
+  // หลังบ้าน › หน้าแรก: แก้ความกว้างป๊อปอัปเป็น 640 → หน้าแรกใช้ค่าใหม่
+  await page.goto(`${BASE}/admin/homepage`);
+  ok((await page.locator('main li:has(a[href^="/admin/homepage?edit="])').count()) === 3, 'หลังบ้าน: รายการสไลด์ 3 ใบ');
+  await page.fill('#popup-width', '640');
+  await page.click('button:has-text("บันทึกป๊อปอัป")');
+  await page.waitForURL(/saved=popup/);
+  await page.goto(`${BASE}/?popup=1`);
+  await page.waitForSelector('[role=dialog]');
+  ok(Math.round((await page.locator('[role=dialog]').boundingBox()).width) === 640, 'ป๊อปอัปกว้าง 640 หลังแก้ในหลังบ้าน');
+  await page.keyboard.press('Escape');
+  await page.goto(`${BASE}/admin/homepage`);
+  await page.fill('#popup-width', '480');
+  await page.click('button:has-text("บันทึกป๊อปอัป")');
+  await page.waitForURL(/saved=popup/);
 
   // รายวัน (ค่าเริ่มต้น)
   await page.goto(`${BASE}/admin`);
