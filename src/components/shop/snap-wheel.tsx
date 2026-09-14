@@ -11,6 +11,13 @@ import { useEffect } from 'react';
 export function SnapWheel() {
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 48rem)');
+    // มีเมาส์/ทัชแพด (pointer: fine) → ปิด snap ของเบราว์เซอร์ ให้ JS คุมคนเดียว ไม่งั้นสองระบบแย่งกันตอนจบแอนิเมชันแล้วกระตุก · จอสัมผัสยังใช้ snap ของเบราว์เซอร์
+    const fine = window.matchMedia('(pointer: fine)');
+    const root = document.documentElement;
+    const applyMode = () => root.classList.toggle('wheel-snap', mq.matches && fine.matches);
+    applyMode();
+    mq.addEventListener('change', applyMode);
+    fine.addEventListener('change', applyMode);
     let locked = false;
     let unlock = 0;
 
@@ -41,11 +48,20 @@ export function SnapWheel() {
       window.scrollTo({ top: target, behavior: 'smooth' });
       clearTimeout(unlock);
       unlock = window.setTimeout(() => (locked = false), 700);
+      // ถึงจุดหมายแล้วปักตำแหน่งให้ตรงพิกเซล (กันค้าง .5px จาก smooth scroll)
+      const settle = () => {
+        window.removeEventListener('scrollend', settle);
+        if (Math.abs(window.scrollY - target) < 2 && window.scrollY !== target) window.scrollTo({ top: target });
+      };
+      window.addEventListener('scrollend', settle, { once: true });
     };
 
     window.addEventListener('wheel', onWheel, { passive: false });
     return () => {
       window.removeEventListener('wheel', onWheel);
+      mq.removeEventListener('change', applyMode);
+      fine.removeEventListener('change', applyMode);
+      root.classList.remove('wheel-snap');
       clearTimeout(unlock);
     };
   }, []);

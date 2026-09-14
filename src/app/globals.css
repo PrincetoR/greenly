@@ -192,6 +192,10 @@
     html:has(.snap-sections) .status-bar {
       scroll-snap-align: start;
     }
+    /* มีเมาส์ (SnapWheel ใส่ class) → ปิด snap ของเบราว์เซอร์ ให้ JS เลื่อนคนเดียว ไม่แย่งกันจนกระตุกตอนจบ */
+    html.wheel-snap:has(.snap-sections) {
+      scroll-snap-type: none;
+    }
   }
   /* หน้าแรกขณะแถบแบนเนอร์ยังอยู่ใต้ header (class จาก HeroHeaderSync): เส้นล่าง header โปร่ง — โผล่เมื่อขอบล่างแถบเลื่อนมาถึง · ยังกินที่ 1px เท่าเดิม ไม่ให้ layout ขยับ */
   html.hero-at-top .site-header {

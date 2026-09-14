@@ -82,7 +82,8 @@ export function ShopHeader({
         </div>
       </div>
 
-    <header className="site-header sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur">
+    {/* พื้นทึบ ไม่ใช้ backdrop-blur — ตอนแบนเนอร์ใหญ่เลื่อนมุดใต้ header การเบลอต้องคำนวณใหม่ทุกเฟรม ทำให้กระตุก (พี่ต่อเห็นตอน snap ไปหมวดหมู่) */}
+    <header className="site-header sticky top-0 z-40 border-b border-line bg-surface">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4">
         {/*
          * เส้นแนวตั้งร่วมกับหน้ารายการสินค้า (จอ md+):

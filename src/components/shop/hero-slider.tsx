@@ -33,7 +33,8 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
    * มือถือ: สไลด์เต็มแถว ภาพเล็กเรียง 2 คอลัมน์ข้างล่าง
    */
   return (
-    <div data-hero-content className={cn('mx-auto grid max-w-6xl gap-3 px-4 pb-4', sides.length > 0 && 'md:h-[372px] md:grid-cols-[2fr_1fr]')}>
+    {/* will-change: opacity ให้ compositor แยกเลเยอร์ — จางตามการเลื่อนได้ลื่นโดยไม่วาดรูปใหม่ทุกเฟรม */}
+    <div data-hero-content className={cn('mx-auto grid max-w-6xl gap-3 px-4 pb-4 will-change-[opacity]', sides.length > 0 && 'md:h-[372px] md:grid-cols-[2fr_1fr]')}>
       <section
         // มุมบนไม่มน — ชิดเส้น header พอดี
         className={cn('group relative aspect-[16/9] overflow-hidden rounded-lg rounded-t-none bg-ink md:aspect-auto', sides.length === 0 ? 'md:aspect-[8/3]' : 'md:h-full')}
