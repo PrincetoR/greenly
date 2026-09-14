@@ -6,7 +6,7 @@ import { cn } from '@/lib/cn';
 
 /**
  * แถวเลื่อนแนวนอน (หมวดหมู่บนมือถือ · โปรโมชันหน้าแรก) พร้อมสัญญาณว่าเลื่อนได้:
- *  · ขอบขวา/ซ้ายไล่จางเมื่อยังมีของอยู่ถัดไป · จุดบอกหน้าใต้แถว · ปุ่มซ้าย/ขวาบนจอที่มีเมาส์ (โผล่ตอนชี้)
+ *  · จุดบอกหน้าใต้แถว · ปุ่มซ้าย/ขวาบนจอที่มีเมาส์ (โผล่ตอนชี้) · ไม่มีขอบไล่จาง (พี่ต่อไม่เอา)
  *  · scroll-snap ทีละหน้า (snap-x mandatory) · ปัดนิ้ว/ทัชแพดได้ตามปกติ
  * ผู้เรียกจัด layout ของลูกเอง (grid/flex) — ตัวนี้แค่ครอบให้เลื่อน + วัดหน้า
  */
@@ -60,9 +60,7 @@ export function HScroller({ children, className, ariaLabel }: { children: React.
       <div ref={ref} className="scrollbar-none -mx-4 snap-x snap-mandatory scroll-pl-4 overflow-x-auto px-4 sm:-mx-1 sm:scroll-pl-1 sm:px-1" role="region" aria-label={ariaLabel}>
         {children}
       </div>
-      {/* ขอบไล่จาง = ยังมีของถัดไป (ไม่บังคลิก) */}
-      {scrollable && !atEnd && <div className="pointer-events-none absolute inset-y-0 -right-4 w-8 bg-gradient-to-l from-page via-page/70 to-transparent sm:-right-1 sm:w-6" aria-hidden />}
-      {scrollable && !atStart && <div className="pointer-events-none absolute inset-y-0 -left-4 w-8 bg-gradient-to-r from-page via-page/70 to-transparent sm:-left-1 sm:w-6" aria-hidden />}
+      {/* ไม่มีขอบไล่จาง — พี่ต่อ: จุดด้านล่างก็บอกอยู่แล้วว่าเลื่อนได้ ขอบให้แสดงปกติ */}
       {scrollable && (
         <>
           <button type="button" onClick={() => go(-1)} disabled={atStart} aria-label="เลื่อนไปซ้าย" className="absolute top-1/2 -left-3 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-surface text-ink opacity-0 shadow border border-line transition-opacity group-hover/hs:opacity-100 disabled:opacity-0! sm:flex">
