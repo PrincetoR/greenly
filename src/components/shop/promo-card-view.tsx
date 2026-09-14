@@ -51,7 +51,7 @@ export function PromoCardView({ data: d }: { data: PromoCardData }) {
             setOpen(true);
           }
         }}
-        className={cn('group card-hover flex h-full cursor-pointer flex-col gap-3 rounded-card bg-surface p-5 border border-line', !d.live && 'opacity-80')}
+        className={cn('group card-hover flex h-full min-w-0 cursor-pointer flex-col gap-3 rounded-card bg-surface p-5 border border-line', !d.live && 'opacity-80')}
       >
         <div className="flex items-start gap-3">
           <span className={cn('flex size-12 shrink-0 items-center justify-center rounded-xl', accent)} aria-hidden>
