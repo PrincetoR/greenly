@@ -4,7 +4,7 @@ import { newId, nowIso, readDocument, updateDocument } from './store';
 
 const NAME = 'homepage';
 
-export const DEFAULT_POPUP: HomePopup = { enabled: false, image: null, title: '', body: '', href: '', buttonLabel: 'ดูรายละเอียด', width: 480, frequency: 'daily', version: '' };
+export const DEFAULT_POPUP: HomePopup = { enabled: false, image: null, title: '', body: '', href: '', width: 480, frequency: 'daily', version: '' };
 export const DEFAULT_HOMEPAGE: Homepage = { slides: [], autoplaySeconds: 5, popup: DEFAULT_POPUP };
 
 /** ผสาน default เผื่อไฟล์ยังไม่มี/ขาด field */

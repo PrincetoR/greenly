@@ -69,7 +69,6 @@ export default async function HomepageAdminPage({ searchParams }: PageProps<'/ad
                       {s.href ? (
                         <>
                           คลิกไป <span className="font-mono">{s.href}</span>
-                          {s.buttonLabel && ` · ปุ่ม "${s.buttonLabel}"`}
                         </>
                       ) : (
                         'ไม่มีลิงก์'

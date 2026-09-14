@@ -5,11 +5,10 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import type { HeroSlide } from '@/lib/types';
-import { buttonStyles } from '@/components/ui/button';
 
 /**
  * สไลด์แบนเนอร์หน้าแรก — เลื่อนเอง (autoplaySeconds · 0 = ไม่เลื่อน) หยุดตอนชี้เมาส์/โฟกัส · ปุ่มซ้าย-ขวา · จุดบอกตำแหน่ง · ปุ่มลูกศรคีย์บอร์ด
- * แต่ละสไลด์คลิกได้ทั้งภาพถ้ามี href · ข้อความ/ปุ่มซ้อนบนรูปพร้อมไล่เฉดให้อ่านออก
+ * แต่ละสไลด์คลิกได้ทั้งภาพถ้ามี href (ไม่มีปุ่ม — พี่ต่อสั่ง) · ข้อความซ้อนบนรูปพร้อมไล่เฉดให้อ่านออก
  * เลื่อนแบบ translateX ทั้งแถว (ไม่ใช่ fade) ให้รู้สึกเป็น "สไลด์" จริง
  */
 export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlide[]; side: HeroSlide[]; autoplaySeconds: number }) {
@@ -61,13 +60,12 @@ export function HeroSlider({ slides, side, autoplaySeconds }: { slides: HeroSlid
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={s.image} alt={s.title || ''} className="absolute inset-0 size-full object-cover" loading={i === 0 ? 'eager' : 'lazy'} draggable={false} />
               {/* ข้อความอยู่มุมล่างซ้าย ไล่เฉดจากล่างขึ้นให้อ่านออก (พี่ต่อไม่เอากลาง) */}
-              {(s.title || s.subtitle || (s.href && s.buttonLabel)) && (
+              {(s.title || s.subtitle) && (
                 <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-ink/75 via-ink/30 to-transparent" aria-hidden />
               )}
               <div className="relative flex h-full flex-col justify-end gap-2 p-5 pb-9 text-white sm:p-7 sm:pb-10">
                 {s.title && <p className="max-w-xl text-2xl font-bold leading-tight drop-shadow sm:text-3xl">{s.title}</p>}
                 {s.subtitle && <p className="max-w-lg text-sm text-white/90 drop-shadow sm:text-base">{s.subtitle}</p>}
-                {s.href && s.buttonLabel && <span className={cn(buttonStyles(), 'mt-1 w-fit')}>{s.buttonLabel}</span>}
               </div>
             </>
           );

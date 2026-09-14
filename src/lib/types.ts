@@ -298,9 +298,8 @@ export interface HeroSlide {
   image: string;
   title: string;
   subtitle: string;
-  /** คลิกแล้วไปไหน — path ในเว็บ (/promotions, /category/…, /product/…) หรือ URL เต็ม · ว่าง = คลิกไม่ได้ */
+  /** คลิกแล้วไปไหน — path ในเว็บ (/promotions, /category/…, /product/…) หรือ URL เต็ม · ว่าง = คลิกไม่ได้ (คลิกทั้งภาพ ไม่มีปุ่ม) */
   href: string;
-  buttonLabel: string;
   active: boolean;
   sortOrder: number;
   /** main = สไลด์ใหญ่ซ้าย (เลื่อน) · side = ภาพเล็กด้านขวา 2 ช่อง (นิ่ง แบบ Shopee) */
@@ -314,8 +313,8 @@ export interface HomePopup {
   image: string | null;
   title: string;
   body: string;
+  /** คลิกที่รูป/เนื้อหาแล้วไปไหน · ว่าง = แค่แสดง (ไม่มีปุ่ม) */
   href: string;
-  buttonLabel: string;
   /** ความกว้างสูงสุด (px) — จอเล็กจะย่อให้พอดีเอง */
   width: number;
   /** แสดงบ่อยแค่ไหน: once = ครั้งเดียวต่อเบราว์เซอร์ · daily = วันละครั้ง · always = ทุกครั้งที่เปิดหน้าแรก */

@@ -33,11 +33,8 @@ export function SlideForm({ slide }: { slide?: HeroSlide }) {
       <Field label="ข้อความรอง" htmlFor="slide-subtitle" error={errors.subtitle}>
         <input id="slide-subtitle" name="subtitle" defaultValue={v.subtitle ?? slide?.subtitle ?? ''} maxLength={160} />
       </Field>
-      <Field label="คลิกแล้วไปที่" htmlFor="slide-href" error={errors.href} hint="เช่น /promotions · /category/เครื่องดื่มสุขภาพ · /product/… · https://… (ว่าง = คลิกไม่ได้)">
+      <Field label="คลิกภาพแล้วไปที่" htmlFor="slide-href" error={errors.href} hint="คลิกได้ทั้งภาพ ไม่มีปุ่ม · เช่น /promotions · /category/เครื่องดื่มสุขภาพ · /product/… · https://… (ว่าง = คลิกไม่ได้)" className="sm:col-span-2">
         <input id="slide-href" name="href" defaultValue={v.href ?? slide?.href ?? ''} placeholder="/promotions" />
-      </Field>
-      <Field label="ข้อความปุ่ม" htmlFor="slide-button" error={errors.buttonLabel} hint="แสดงเมื่อมีลิงก์ · ว่าง = ไม่มีปุ่ม (คลิกทั้งภาพได้)">
-        <input id="slide-button" name="buttonLabel" defaultValue={v.buttonLabel ?? slide?.buttonLabel ?? ''} maxLength={30} placeholder="ดูโปรโมชัน" />
       </Field>
       <Field label="ตำแหน่ง" htmlFor="slide-slot" error={errors.slot} hint="แบบ Shopee: ซ้ายเป็นสไลด์ใหญ่ ขวาเป็นภาพเล็ก 2 ช่อง (ใช้ 2 ภาพแรกตามลำดับ)">
         <select id="slide-slot" name="slot" defaultValue={v.slot ?? slide?.slot ?? 'main'}>
@@ -98,11 +95,8 @@ export function PopupForm({ popup }: { popup: HomePopup }) {
       <Field label="ข้อความ" htmlFor="popup-body" error={errors.body} className="sm:row-span-2">
         <textarea id="popup-body" name="body" defaultValue={v.body ?? popup.body} rows={4} maxLength={500} />
       </Field>
-      <Field label="คลิกปุ่มแล้วไปที่" htmlFor="popup-href" error={errors.href} hint="ว่าง = ไม่มีปุ่ม มีแค่ปิด">
+      <Field label="คลิกรูป/เนื้อหาแล้วไปที่" htmlFor="popup-href" error={errors.href} hint="คลิกได้ทั้งป๊อปอัป ไม่มีปุ่ม · ว่าง = แค่แสดง (ปิดด้วยกากบาท)">
         <input id="popup-href" name="href" defaultValue={v.href ?? popup.href} placeholder="/promotions" />
-      </Field>
-      <Field label="ข้อความปุ่ม" htmlFor="popup-button" error={errors.buttonLabel}>
-        <input id="popup-button" name="buttonLabel" defaultValue={v.buttonLabel ?? popup.buttonLabel} maxLength={30} />
       </Field>
       <Field label="ความกว้าง (px)" htmlFor="popup-width" error={errors.width} hint="จอเล็กกว่านี้จะย่อให้พอดีเอง · พิมพ์เองได้ 280–1200">
         <div className="flex gap-2">

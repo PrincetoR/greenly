@@ -20,7 +20,6 @@ const slideSchema = z.object({
   title: z.string().trim().max(80, 'หัวข้อยาวเกิน 80 ตัวอักษร'),
   subtitle: z.string().trim().max(160, 'ข้อความรองยาวเกิน 160 ตัวอักษร'),
   href: hrefInput,
-  buttonLabel: z.string().trim().max(30),
   active: checkbox,
   sortOrder: intInput({ min: 0, max: 999, label: 'ลำดับ' }),
   slot: z.enum(['main', 'side'], { message: 'เลือกตำแหน่ง' }),
@@ -34,7 +33,6 @@ export async function saveSlide(_prev: FormState, formData: FormData): Promise<F
     title: formData.get('title') ?? '',
     subtitle: formData.get('subtitle') ?? '',
     href: formData.get('href') ?? '',
-    buttonLabel: formData.get('buttonLabel') ?? '',
     active: formData.get('active'),
     sortOrder: formData.get('sortOrder') ?? '0',
     slot: formData.get('slot') ?? 'main',
@@ -66,7 +64,6 @@ const popupSchema = z.object({
   title: z.string().trim().max(80, 'หัวข้อยาวเกิน 80 ตัวอักษร'),
   body: z.string().trim().max(500, 'ข้อความยาวเกิน 500 ตัวอักษร'),
   href: hrefInput,
-  buttonLabel: z.string().trim().max(30),
   width: intInput({ min: 280, max: 1200, label: 'ความกว้าง' }),
   frequency: z.enum(['once', 'daily', 'always'], { message: 'เลือกความถี่' }),
 });
@@ -79,7 +76,6 @@ export async function savePopup(_prev: FormState, formData: FormData): Promise<F
     title: formData.get('title') ?? '',
     body: formData.get('body') ?? '',
     href: formData.get('href') ?? '',
-    buttonLabel: formData.get('buttonLabel') ?? '',
     width: formData.get('width') ?? '480',
     frequency: formData.get('frequency'),
   });

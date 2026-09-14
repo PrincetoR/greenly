@@ -477,17 +477,17 @@ function bannerSvg(title: string, sub: string, hue: number, emoji: string, withT
 `;
 }
 
-const bannerSeed: { id: string; file: string; title: string; subtitle: string; href: string; buttonLabel: string; hue: number; emoji: string; slot: 'main' | 'side' }[] = [
-  { id: 'slide-promo', file: 'banner-promo', title: 'ลด 20% เครื่องดื่มสุขภาพ', subtitle: 'สกัดเย็น คอมบูชา มัทฉะ — โปรถึงสิ้นเดือนนี้', href: '/promotions', buttonLabel: 'ดูโปรโมชัน', hue: 150, emoji: '🥤', slot: 'main' },
-  { id: 'slide-new', file: 'banner-new', title: 'สินค้าใหม่ประจำสัปดาห์', subtitle: 'กราโนล่า โปรตีนบาร์ ขนมสุขภาพ ส่งฟรีเมื่อครบ 1,000 บาท', href: '/products?sort=newest', buttonLabel: 'เลือกซื้อ', hue: 30, emoji: '🍪', slot: 'main' },
-  { id: 'slide-brand', file: 'banner-brand', title: 'Greenly', subtitle: 'อาหารสุขภาพ ส่งตรงถึงบ้าน', href: '/products', buttonLabel: '', hue: 200, emoji: '🌿', slot: 'main' },
+const bannerSeed: { id: string; file: string; title: string; subtitle: string; href: string; hue: number; emoji: string; slot: 'main' | 'side' }[] = [
+  { id: 'slide-promo', file: 'banner-promo', title: 'ลด 20% เครื่องดื่มสุขภาพ', subtitle: 'สกัดเย็น คอมบูชา มัทฉะ — โปรถึงสิ้นเดือนนี้', href: '/promotions', hue: 150, emoji: '🥤', slot: 'main' },
+  { id: 'slide-new', file: 'banner-new', title: 'สินค้าใหม่ประจำสัปดาห์', subtitle: 'กราโนล่า โปรตีนบาร์ ขนมสุขภาพ ส่งฟรีเมื่อครบ 1,000 บาท', href: '/products?sort=newest', hue: 30, emoji: '🍪', slot: 'main' },
+  { id: 'slide-brand', file: 'banner-brand', title: 'Greenly', subtitle: 'อาหารสุขภาพ ส่งตรงถึงบ้าน', href: '/products', hue: 200, emoji: '🌿', slot: 'main' },
   // ภาพเล็กด้านขวา 2 ช่อง (แบบ Shopee)
-  { id: 'side-freeship', file: 'banner-side-freeship', title: 'ส่งฟรีเมื่อครบ 1,000', subtitle: 'ทุกออเดอร์ ทั่วไทย', href: '/products', buttonLabel: '', hue: 100, emoji: '🚚', slot: 'side' },
-  { id: 'side-coupon', file: 'banner-side-coupon', title: 'โค้ด SAVE100', subtitle: 'ลูกค้าใหม่ลดทันที 100 บาท', href: '/promotions', buttonLabel: '', hue: 340, emoji: '🎟️', slot: 'side' },
+  { id: 'side-freeship', file: 'banner-side-freeship', title: 'ส่งฟรีเมื่อครบ 1,000', subtitle: 'ทุกออเดอร์ ทั่วไทย', href: '/products', hue: 100, emoji: '🚚', slot: 'side' },
+  { id: 'side-coupon', file: 'banner-side-coupon', title: 'โค้ด SAVE100', subtitle: 'ลูกค้าใหม่ลดทันที 100 บาท', href: '/promotions', hue: 340, emoji: '🎟️', slot: 'side' },
 ];
 
 const homepage: Homepage = {
-  slides: bannerSeed.map((b, i) => ({ id: b.id, image: `/uploads/seed/${b.file}.svg`, title: b.title, subtitle: b.subtitle, href: b.href, buttonLabel: b.buttonLabel, active: true, sortOrder: (i + 1) * 10, slot: b.slot })),
+  slides: bannerSeed.map((b, i) => ({ id: b.id, image: `/uploads/seed/${b.file}.svg`, title: b.title, subtitle: b.subtitle, href: b.href, active: true, sortOrder: (i + 1) * 10, slot: b.slot })),
   autoplaySeconds: 5,
   // ป๊อปอัปเปิดเฉพาะ seed สาธิต — e2e (seed:clean) ปิดไว้ ไม่งั้นบังปุ่มที่เทสต์กด
   popup: {
@@ -496,7 +496,6 @@ const homepage: Homepage = {
     title: 'ลูกค้าใหม่รับส่วนลด 100 บาท',
     body: 'ใส่โค้ด SAVE100 ที่หน้าตะกร้า เมื่อสั่งซื้อครบ 500 บาท · ใช้ได้ 1 ครั้งต่อลูกค้า',
     href: '/promotions',
-    buttonLabel: 'ดูโปรโมชัน',
     width: 480,
     frequency: 'daily',
     version: iso(now),

@@ -14,6 +14,7 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   await page.goto(`${BASE}/`);
   await page.waitForSelector('[role=dialog][aria-labelledby=welcome-popup-title]');
   ok((await page.locator('#welcome-popup-title').textContent()).includes('ลูกค้าใหม่'), 'ป๊อปอัปตอนเข้าเว็บเด้งครั้งแรก');
+  ok((await page.locator('[role=dialog] a[href="/promotions"]').count()) === 1 && (await page.locator('[role=dialog] button').count()) === 1, 'ป๊อปอัป: คลิกรูป/เนื้อหาไปลิงก์ได้ ไม่มีปุ่ม (มีแค่กากบาท)');
   ok(Math.round((await page.locator('[role=dialog]').boundingBox()).width) === 480, 'ป๊อปอัปกว้าง 480 ตามตั้งค่า');
   await page.click('[role=dialog] button[aria-label="ปิด"]');
   await page.reload();
@@ -35,7 +36,7 @@ const { BASE, DATA, launch, login, shot, ok } = require('./lib');
   await page.click('button[aria-label="สไลด์ถัดไป"]');
   await page.waitForTimeout(800);
   ok((await page.getAttribute('[role=tab][aria-label="สไลด์ 2"]', 'aria-selected')) === 'true', 'กดถัดไป → สไลด์ 2');
-  ok((await page.locator('[aria-roledescription=slide]').nth(1).locator('a[href="/products?sort=newest"]').count()) === 1, 'สไลด์ 2 คลิกไป /products?sort=newest');
+  ok((await page.locator('[aria-roledescription=slide]').nth(1).locator('a[href="/products?sort=newest"]').count()) === 1 && (await page.locator('[aria-roledescription=slide] a button, [aria-roledescription=slide] a span[class*="bg-brand"]').count()) === 0, 'สไลด์ 2 คลิกทั้งภาพไป /products?sort=newest ไม่มีปุ่ม');
   ok((await page.locator('h1').count()) === 1, 'หน้าแรกยังมี h1 (ซ่อนไว้)');
 
   // หน้าแรก: สินค้าขายดีอยู่ระหว่างสินค้าแนะนำกับสินค้าใหม่ (จัดอันดับจากออเดอร์จริง)
