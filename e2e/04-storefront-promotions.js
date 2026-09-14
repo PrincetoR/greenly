@@ -60,8 +60,9 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
 
   // /promotions page
   await page.goto(`${BASE}/promotions`);
-  ok((await page.textContent('h2:has-text("กำลังใช้งาน")')).includes('(4)'), 'promotions: 4 live');
-  ok((await page.textContent('h2:has-text("เร็ว ๆ นี้")')).includes('(1)'), 'promotions: 1 upcoming');
+  // ไม่มีหัวข้อย่อย กำลังใช้งาน/เร็ว ๆ นี้ (พี่ต่อเอาออก) · หัวข้อ "โปรโมชันทั้งหมด" · 5 การ์ด live 4 ใบก่อน scheduled 1 ใบ
+  const badges = await page.locator('main article h3 + div').allTextContents();
+  ok((await page.textContent('main h1')) === 'โปรโมชันทั้งหมด' && (await page.locator('main h2').count()) === 0 && badges.join('|') === 'กำลังใช้งาน|กำลังใช้งาน|กำลังใช้งาน|กำลังใช้งาน|เร็ว ๆ นี้', `promotions: หัวข้อ โปรโมชันทั้งหมด · ไม่มีหัวข้อย่อย · ${badges.length} การ์ด (live ก่อน)`);
   ok((await page.locator('text=ลด 10% ทั้งร้าน กลางเดือน').count()) === 0 && (await page.locator('text=SUMMER50').count()) === 0, 'promotions: expired hidden');
   ok((await page.locator('text=เริ่มใน').count()) === 1, 'promotions: upcoming shows "เริ่มใน"');
   // โครงเดียวกับหน้ารายการสินค้า (พี่ต่อสั่ง 2026-09-15): card หมวดซ้าย ตัวเลข = จำนวนโปรที่เข้าร่วม · โปรทั้งร้านนับทุกหมวด · เลือกหมวดแล้วกรอง

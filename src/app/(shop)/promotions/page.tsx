@@ -27,6 +27,7 @@ function promoCategoryIds(promo: Promotion, products: Product[]): Set<string> | 
 /**
  * หน้าโปรโมชัน โครงเดียวกับหน้ารายการสินค้า (พี่ต่อสั่ง 2026-09-15): card หมวดหมู่ซ้าย (ตัวเลข = จำนวนโปรที่เข้าร่วม)
  * เลือกหมวด (?category=slug) → โปรที่ใช้กับหมวดนั้น + โปรทั้งร้าน · มือถือเป็น dropdown ใต้หัวข้อ
+ * ไม่มีหัวข้อย่อย "กำลังใช้งาน / เร็ว ๆ นี้" (พี่ต่อเอาออก) — เรียง live ก่อน scheduled ป้ายสถานะอยู่บนการ์ดแล้ว
  */
 export default async function PromotionsPage({ searchParams }: PageProps<'/promotions'>) {
   const sp = await searchParams;
@@ -47,15 +48,8 @@ export default async function PromotionsPage({ searchParams }: PageProps<'/promo
     ...categories.map((c) => ({ href: `/promotions?category=${encodeURIComponent(c.slug)}`, label: c.name, count: visible.filter((x) => inCategory(x, c.id)).length, active: current?.id === c.id })),
   ];
   const currentHref = links.find((l) => l.active)?.href ?? '/promotions';
-  const title = current ? current.name : 'โปรโมชัน';
+  const title = current ? current.name : 'โปรโมชันทั้งหมด';
 
-  const grid = (items: typeof shown, status: 'live' | 'scheduled') => (
-    <div className="grid gap-3 md:grid-cols-2">
-      {items.map(({ p }) => (
-        <PromoCard key={p.id} promo={p} status={status} usage={usage[p.id]} categories={categories} products={products} now={now} />
-      ))}
-    </div>
-  );
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-8 md:grid md:grid-cols-[var(--aside-w)_1fr] md:items-start md:gap-4">
@@ -89,24 +83,11 @@ export default async function PromotionsPage({ searchParams }: PageProps<'/promo
             }
           />
         ) : (
-          <>
-            {live.length > 0 && (
-              <section aria-labelledby="promo-live">
-                <h2 id="promo-live" className="mb-3 text-lg font-bold">
-                  กำลังใช้งาน <span className="text-sm font-normal text-muted">({live.length})</span>
-                </h2>
-                {grid(live, 'live')}
-              </section>
-            )}
-            {upcoming.length > 0 && (
-              <section aria-labelledby="promo-upcoming" className={live.length > 0 ? 'mt-8' : undefined}>
-                <h2 id="promo-upcoming" className="mb-3 text-lg font-bold">
-                  เร็ว ๆ นี้ <span className="text-sm font-normal text-muted">({upcoming.length})</span>
-                </h2>
-                {grid(upcoming, 'scheduled')}
-              </section>
-            )}
-          </>
+          <div className="grid gap-3 md:grid-cols-2">
+            {[...live, ...upcoming].map(({ p, status }) => (
+              <PromoCard key={p.id} promo={p} status={status} usage={usage[p.id]} categories={categories} products={products} now={now} />
+            ))}
+          </div>
         )}
       </div>
     </div>
