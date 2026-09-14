@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import { SearchX } from 'lucide-react';
-import { cn } from '@/lib/cn';
 import type { Category, Product } from '@/lib/types';
 import { countActiveByCategory } from '@/lib/db/products';
 import { ProductCard, ProductGrid } from './product-card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { buttonStyles } from '@/components/ui/button';
 import { ListingToolbar } from './listing-toolbar';
+import { CategoryAside } from './category-aside';
 import type { SortValue } from './sort-options';
 
 export { SORT_OPTIONS, parseSort, type SortValue } from './sort-options';
@@ -62,31 +62,7 @@ export async function ProductListing({
      * มือถือไม่ sticky (แถบสูงเกินครึ่งจอ)
      */
     <div className="mx-auto max-w-6xl px-4 pb-8 md:grid md:grid-cols-[var(--aside-w)_1fr] md:items-start md:gap-4">
-      <aside className="sticky top-[65px] hidden pt-4 md:block">
-        {/* ขอบบน card ตรงกับช่องค้นหา · แถวแรก "หมวดหมู่สินค้า" สูง 40 เท่าช่องค้นหา · คั่นด้วยเส้น */}
-        <nav aria-label="หมวดหมู่สินค้า" className="rounded-card bg-surface p-2 pt-0 border border-line">
-          {/* ขนาดใกล้เคียงหัวข้อหน้า (ย่อมกว่าหนึ่งขั้น) ให้ดูเป็นหัวข้อของคอลัมน์ ไม่ใช่รายการหนึ่ง */}
-          {/* -mt-px ชดเชย border บน 1px ของ card: แถวสูง 40 เท่าช่องค้นหา กึ่งกลางตรงหัวข้อหน้า เส้นคั่นที่ 40 */}
-          <p className="-mt-px flex h-10 items-center px-2 text-lg font-bold">หมวดหมู่สินค้า</p>
-          {/* เส้นคั่นอยู่ที่ 40px = ขอบล่างช่องค้นหา · เว้น 15px ให้ "ทั้งหมด" เริ่มที่ 56 = ขอบบนการ์ดสินค้า */}
-          <div className="divider-caret mb-[15px] border-t border-line" aria-hidden />
-          <ul className="flex flex-col">
-            {links.map((l) => (
-              <li key={l.href}>
-                <Link
-                  href={l.href}
-                  aria-current={l.active ? 'page' : undefined}
-                  className={cn('flex items-center gap-2 rounded-lg px-3 py-1.5 text-[15px] font-medium transition-colors', l.active ? 'bg-brand-soft text-brand' : 'text-ink hover:bg-surface-alt')}
-                >
-                  <span className="min-w-0 flex-1 truncate">{l.label}</span>
-                  {/* จำนวนสินค้าชิดขวาแถวเดียวกับชื่อ */}
-                  <span className={cn('shrink-0 text-xs tabular-nums', l.active ? 'text-brand/80' : 'text-muted')}>{l.count}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </aside>
+      <CategoryAside links={links} />
 
       <div className="min-w-0">
         {/*

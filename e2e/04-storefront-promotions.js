@@ -64,6 +64,20 @@ const writePromos = (p) => fs.writeFileSync(PROMOS, JSON.stringify(p, null, 2) +
   ok((await page.textContent('h2:has-text("เร็ว ๆ นี้")')).includes('(1)'), 'promotions: 1 upcoming');
   ok((await page.locator('text=ลด 10% ทั้งร้าน กลางเดือน').count()) === 0 && (await page.locator('text=SUMMER50').count()) === 0, 'promotions: expired hidden');
   ok((await page.locator('text=เริ่มใน').count()) === 1, 'promotions: upcoming shows "เริ่มใน"');
+  // โครงเดียวกับหน้ารายการสินค้า (พี่ต่อสั่ง 2026-09-15): card หมวดซ้าย ตัวเลข = จำนวนโปรที่เข้าร่วม · โปรทั้งร้านนับทุกหมวด · เลือกหมวดแล้วกรอง
+  const pl = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll('main aside nav ul a')].map((a) => { const [n, c] = a.querySelectorAll('span'); return { label: n.textContent, count: Number(c.textContent) }; });
+    return { title: document.querySelector('main aside nav p').textContent, rows, asideTop: document.querySelector('main aside nav').getBoundingClientRect().top, h1Top: document.querySelector('main h1').getBoundingClientRect().top };
+  });
+  const row = (l) => pl.rows.find((r) => r.label === l)?.count;
+  ok(pl.title === 'หมวดหมู่สินค้า' && pl.asideTop === pl.h1Top && row('ทั้งหมด') === 5, `promotions: card หมวดซ้ายเหมือนหน้ารายการ · ทั้งหมด ${row('ทั้งหมด')}`);
+  // SAVE100 (ทั้งร้าน) นับทุกหมวด → ทุกหมวด ≥ 1 · เครื่องดื่ม = SAVE100 + ลด 20% + MATCHA50 (สินค้า p-002 อยู่หมวดเครื่องดื่ม) = 3 · อาหารเสริม = SAVE100 + Flash Sale = 2
+  ok(pl.rows.every((r) => r.count >= 1) && row('เครื่องดื่มสุขภาพ') === 3 && row('อาหารเสริม') === 2 && row('ชาและกาแฟ') === 1, `promotions: จำนวนต่อหมวด (เครื่องดื่ม ${row('เครื่องดื่มสุขภาพ')} · อาหารเสริม ${row('อาหารเสริม')} · ชา ${row('ชาและกาแฟ')})`);
+  await page.click('main aside nav a:has-text("อาหารเสริม")');
+  await page.waitForURL(/category=/);
+  const names = await page.locator('main article h3').allTextContents();
+  ok((await page.textContent('main h1')) === 'อาหารเสริม' && names.length === 2 && names.some((n) => n.includes('SAVE100')) && names.some((n) => n.includes('Flash Sale')) && (await page.locator('main aside nav a[aria-current=page]').textContent()).includes('อาหารเสริม'), `promotions: เลือกหมวดอาหารเสริม → ${names.length} โปร (ทั้งร้าน + Flash Sale)`);
+  await page.goto(`${BASE}/promotions`);
   await shot(page, 'p5-promotions');
   // link to products in promo
   await page.locator('article', { hasText: 'ลด 20% เครื่องดื่มสุขภาพ' }).locator('a:has-text("ดูสินค้าในโปร")').click();
