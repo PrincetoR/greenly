@@ -63,7 +63,6 @@ export default async function PromotionsPage({ searchParams }: PageProps<'/promo
               <h1 className="truncate text-2xl leading-10 font-bold">{title}</h1>
               <span className="shrink-0 text-sm text-muted">{shown.length} โปรโมชัน</span>
             </div>
-            <p className="hidden text-sm text-muted lg:block lg:ml-auto">ส่วนลดมีผลอัตโนมัติเมื่อใส่สินค้าลงตะกร้า · คูปองกรอกโค้ดตอนชำระเงิน</p>
             {/* มือถือ: หมวดหมู่เป็น dropdown ใต้หัวข้อ (เหมือนหน้ารายการสินค้า) */}
             <div className="w-full md:hidden">
               <CategoryPicker options={links.map((l) => ({ value: l.href, label: `${l.label} (${l.count})` }))} value={currentHref} />
