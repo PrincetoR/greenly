@@ -11,7 +11,7 @@ import { neon } from '@neondatabase/serverless';
  *  - ไฟล์ `data/*.json` (รันในเครื่อง) — read-modify-write ต่อคิวต่อไฟล์ เขียน .tmp แล้ว rename กันไฟล์เสีย
  *  - Postgres (Neon, มี `DATABASE_URL`) — Vercel เขียนไฟล์ในโปรเจกต์ไม่ได้ (EROFS) จึงเก็บทั้ง collection เป็น jsonb แถวเดียวต่อชื่อ
  *    ตาราง `collections(name, data, updated_at)` สร้างเองครั้งแรก · **อ่านไม่เจอแถว = ใช้ไฟล์ seed ใน data/ แทน** (deploy ครั้งแรกมีข้อมูลสาธิตทันที
- *    เขียนครั้งแรกค่อยย้ายทั้ง collection ขึ้น DB) · cache ต่อ instance 2 วินาที ลดการดึง jsonb ก้อนใหญ่ทุก request
+ *    เขียนครั้งแรกค่อยย้ายทั้ง collection ขึ้น DB) · cache ต่อ instance ตรวจด้วย updated_at (query เวอร์ชันเล็ก ๆ ครั้งเดียวต่อวินาที) — ดึง jsonb ก้อนใหญ่เฉพาะตอนเปลี่ยน
  */
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -44,10 +44,14 @@ async function writeFileJson(name: string, value: unknown): Promise<void> {
 /* ---------- driver: Postgres (Neon HTTP) ---------- */
 
 const DATABASE_URL = process.env.DATABASE_URL;
-const CACHE_MS = 2000;
+/** เวอร์ชัน (updated_at ทุก collection) จำไว้ 1 วินาที — หน้าเดียวอ่านหลาย collection พร้อมกันจะยิง query เวอร์ชันแค่ครั้งเดียว */
+const VERSIONS_MS = 1000;
 let sqlClient: ReturnType<typeof neon> | null = null;
 let ready: Promise<void> | null = null;
-const cache = new Map<string, { data: unknown; updatedAt: string; checkedAt: number }>();
+/** ข้อมูลต่อ instance — ใช้ซ้ำได้ตราบใดที่ updated_at ใน DB ยังเท่าเดิม (ไม่ต้องดึง jsonb ก้อนใหญ่ทุก request) */
+const cache = new Map<string, { data: unknown; updatedAt: string }>();
+let versions: { at: number; map: Map<string, string> } | null = null;
+const inflight = new Map<string, Promise<unknown>>();
 
 function sql() {
   if (!sqlClient) sqlClient = neon(DATABASE_URL!);
@@ -67,28 +71,50 @@ function ensureTable(): Promise<void> {
   return ready;
 }
 
-async function readPgJson<T>(name: string, fallback: T): Promise<T> {
+/** updated_at ของทุก collection ใน query เดียว (แถวเล็ก ๆ ไม่กี่แถว) */
+async function getVersions(fresh = false): Promise<Map<string, string>> {
+  if (!fresh && versions && Date.now() - versions.at < VERSIONS_MS) return versions.map;
+  const rows = (await sql()`SELECT name, updated_at FROM collections`) as { name: string; updated_at: string }[];
+  versions = { at: Date.now(), map: new Map(rows.map((r) => [r.name, String(r.updated_at)])) };
+  return versions.map;
+}
+
+async function readPgJson<T>(name: string, fallback: T, fresh = false): Promise<T> {
   await ensureTable();
-  const hit = cache.get(name);
-  if (hit && Date.now() - hit.checkedAt < CACHE_MS) return hit.data as T;
-  const rows = (await sql()`SELECT data, updated_at FROM collections WHERE name = ${name}`) as { data: T; updated_at: string }[];
+  const ver = (await getVersions(fresh)).get(name);
   // ไม่มีแถว = ยังไม่เคยเขียน → ใช้ไฟล์ seed ที่ bundle มากับโปรเจกต์
-  if (rows.length === 0) return readFileJson(name, fallback);
-  cache.set(name, { data: rows[0].data, updatedAt: String(rows[0].updated_at), checkedAt: Date.now() });
-  return rows[0].data;
+  if (ver === undefined) return readFileJson(name, fallback);
+  const hit = cache.get(name);
+  if (hit && hit.updatedAt === ver) return hit.data as T;
+  // หลายที่ในหน้าเดียวอ่าน collection เดียวกันพร้อมกัน (เช่น orders) → ดึงครั้งเดียวแล้วแบ่งกัน
+  let job = inflight.get(name) as Promise<T> | undefined;
+  if (!job) {
+    job = (async () => {
+      const rows = (await sql()`SELECT data, updated_at FROM collections WHERE name = ${name}`) as { data: T; updated_at: string }[];
+      if (rows.length === 0) return readFileJson(name, fallback);
+      cache.set(name, { data: rows[0].data, updatedAt: String(rows[0].updated_at) });
+      return rows[0].data;
+    })();
+    inflight.set(name, job);
+    job.finally(() => inflight.delete(name)).catch(() => undefined);
+  }
+  return job;
 }
 
 async function writePgJson(name: string, value: unknown): Promise<void> {
   await ensureTable();
   const json = JSON.stringify(value);
-  await sql()`INSERT INTO collections (name, data, updated_at) VALUES (${name}, ${json}::jsonb, now())
-    ON CONFLICT (name) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`;
-  cache.set(name, { data: value, updatedAt: new Date().toISOString(), checkedAt: Date.now() });
+  const rows = (await sql()`INSERT INTO collections (name, data, updated_at) VALUES (${name}, ${json}::jsonb, now())
+    ON CONFLICT (name) DO UPDATE SET data = EXCLUDED.data, updated_at = now() RETURNING updated_at`) as { updated_at: string }[];
+  const updatedAt = String(rows[0]?.updated_at ?? new Date().toISOString());
+  cache.set(name, { data: value, updatedAt });
+  // เวอร์ชันที่จำไว้ล้าสมัยแล้ว — อ่านครั้งถัดไปดึงใหม่ (instance อื่นจะเห็นผ่าน updated_at เช่นกัน)
+  if (versions) versions.map.set(name, updatedAt);
 }
 
 /* ---------- เลือก driver ---------- */
 
-const readJson = DATABASE_URL ? readPgJson : readFileJson;
+const readJson = <T,>(name: string, fallback: T, fresh = false): Promise<T> => (DATABASE_URL ? readPgJson(name, fallback, fresh) : readFileJson(name, fallback));
 const writeJson = DATABASE_URL ? writePgJson : writeFileJson;
 
 /** ต่อคิวงานเขียนของ collection เดียวกันให้ทำทีละงาน (ใน instance นี้) */
@@ -109,8 +135,8 @@ export async function readCollection<T>(name: string): Promise<T[]> {
  */
 export async function updateCollection<T>(name: string, fn: (items: T[]) => T[] | Promise<T[]>): Promise<T[]> {
   return enqueue(name, async () => {
-    cache.delete(name);
-    const items = await readJson<T[]>(name, []);
+    // fresh = เช็คเวอร์ชันสดจาก DB ก่อนเขียน (ข้าม cache 1 วิ) กันทับของ instance อื่น
+    const items = await readJson<T[]>(name, [], true);
     const next = await fn(items);
     await writeJson(name, next);
     return next;
@@ -124,8 +150,7 @@ export async function readDocument<T>(name: string, fallback: T): Promise<T> {
 
 export async function updateDocument<T>(name: string, fallback: T, fn: (doc: T) => T | Promise<T>): Promise<T> {
   return enqueue(name, async () => {
-    cache.delete(name);
-    const doc = await readJson<T>(name, fallback);
+    const doc = await readJson<T>(name, fallback, true);
     const next = await fn(doc);
     await writeJson(name, next);
     return next;

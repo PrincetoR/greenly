@@ -13,12 +13,18 @@ export async function GET() {
     databaseUrl: Boolean(process.env.DATABASE_URL),
     blobToken: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
     region: process.env.VERCEL_REGION ?? null,
+    // region ของ Neon จาก host (ep-xxx.<region>.aws.neon.tech) — ควรอยู่ใกล้ region ของ function
+    dbRegion: process.env.DATABASE_URL ? (new URL(process.env.DATABASE_URL).hostname.split('.')[1] ?? null) : null,
   };
   try {
+    const t0 = Date.now();
     const before = await readDocument<{ n: number }>('health', { n: 0 });
+    const t1 = Date.now();
     const after = await updateDocument<{ n: number }>('health', { n: 0 }, (d) => ({ n: d.n + 1 }));
     out.read = before.n;
     out.write = after.n;
+    out.readMs = t1 - t0;
+    out.writeMs = Date.now() - t1;
     out.ok = true;
   } catch (e) {
     out.ok = false;
