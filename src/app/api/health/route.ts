@@ -14,7 +14,7 @@ export async function GET() {
     blobToken: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
     region: process.env.VERCEL_REGION ?? null,
     // region ของ Neon จาก host (ep-xxx.<region>.aws.neon.tech) — ควรอยู่ใกล้ region ของ function
-    dbRegion: process.env.DATABASE_URL ? (new URL(process.env.DATABASE_URL).hostname.split('.')[1] ?? null) : null,
+    dbRegion: process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL).hostname.split('.').slice(1, 3).join('.') : null,
   };
   try {
     const t0 = Date.now();
