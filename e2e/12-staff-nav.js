@@ -14,6 +14,9 @@ const { BASE, launch, login, ok } = require('./lib');
     ok(JSON.stringify(items.map((t) => t.trim())) === JSON.stringify(['สินค้าทั้งหมด', 'โปรโมชัน', 'การจัดการ']), `${user}: เมนู ${items.join(' · ')}`);
     // แถบสถานะโชว์ชื่อที่แสดงของบัญชี (ไม่ใช่ username — พี่ต่อสั่ง 2026-09-15)
     ok((await page.locator('nav[aria-label="แถบสถานะ"] a[href="/account"]').textContent()).trim() === { admin: 'ผู้ดูแลระบบ', staff: 'พนักงานร้าน' }[user], `${user}: แถบสถานะแสดงชื่อบัญชี`);
+    // "| ออกจากระบบ" ต่อท้ายชื่อ (พี่ต่อสั่ง 2026-09-15)
+    const tail = await page.evaluate(() => { const nav = document.querySelector('nav[aria-label="แถบสถานะ"]'); const items = [...nav.children].slice(-3); return items.map((el) => el.textContent.trim()); });
+    ok(tail[1] === '|' && tail[2] === 'ออกจากระบบ' && (await page.locator('nav[aria-label="แถบสถานะ"] form button:has-text("ออกจากระบบ")').isVisible()), `${user}: แถบสถานะ ${tail.join(' ')}`);
     await page.click('header nav[aria-label="เมนูหลัก"] a[href="/admin"]');
     await page.waitForURL(/\/admin$/);
     ok(await page.locator('main aside nav ul a[aria-current=page][href="/admin"]').isVisible(), `${user}: กดการจัดการ → แดชบอร์ด`);

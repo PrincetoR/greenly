@@ -9,7 +9,7 @@ const { BASE, launch, ok, shot } = require('./lib');
   await page.goto(`${BASE}/account`);
   await page.waitForLoadState('networkidle');
   ok((await page.locator('h1').textContent()) === 'ลูกค้าทั่วไป' && (await page.locator('section:first-child button:has-text("เข้าสู่ระบบ")').isVisible()), 'guest: โปรไฟล์มีปุ่มเข้าสู่ระบบ');
-  ok((await page.locator('form button:has-text("ออกจากระบบ")').count()) === 0, 'guest: ไม่มีปุ่มออกจากระบบ');
+  ok((await page.locator('main form button:has-text("ออกจากระบบ")').count()) === 0, 'guest: ไม่มีปุ่มออกจากระบบ');
 
   // กดแล้วเลื่อนไปทางซ้าย — URL เดิม header/แถบล่างอยู่ครบ
   const before = await page.locator('h1').evaluate((h) => h.getBoundingClientRect().left);
@@ -33,11 +33,11 @@ const { BASE, launch, ok, shot } = require('./lib');
   // login ลูกค้า → โปรไฟล์ชื่อบัญชี + ออกจากระบบล่างสุด
   await page.fill('#password', 'customer1234');
   await page.click('form button[type=submit]:has-text("เข้าสู่ระบบ")');
-  await page.waitForSelector('form button:has-text("ออกจากระบบ")');
+  await page.waitForSelector('main form button:has-text("ออกจากระบบ")');
   await page.waitForLoadState('networkidle');
   ok((await page.locator('h1').textContent()) === 'สมชาย ใจดี' && (await page.locator('text=ลูกค้า · customer').count()) === 1, 'ลูกค้า login แล้ว: ชื่อบัญชี + role');
   const bottom = await page.evaluate(() => {
-    const btn = document.querySelector('form button');
+    const btn = document.querySelector('main form button');
     const main = document.querySelector('main');
     const all = [...main.querySelectorAll('a,button')].filter((el) => el.getBoundingClientRect().height > 0 && !el.closest('[inert]'));
     return { last: all[all.length - 1] === btn, text: btn.textContent.trim() };
@@ -49,7 +49,7 @@ const { BASE, launch, ok, shot } = require('./lib');
   await page.goto(`${BASE}/admin/products`);
   ok(page.url().endsWith('/account'), 'ลูกค้าเข้า /admin/products → เด้งกลับโปรไฟล์');
   await shot(page, 'p16-account-customer');
-  await page.click('form button:has-text("ออกจากระบบ")');
+  await page.click('main form button:has-text("ออกจากระบบ")');
   await page.waitForURL((u) => u.pathname === '/');
   await page.goto(`${BASE}/account`);
   ok((await page.locator('h1').textContent()) === 'ลูกค้าทั่วไป' && (await page.locator('section:first-child button:has-text("เข้าสู่ระบบ")').isVisible()), 'ออกจากระบบ → หน้าแรก · โปรไฟล์กลับเป็น guest');
@@ -64,6 +64,6 @@ const { BASE, launch, ok, shot } = require('./lib');
   ok(true, 'พนักงาน login จากโปรไฟล์ → หน้าการจัดการ');
   await page.goto(`${BASE}/account`);
   await page.waitForLoadState('networkidle');
-  ok((await page.locator('a:has-text("ไปหน้าการจัดการ")').isVisible()) && (await page.locator('form button:has-text("ออกจากระบบ")').count()) === 0 && (await page.locator('nav[aria-label="เมนูมือถือ"] a[href="/admin"]').count()) === 1, 'โปรไฟล์พนักงาน: ลิงก์การจัดการ ไม่มีปุ่มออกจากระบบ · แถบล่างเป็นการจัดการ');
+  ok((await page.locator('a:has-text("ไปหน้าการจัดการ")').isVisible()) && (await page.locator('main form button:has-text("ออกจากระบบ")').count()) === 1 && (await page.locator('nav[aria-label="เมนูมือถือ"] a[href="/admin"]').count()) === 1, 'โปรไฟล์พนักงาน: ลิงก์การจัดการ + ปุ่มออกจากระบบ · แถบล่างเป็นการจัดการ');
   await browser.close();
 })().catch((e) => { console.error('💥', e); process.exit(1); });

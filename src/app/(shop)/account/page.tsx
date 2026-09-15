@@ -17,7 +17,7 @@ export const metadata = { title: 'โปรไฟล์' };
 
 /**
  * หน้าโปรไฟล์ — guest: สรุปสิ่งที่ระบบจำไว้ให้เครื่องนี้ + ปุ่มเข้าสู่ระบบ (เลื่อนไปฟอร์ม login ในหน้าเดียวกัน)
- * login เป็นลูกค้า: ชื่อบัญชี + ปุ่มออกจากระบบล่างสุด · พนักงาน: ลิงก์ไปการจัดการ (ออกจากระบบอยู่ใน hamburger เหมือนเดิม — พี่ต่อสั่ง)
+ * login แล้ว: ชื่อบัญชี + ปุ่มออกจากระบบล่างสุด (ทุก role) · พนักงานมีลิงก์ไปการจัดการเพิ่ม (hamburger หลังบ้านก็ยังมีออกจากระบบ)
  * ตะกร้า/รายการโปรด/ออเดอร์ยังผูกกับ guest id ของเครื่อง (บัญชีลูกค้ายังไม่รวมประวัติข้ามเครื่อง)
  */
 export default async function AccountPage({ searchParams }: PageProps<'/account'>) {
@@ -82,9 +82,9 @@ export default async function AccountPage({ searchParams }: PageProps<'/account'
           ไปหน้าการจัดการ
         </Link>
       )}
-      {/* ลูกค้า: ออกจากระบบล่างสุดของโปรไฟล์ (พนักงานใช้ hamburger) */}
-      {session && !staff && (
-        <form action={logout} className="mt-6">
+      {/* login แล้ว (ทุก role): ออกจากระบบล่างสุดของโปรไฟล์ (พี่ต่อสั่ง 2026-09-15 — เดิมเฉพาะลูกค้า) */}
+      {session && (
+        <form action={logout} className={staff ? 'mt-3' : 'mt-6'}>
           <Button type="submit" variant="secondary" className="w-full text-danger">
             <LogOut className="size-4" aria-hidden />
             ออกจากระบบ

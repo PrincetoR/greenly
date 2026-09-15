@@ -81,6 +81,19 @@ export function ShopHeader({
               <User className="size-3.5" aria-hidden />
               {userName ?? 'เข้าสู่ระบบ'}
             </Link>
+            {/* login แล้ว: "| ออกจากระบบ" ต่อท้ายชื่อ (พี่ต่อสั่ง 2026-09-15) — gap-4 ของ nav อยู่ระหว่าง | กับชื่อ/ปุ่มพอดี */}
+            {userName && (
+              <>
+                <span className="-mx-2 text-white/50" aria-hidden>
+                  |
+                </span>
+                <form action={logout}>
+                  <button type="submit" className="hover:text-white">
+                    ออกจากระบบ
+                  </button>
+                </form>
+              </>
+            )}
           </nav>
         </div>
       </div>
