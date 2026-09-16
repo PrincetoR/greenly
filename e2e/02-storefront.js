@@ -101,6 +101,9 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
     ok(sw <= 375, `mobile no h-scroll ${path} (${sw})`);
   }
   ok(await page.locator('.fixed.bottom-0 button:has-text("ใส่ตะกร้า")').isVisible(), 'mobile sticky add-to-cart bar');
+  // แถบล่าง = [ย้อนกลับ] [หัวใจ] ไอคอน 48×48 · [ใส่ตะกร้า] เต็มที่เหลือ (พี่ต่อสั่ง 2026-09-16)
+  const bar = await page.evaluate(() => [...document.querySelector('.fixed.bottom-0').querySelectorAll('button')].map((b) => ({ l: b.getAttribute('aria-label') || b.textContent.trim(), w: b.getBoundingClientRect().width, h: b.getBoundingClientRect().height })));
+  ok(bar.length === 3 && bar[0].l === 'ย้อนกลับ' && bar[1].l.includes('รายการโปรด') && bar[2].l === 'ใส่ตะกร้า' && bar[0].w === 48 && bar[1].w === 48 && bar[2].w > 200 && bar.every((b) => b.h === 48), `mobile bar: ${bar.map((b) => b.l).join(' · ')}`);
   ok((await page.locator('nav[aria-label="เมนูมือถือ"]').count()) === 0, 'mobile: หน้าสินค้าไม่มีแถบเมนูล่าง (แถบใส่ตะกร้าแทน)');
   // หน้าสินค้าแบบ Shopee (พี่ต่อสั่ง 2026-09-15): ไม่มี breadcrumb · รูปเต็มความกว้างจอ ปัดดูได้ (snap) · ปุ่มย้อนกลับลอยมุมซ้ายบนของรูป · ตัวนับ 1/3
   const pd = await page.evaluate(() => {

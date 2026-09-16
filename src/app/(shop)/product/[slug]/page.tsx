@@ -139,12 +139,13 @@ export default async function ProductPage({ params }: PageProps<'/product/[slug]
         </Section>
       )}
 
-      {/* หน้าสินค้าไม่มีแถบเมนูล่าง (MobileTabBar ซ่อนเอง) แถบนี้ติดล่างสุดแทน */}
+      {/* หน้าสินค้าไม่มีแถบเมนูล่าง (MobileTabBar ซ่อนเอง) แถบนี้ติดล่างสุดแทน: [ย้อนกลับ] [หัวใจ] ไอคอนล้วน · [ใส่ตะกร้า] เต็มที่เหลือ (พี่ต่อสั่ง 2026-09-16) */}
       <div className="fixed inset-x-0 bottom-0 z-30 flex items-start gap-2 border-t border-line bg-surface/95 p-3 backdrop-blur md:hidden">
-        <div className="flex-1">
+        <BackButton variant="button" fallback={category ? `/category/${category.slug}` : '/products'} />
+        <WishlistButton productId={product.id} saved={ctx.wishlist.includes(product.id)} variant="button" />
+        <div className="min-w-0 flex-1">
           <AddToCart productId={product.id} stock={product.stock} />
         </div>
-        <WishlistButton productId={product.id} saved={ctx.wishlist.includes(product.id)} variant="button" />
       </div>
     </div>
   );
