@@ -151,7 +151,7 @@ const { BASE, launch, shot, ok, SHOT } = require('./lib');
   await page.waitForURL(/q=/);
   await page.waitForLoadState('networkidle');
   const heads = await page.locator('main h2').allTextContents();
-  ok(heads.length === 2 && heads[0].startsWith('โปรโมชัน') && heads[1].startsWith('สินค้า') && (await page.locator('main article').count()) >= 3 && (await page.locator('main .group:has(h3)').count()) >= 1, `search "ลด": ${heads.join(' → ')} (โปรก่อน แยกหัวเรื่อง)`);
+  ok(heads.length === 3 && heads[0].startsWith('โปรโมชัน') && heads[1].startsWith('สินค้า') && heads[2].startsWith('บทความ') && (await page.locator('main article').count()) >= 3 && (await page.locator('main .group:has(h3)').count()) >= 1, `search "ลด": ${heads.join(' → ')} (โปร → สินค้า → บทความ แยกหัวเรื่อง)`);
   await page.keyboard.press('Backspace'); await page.keyboard.press('Backspace');
   await page.keyboard.type('zzzz');
   await page.waitForURL(/q=zzzz/);

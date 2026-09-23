@@ -1,12 +1,14 @@
 import { SearchX } from 'lucide-react';
 import { listCategories } from '@/lib/db/categories';
 import { listProducts } from '@/lib/db/products';
+import { listArticles } from '@/lib/db/articles';
 import { loadPromotionContext } from '@/lib/promotions/service';
 import { promotionStatus } from '@/lib/pricing/status';
 import { describePromotion } from '@/lib/promotions/describe';
 import { SearchBox } from '@/components/shop/search-box';
 import { PromoCard } from '@/components/shop/promo-card';
 import { ProductGrid } from '@/components/shop/product-card';
+import { ArticleCard, ArticleGrid } from '@/components/shop/article-card';
 import { PromoProductCard } from '@/components/shop/promo-product-card';
 import { EmptyState } from '@/components/ui/empty-state';
 
@@ -14,16 +16,17 @@ export const metadata = { title: 'ค้นหา' };
 
 /**
  * ค้นหาทั้งเว็บ (พี่ต่อสั่ง 2026-09-15): หน้ามีแค่ header + ช่องค้นหา · พิมพ์แล้วแสดง "โปรโมชัน" ก่อน แล้วค่อย "สินค้า" แยกหัวเรื่อง
- * โปรที่ค้นเจอ = กำลังใช้งาน/เร็ว ๆ นี้ ที่ชื่อ/ประโยคสรุป/โค้ดคูปองมีคำค้น · สินค้า = ชื่อ/SKU/คำอธิบาย (listProducts q)
+ * โปรที่ค้นเจอ = กำลังใช้งาน/เร็ว ๆ นี้ ที่ชื่อ/ประโยคสรุป/โค้ดคูปองมีคำค้น · สินค้า = ชื่อ/SKU/คำอธิบาย (listProducts q) · บทความ = หัวข้อ/สรุป/เนื้อหา
  */
 export default async function SearchPage({ searchParams }: PageProps<'/search'>) {
   const sp = await searchParams;
   const q = typeof sp.q === 'string' ? sp.q.trim() : '';
-  const [ctx, categories, allProducts, products] = await Promise.all([
+  const [ctx, categories, allProducts, products, articles] = await Promise.all([
     loadPromotionContext(),
     listCategories({ activeOnly: true }),
     listProducts(),
     q ? listProducts({ activeOnly: true, q, sort: 'newest' }) : [],
+    q ? listArticles({ visibleOnly: true, q }) : [],
   ]);
   const { promotions, usage, now } = ctx;
   const names = { categories: new Map(categories.map((c) => [c.id, c.name])), products: new Map(allProducts.map((p) => [p.id, p.name])) };
@@ -33,7 +36,7 @@ export default async function SearchPage({ searchParams }: PageProps<'/search'>)
         .map((p) => ({ p, status: promotionStatus(p, now, usage[p.id]) }))
         .filter(({ p, status }) => (status === 'live' || status === 'scheduled') && `${p.name} ${describePromotion(p, names)} ${p.coupon?.code ?? ''}`.toLowerCase().includes(needle))
     : [];
-  const none = q && promos.length === 0 && products.length === 0;
+  const none = q && promos.length === 0 && products.length === 0 && articles.length === 0;
 
   return (
     // data-search-page: globals.css ซ่อน footer เว็บ — หน้ามีแค่ header กับช่องค้นหา (+ แถบเมนูล่างมือถือ — พี่ต่อขอให้คงไว้)
@@ -63,6 +66,19 @@ export default async function SearchPage({ searchParams }: PageProps<'/search'>)
               <PromoProductCard key={p.id} product={p} ctx={ctx} priority={i < 4} />
             ))}
           </ProductGrid>
+        </section>
+      )}
+
+      {articles.length > 0 && (
+        <section className="mt-6" aria-labelledby="search-articles">
+          <h2 id="search-articles" className="mb-3 text-lg font-bold">
+            บทความ <span className="text-sm font-normal text-muted">({articles.length})</span>
+          </h2>
+          <ArticleGrid>
+            {articles.map((a) => (
+              <ArticleCard key={a.id} article={a} />
+            ))}
+          </ArticleGrid>
         </section>
       )}
 

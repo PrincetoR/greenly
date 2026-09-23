@@ -330,3 +330,27 @@ export interface Homepage {
   autoplaySeconds: number;
   popup: HomePopup;
 }
+
+/* ---------- บทความ (data/articles.json) ---------- */
+export interface Article {
+  id: string;
+  slug: string;
+  title: string;
+  /** สรุปสั้น 1–2 บรรทัด — แสดงบนการ์ดและใช้เป็น description ของหน้า */
+  excerpt: string;
+  /**
+   * เนื้อหาเป็นข้อความล้วน — ย่อหน้าคั่นด้วยบรรทัดว่าง
+   * บรรทัดขึ้นต้น "## " = หัวข้อย่อย · "- " = รายการ (ดู components/shop/article-body.tsx)
+   */
+  body: string;
+  /** รูปปก (อัปโหลด) · null = ใช้พื้นหลังเปล่า */
+  cover: string | null;
+  /** ชื่อผู้เขียนที่แสดงใต้หัวข้อ */
+  author: string;
+  /** false = ฉบับร่าง ไม่ขึ้นหน้าร้าน */
+  published: boolean;
+  /** เวลาที่ให้ขึ้นหน้าร้าน — อนาคต = ตั้งเวลาไว้ ยังไม่แสดง (กติกาเดียวกับโปรโมชัน) */
+  publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}

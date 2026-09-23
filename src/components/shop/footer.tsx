@@ -19,6 +19,7 @@ export function ShopFooter({ settings }: { settings: Settings }) {
           <ul className="mt-2 space-y-1 text-muted">
             <li><Link href="/products" className="hover:text-ink">สินค้าทั้งหมด</Link></li>
             <li><Link href="/promotions" className="hover:text-ink">โปรโมชัน</Link></li>
+            <li><Link href="/articles" className="hover:text-ink">บทความ</Link></li>
             <li><Link href="/cart" className="hover:text-ink">ตะกร้าสินค้า</Link></li>
             <li><Link href="/account" className="hover:text-ink">โปรไฟล์</Link></li>
             <li><Link href="/wishlist" className="hover:text-ink">รายการโปรด</Link></li>

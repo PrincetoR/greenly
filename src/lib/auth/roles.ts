@@ -21,6 +21,7 @@ export const PERMISSIONS = [
   'catalog.manage', // สินค้า + หมวดหมู่
   'order.manage', // ดู/เปลี่ยนสถานะคำสั่งซื้อ
   'promotion.manage',
+  'article.manage', // บทความหน้าร้าน
   'payment.manage', // ดู ledger Beam · คืนเงิน · ตั้งค่าช่องทาง
   'user.manage',
   'settings.manage',
@@ -30,7 +31,7 @@ export type Permission = (typeof PERMISSIONS)[number];
 /** role เป็นแค่ชุดของ permission — เพิ่มตำแหน่งใหม่ = เพิ่ม entry ตรงนี้ */
 const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   admin: PERMISSIONS,
-  staff: ['catalog.manage', 'order.manage'],
+  staff: ['catalog.manage', 'order.manage', 'article.manage'],
   customer: [],
 };
 
@@ -46,7 +47,7 @@ export function isRole(value: unknown): value is Role {
  * เมนูหลังบ้าน = แหล่งความจริงเดียวของ "หน้าไหนต้องใช้สิทธิ์อะไร"
  * sidebar, proxy และ layout อ่านจากตรงนี้ทั้งหมด — เมนูที่เห็นกับหน้าที่เข้าได้จึงตรงกันเสมอ
  */
-export type AdminIconName = 'dashboard' | 'products' | 'categories' | 'promotions' | 'homepage' | 'orders' | 'shipping' | 'payments' | 'users' | 'settings';
+export type AdminIconName = 'dashboard' | 'products' | 'categories' | 'promotions' | 'articles' | 'homepage' | 'orders' | 'shipping' | 'payments' | 'users' | 'settings';
 
 export interface AdminMenuItem {
   href: string;
@@ -62,6 +63,7 @@ export const ADMIN_MENU: AdminMenuItem[] = [
   { href: '/admin/products', label: 'สินค้า', icon: 'products', permission: 'catalog.manage' },
   { href: '/admin/categories', label: 'หมวดหมู่', icon: 'categories', permission: 'catalog.manage' },
   { href: '/admin/promotions', label: 'โปรโมชัน', icon: 'promotions', permission: 'promotion.manage' },
+  { href: '/admin/articles', label: 'บทความ', icon: 'articles', permission: 'article.manage' },
   // หน้าแรก = สไลด์แบนเนอร์ + ป๊อปอัปตอนเข้าเว็บ (เนื้อหาการตลาด) — ให้ admin เหมือนตั้งค่าร้าน
   { href: '/admin/homepage', label: 'หน้าแรก', icon: 'homepage', permission: 'settings.manage' },
   { href: '/admin/orders', label: 'คำสั่งซื้อ', icon: 'orders', permission: 'order.manage' },

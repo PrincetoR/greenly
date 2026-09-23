@@ -12,6 +12,7 @@ import { TopLine } from './top-line';
 const NAV = [
   { href: '/products', label: 'สินค้าทั้งหมด' },
   { href: '/promotions', label: 'โปรโมชัน' },
+  { href: '/articles', label: 'บทความ' },
 ] as const;
 /** โผล่เฉพาะเมื่อ login หลังบ้านอยู่ (admin/staff) — layout ฝั่ง server เป็นคนตัดสิน */
 const STAFF_NAV = { href: '/admin', label: 'การจัดการ' } as const;
